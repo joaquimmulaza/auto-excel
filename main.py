@@ -23,12 +23,12 @@ def normalize_col(txt):
     return txt.strip().upper()
 
 def ultra_clean(text):
-    """Mantém apenas letras e números (para comparação de referências)."""
+    """Mantém apenas letras, números e traços (para comparação de referências)."""
     if pd.isna(text):
         return ""
     text = str(text).upper()
     text = unicodedata.normalize('NFKD', text).encode('ASCII', 'ignore').decode('ASCII')
-    return re.sub(r'[^A-Z0-9]', '', text)
+    return re.sub(r'[^A-Z0-9-]', '', text)
 
 def limpar_preco(x):
     """Converte valor de preço para float, tolerando formatos variados."""
@@ -42,7 +42,7 @@ def limpar_preco(x):
     if len(partes) > 2:
         s = ''.join(partes[:-1]) + '.' + partes[-1]
     try:
-        return float(s)
+        return round(float(s), 2)
     except ValueError:
         return 0.0
 
@@ -234,9 +234,13 @@ total_atualizados = 0
 # ─────────────────────────────────────────────
 print("[Passo 4] A atualizar produtos existentes no Mano...")
 
-for col in ['original_price', 'quantity', 'is_active', 'sold_out']:
+for col in ['original_price', 'quantity']:
     if col not in df_mano.columns:
         df_mano[col] = np.nan
+
+for col in ['is_active', 'sold_out']:
+    if col not in df_mano.columns:
+        df_mano[col] = pd.Series(dtype='object')
 
 for idx, row in df_mano.iterrows():
     ref = row['ref_match']

@@ -38,7 +38,7 @@ O script foi desenhado com foco em **tolerância a falhas** e **automação inte
 *   🔍 **Deteção Automática de Cabeçalho:** Lê as primeiras linhas das planilhas para identificar automaticamente onde começam os dados reais (útil para planilhas de fornecedores com cabeçalhos decorativos ou linhas em branco).
 *   🏷️ **Mapeamento Tolerante de Colunas:** Possui dicionários de sinónimos para as colunas. Se a coluna de referência se chamar `REF`, `SKU`, `Código` ou `Modelo`, o script reconhece e mapeia de forma autónoma.
 *   🧼 **Saneamento Avançado de Dados:**
-    *   **Ultra Clean:** Remove pontuação, espaços adicionais e caracteres especiais das referências para garantir correspondências perfeitas (ex: `Galaxy-S21_FE` -> `GALAXYS21FE`).
+    *   **Ultra Clean:** Remove pontuação (exceto o traço), espaços adicionais e caracteres especiais das referências para garantir correspondências perfeitas (ex: `Galaxy-S21_FE` -> `GALAXY-S21FE`).
     *   **Limpeza de Preços:** Trata strings financeiras complexas, remove símbolos monetários e normaliza pontos e vírgulas.
 *   ⚖️ **Regras de Negócio Integradas:**
     *   **Ativação/Inativação:** Produtos com stock **igual ou superior a 3** são definidos como ativos (`is_active = True`) e não-esgotados (`sold_out = False`).
