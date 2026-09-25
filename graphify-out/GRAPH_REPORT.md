@@ -1,17 +1,17 @@
 # Graph Report - up_prices  (2026-09-25)
 
 ## Corpus Check
-- 54 files · ~43,457 words
+- 67 files · ~53,246 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 3 file(s) not represented in the graph (top: (none) 3)
 
 ## Summary
-- 799 nodes · 976 edges · 55 communities (47 shown, 8 thin omitted)
-- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 40 edges (avg confidence: 0.95)
+- 1021 nodes · 1453 edges · 69 communities (57 shown, 12 thin omitted)
+- Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 78 edges (avg confidence: 0.95)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `f7da4788`
+- Built from commit: `82605556`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -71,30 +71,40 @@
 - services/__init__.py
 - backend/__init__.py
 - tests/__init__.py
+- JobRepository
+- ProfileRepository
+- session
+- session.py
+- Fase 2 — Database & Supabase (Debriefing & Intelligence)
+- test_schema.py
+- TestSeedProfilesShape
+- AuditLogOrm
+- JobItemOrm
+- _get_session_factory
 
 ## God Nodes (most connected - your core abstractions)
-1. `process_price_table()` - 41 edges
-2. `Stack Tecnológica & Regras de Ouro (Tech Stack & Guardrails)` - 22 edges
-3. `3. Tabelas` - 20 edges
-4. `PriceRule` - 19 edges
-5. `StockRule` - 19 edges
-6. `4. Requisitos funcionais` - 19 edges
-7. `IssueSeverity` - 18 edges
-8. `CommercialProfile` - 18 edges
-9. `UI/UX Wireframes + Design System Base` - 17 edges
-10. `DecisionCode` - 16 edges
+1. `JobRepository` - 44 edges
+2. `process_price_table()` - 41 edges
+3. `session()` - 39 edges
+4. `ProfileRepository` - 24 edges
+5. `Stack Tecnológica & Regras de Ouro (Tech Stack & Guardrails)` - 22 edges
+6. `3. Tabelas` - 20 edges
+7. `PriceRule` - 19 edges
+8. `StockRule` - 19 edges
+9. `4. Requisitos funcionais` - 19 edges
+10. `ProcessingJobOrm` - 18 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `4. Gotcha: `metadata` Reservado pelo SQLAlchemy Declarative` --references--> `AuditLogOrm`  [INFERRED]
+  .notebook/phase-2-database.md → backend/app/infra/db/models.py
 - `1.1 Bug do Preço Zero (Passo 4 do Legado)` --references--> `ValidationIssue`  [INFERRED]
   .notebook/phase-1-domain-engine.md → backend/app/domain/models.py
 - `1.2 Sobrescrita Silenciosa de Duplicados (Dicionário Zip)` --references--> `ValidationIssue`  [INFERRED]
   .notebook/phase-1-domain-engine.md → backend/app/domain/models.py
-- `2. Contratos e Modelos Principais` --references--> `CommercialProfile`  [INFERRED]
-  .notebook/phase-1-domain-engine.md → backend/app/domain/models.py
-- `2. Contratos e Modelos Principais` --references--> `ProcessResult`  [INFERRED]
-  .notebook/phase-1-domain-engine.md → backend/app/domain/models.py
-- `2. Contratos e Modelos Principais` --references--> `Product`  [INFERRED]
-  .notebook/phase-1-domain-engine.md → backend/app/domain/models.py
+- `1. Ficheiros Criados` --references--> `JobRepository`  [INFERRED]
+  .notebook/phase-2-database.md → backend/app/infra/repositories/jobs.py
+- `1. Ficheiros Criados` --references--> `ProfileRepository`  [INFERRED]
+  .notebook/phase-2-database.md → backend/app/infra/repositories/profiles.py
 
 ## Import Cycles
 - None detected.
@@ -104,11 +114,11 @@
 - **Graphify Setup Components** — graphify, uv_tool, agents_rules_graphify_md, agents_workflows_graphify_md, git_hooks, gitattributes, graphifyignore [EXTRACTED 1.00]
 - **Price and Stock Updater Workflow** — cotarco_samsung_preco_atualizado_xlsx, mano_preco_desatualizado_xlsx, main, mano_preco_atualizado_final_xlsx, log_decisao_samsung_xlsx, deteccao_automatica_cabecalho, mapeamento_tolerante_colunas, saneamento_avancado_dados, regras_negocio_integradas, log_decisao_transparente [EXTRACTED 1.00]
 
-## Communities (55 total, 8 thin omitted)
+## Communities (69 total, 12 thin omitted)
 
 ### Community 0 - "main.py"
 Cohesion: 0.05
-Nodes (46): argparse, Ativação/Inativação, Cotarco-Samsung-preco-atualizado.xlsx, datetime, Deteção Automática de Cabeçalho, Filtragem de Segurança, io, Limpeza de Preços (+38 more)
+Nodes (44): argparse, Ativação/Inativação, Cotarco-Samsung-preco-atualizado.xlsx, Deteção Automática de Cabeçalho, Filtragem de Segurança, io, Limpeza de Preços, LOG_DECISAO_SAMSUNG.xlsx (+36 more)
 
 ### Community 1 - "Graphify"
 Cohesion: 0.12
@@ -294,25 +304,65 @@ Nodes (11): 🔴 P0 — CRITICAL (Must resolve before implementation begins), RE
 Cohesion: 0.33
 Nodes (4): ProcessResult, Aggregate processing output containing items, issues, summary, and final…, Returns True if any blocker issues exist., Returns total evaluated items.
 
+### Community 55 - "JobRepository"
+Cohesion: 0.09
+Nodes (23): PriceHistoryOrm, ProcessingJobOrm, Core operational entity — one job per submitted price/stock table.…, Structured validation or business rule violation for a job. Aligned with domain…, Immutable price change record — append-only historical ledger.…, ValidationIssueOrm, JobRepository, Session (+15 more)
+
+### Community 56 - "ProfileRepository"
+Cohesion: 0.08
+Nodes (21): CommercialProfileOrm, ProfileRuleOrm, Commercial profile defining channel / destination / rule-set. ``code`` is the…, Versioned rule configuration attached to a commercial profile. Unique per…, ProfileRepository, Session, UUID, Repository for CommercialProfile data access. Follows the Repository pattern:… (+13 more)
+
+### Community 57 - "session"
+Cohesion: 0.11
+Nodes (22): Local representation of an authenticated Supabase user. The ``id`` aligns with…, UserOrm, job_repo(), make_job(), make_profile(), make_user(), profile_repo(), UUID (+14 more)
+
+### Community 58 - "session.py"
+Cohesion: 0.09
+Nodes (25): create_all_tables(), create_db_engine(), drop_all_tables(), _get_database_url(), _get_engine(), get_test_engine(), ping_database(), SQLAlchemy 2.0 session and engine management. Supports two modes: -… (+17 more)
+
+### Community 59 - "Fase 2 — Database & Supabase (Debriefing & Intelligence)"
+Cohesion: 0.10
+Nodes (17): _JsonColumn, Maps to JSONB on PostgreSQL, native JSON on everything else (SQLite for tests)., Maps to native UUID on PostgreSQL, String(36) on SQLite (tests)., _UuidColumn, 1. Ficheiros Criados, 2. DDL Summary — Tabelas e Chaves Estrangeiras, 3. Gotcha: `_JsonColumn` / `_UuidColumn` Dialect-Aware Types, 4. Gotcha: `metadata` Reservado pelo SQLAlchemy Declarative (+9 more)
+
+### Community 60 - "test_schema.py"
+Cohesion: 0.14
+Nodes (17): ApprovalOrm, Base, JobFileOrm, SQLAlchemy 2.0 ORM models for Cotarco Commercial Manager. Mapped to PostgreSQL…, Versioned file record for inputs, outputs, logs, and reports. The actual binary…, Immutable record of an approval, rejection, or cancellation action. Append-only…, # NOTE: 'metadata' is reserved in SQLAlchemy Declarative; mapped to DB col…, Shared declarative base for all ORM models. (+9 more)
+
+### Community 61 - "TestSeedProfilesShape"
+Cohesion: 0.22
+Nodes (5): Validates that the expected seed profiles can be created and configured., MANO profile config must have stock_min=3 and variation=30%., BFA must have a 10% threshold (not the default 30%)., WooCommerce live push starts disabled (Guardrail #14)., TestSeedProfilesShape
+
+### Community 62 - "AuditLogOrm"
+Cohesion: 0.32
+Nodes (5): AuditLogOrm, Immutable audit trail for all administrative and critical actions. SECURITY:…, Insert an audit log entry — NEVER update or delete. Application code must only…, System-generated audit logs have no actor_id (nullable)., TestAuditLogOrm
+
+### Community 63 - "JobItemOrm"
+Cohesion: 0.32
+Nodes (5): JobItemOrm, Per-reference evaluation result from the domain engine. Stores both raw and…, Bulk-insert job item rows without individual flushes., Blocked items with BLOCKED_PRICE_VARIATION code are stored correctly., TestJobItemOrm
+
+### Community 64 - "_get_session_factory"
+Cohesion: 0.50
+Nodes (5): get_db_session(), _get_session_factory(), Session, Context manager yielding a transactional database session. Usage:: with…, sessionmaker
+
 ## Knowledge Gaps
-- **478 isolated node(s):** `Resumo Executivo`, `1.3 Price Guard Hardcoded vs Dinâmico`, `1.4 Higienização e Normalização Determinística`, `3. Evidência de Testes TDD`, `0. Ordem obrigatória de leitura` (+473 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 590 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **8 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **485 isolated node(s):** `Resumo Executivo`, `2. DDL Summary — Tabelas e Chaves Estrangeiras`, `5. RLS Audit — Políticas Aplicadas`, `6. Seed dos Perfis Iniciais`, `ADR-implícita: Sem Alembic no MVP` (+480 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 684 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **12 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Cotarco Commercial Manager — Remediation Plan` connect `Cotarco Commercial Manager — Remediation Plan` to `🟠 P1 — HIGH (Resolver antes das fases de DB/API)`, `🟢 P3 — LOW (Housekeeping — antes do MVP Demo)`, `Documentation Audit Report — Cotarco Commercial Manager`, `🟡 P2 — MEDIUM (Resolver antes das fases de UI)`, `🔴 P0 — CRITICAL (Must resolve before implementation begins)`?**
+- **Why does `JobRepository` connect `JobRepository` to `session`, `Fase 2 — Database & Supabase (Debriefing & Intelligence)`, `test_schema.py`, `AuditLogOrm`, `JobItemOrm`?**
+  _High betweenness centrality (0.029) - this node is a cross-community bridge._
+- **Why does `process_price_table()` connect `process_price_table` to `normalization.py`, `domain/__init__.py`, `engine.py`, `PriceRule`, `ProcessSummary`, `CommercialProfile`, `create_profile`, `ProcessResult`, `TestZeroPriceNewProducts`?**
   _High betweenness centrality (0.025) - this node is a cross-community bridge._
-- **Why does `Git & Artifacts Audit Report` connect `7. Proposed Remediation Steps (DO NOT EXECUTE — Reference Only)` to `Documentation Audit Report — Cotarco Commercial Manager`?**
-  _High betweenness centrality (0.024) - this node is a cross-community bridge._
-- **Why does `Graphify Audit Report — Cotarco Commercial Manager / up_prices` connect `4. Discrepancies Between Rules, Workflows, Setup Docs, and Reality` to `Documentation Audit Report — Cotarco Commercial Manager`?**
-  _High betweenness centrality (0.018) - this node is a cross-community bridge._
+- **Why does `session()` connect `session` to `JobRepository`, `ProfileRepository`, `test_schema.py`, `TestSeedProfilesShape`, `AuditLogOrm`, `JobItemOrm`?**
+  _High betweenness centrality (0.014) - this node is a cross-community bridge._
+- **Are the 14 inferred relationships involving `JobRepository` (e.g. with `ApprovalOrm` and `AuditLogOrm`) actually correct?**
+  _`JobRepository` has 14 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 3 inferred relationships involving `process_price_table()` (e.g. with `CommercialProfile` and `DecisionCode`) actually correct?**
   _`process_price_table()` has 3 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 7 inferred relationships involving `PriceRule` (e.g. with `evaluate_new_product_eligibility()` and `evaluate_price_guard()`) actually correct?**
-  _`PriceRule` has 7 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 7 inferred relationships involving `StockRule` (e.g. with `evaluate_new_product_eligibility()` and `evaluate_stock_activation()`) actually correct?**
-  _`StockRule` has 7 INFERRED edges - model-reasoned connections that need verification._
-- **What connects `Resumo Executivo`, `1.3 Price Guard Hardcoded vs Dinâmico`, `1.4 Higienização e Normalização Determinística` to the rest of the system?**
-  _478 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Are the 5 inferred relationships involving `ProfileRepository` (e.g. with `CommercialProfileOrm` and `ProfileRuleOrm`) actually correct?**
+  _`ProfileRepository` has 5 INFERRED edges - model-reasoned connections that need verification._
+- **What connects `Resumo Executivo`, `2. DDL Summary — Tabelas e Chaves Estrangeiras`, `5. RLS Audit — Políticas Aplicadas` to the rest of the system?**
+  _485 weakly-connected nodes found - possible documentation gaps or missing edges._

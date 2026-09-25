@@ -6,9 +6,9 @@
     "semantic_hash": "2b6baa5670371eff116fbe79bcb484c2"
   },
   ".notebook/INDEX.md": {
-    "mtime": 1790349273.382959,
-    "seen": 1790349483.7051764,
-    "ast_hash": "d5922634fd946e73bc2f485e26115a76",
+    "mtime": 1790350673.2225475,
+    "seen": 1790350811.6804671,
+    "ast_hash": "b8acee00f04f8dd2deb611933ec482cc",
     "semantic_hash": ""
   },
   ".notebook/graphify-setup.md": {
@@ -321,6 +321,66 @@
     "mtime": 1790349268.0582266,
     "seen": 1790349483.7051764,
     "ast_hash": "69cf54db13c9310d1a9b23b969dcf794",
+    "semantic_hash": ""
+  },
+  "backend/app/infra/__init__.py": {
+    "mtime": 1790349904.3141816,
+    "seen": 1790350811.677728,
+    "ast_hash": "4267bfdf7905c51a400b09bb2fa9271c",
+    "semantic_hash": ""
+  },
+  "backend/app/infra/db/__init__.py": {
+    "mtime": 1790349905.8346007,
+    "seen": 1790350811.677728,
+    "ast_hash": "bc4807e28ca013c4b835c90c66976179",
+    "semantic_hash": ""
+  },
+  "backend/app/infra/db/models.py": {
+    "mtime": 1790350569.9183187,
+    "seen": 1790350811.677728,
+    "ast_hash": "708366db0e90d9b3c291ae370afe3ed3",
+    "semantic_hash": ""
+  },
+  "backend/app/infra/db/session.py": {
+    "mtime": 1790350005.4030175,
+    "seen": 1790350811.677728,
+    "ast_hash": "b4bb4218293b531d7367930f71d654e2",
+    "semantic_hash": ""
+  },
+  "backend/app/infra/repositories/__init__.py": {
+    "mtime": 1790349905.9605043,
+    "seen": 1790350811.677728,
+    "ast_hash": "9d47b18affff570dd689bfaa05c583bb",
+    "semantic_hash": ""
+  },
+  "backend/app/infra/repositories/jobs.py": {
+    "mtime": 1790350045.8805847,
+    "seen": 1790350811.677728,
+    "ast_hash": "e7d05d13d38a51ea19380b895033d231",
+    "semantic_hash": ""
+  },
+  "backend/app/infra/repositories/profiles.py": {
+    "mtime": 1790350022.3079083,
+    "seen": 1790350811.677728,
+    "ast_hash": "5d60d57f9481087f1abfb710d05f3a5f",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_database/__init__.py": {
+    "mtime": 1790350179.9378843,
+    "seen": 1790350811.6794615,
+    "ast_hash": "38b4bcb72883fb01fd9a8eddef1b61a8",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_database/test_schema.py": {
+    "mtime": 1790350402.8727617,
+    "seen": 1790350811.6794615,
+    "ast_hash": "ef747dae462fc7ec1c95098f1d383416",
+    "semantic_hash": ""
+  },
+  ".notebook/phase-2-database.md": {
+    "mtime": 1790350647.5857644,
+    "seen": 1790350811.6804671,
+    "ast_hash": "516b63a41e02765aa543d5238e8ffeaf",
     "semantic_hash": ""
   }
 }
