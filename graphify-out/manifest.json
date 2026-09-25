@@ -6,9 +6,9 @@
     "semantic_hash": "2b6baa5670371eff116fbe79bcb484c2"
   },
   ".notebook/INDEX.md": {
-    "mtime": 1790326241.0465732,
-    "seen": 1790326256.4855745,
-    "ast_hash": "df7565dde0b40cb8ee2a0f8d3f56a9c7",
+    "mtime": 1790349273.382959,
+    "seen": 1790349483.7051764,
+    "ast_hash": "d5922634fd946e73bc2f485e26115a76",
     "semantic_hash": ""
   },
   ".notebook/graphify-setup.md": {
@@ -48,9 +48,9 @@
     "semantic_hash": ""
   },
   "cotarco-commercial-manager/agents.md": {
-    "mtime": 1790339060.0720043,
-    "seen": 1790339720.2295308,
-    "ast_hash": "411ebfc35d9062c8b0d8bf1a3ce11e3e",
+    "mtime": 1790348385.6296425,
+    "seen": 1790349483.7051764,
+    "ast_hash": "ee973ba7dfe524e371199492720f9ccd",
     "semantic_hash": ""
   },
   "cotarco-commercial-manager/context.md": {
@@ -225,6 +225,102 @@
     "mtime": 1790334185.4079661,
     "seen": 1790339720.2295308,
     "ast_hash": "61bd449bc27fd7374c57322b4f1fef0c",
+    "semantic_hash": ""
+  },
+  "backend/__init__.py": {
+    "mtime": 1790348492.4746017,
+    "seen": 1790349483.7051764,
+    "ast_hash": "78bff2a1dc97e1c4f69dfa4f822c707a",
+    "semantic_hash": ""
+  },
+  "backend/app/__init__.py": {
+    "mtime": 1790348495.7967129,
+    "seen": 1790349483.7051764,
+    "ast_hash": "d97d602e78473ee57e60672b9d0b3543",
+    "semantic_hash": ""
+  },
+  "backend/app/domain/__init__.py": {
+    "mtime": 1790348877.3952703,
+    "seen": 1790349483.7051764,
+    "ast_hash": "2b16310c800e9ed3b68e8bf68cf06531",
+    "semantic_hash": ""
+  },
+  "backend/app/domain/engine.py": {
+    "mtime": 1790348866.326015,
+    "seen": 1790349483.7051764,
+    "ast_hash": "7e7bbb6434596c5ec17caa156eced3aa",
+    "semantic_hash": ""
+  },
+  "backend/app/domain/models.py": {
+    "mtime": 1790348831.7119956,
+    "seen": 1790349483.7051764,
+    "ast_hash": "45baa16d46877345184f9d14080a053a",
+    "semantic_hash": ""
+  },
+  "backend/app/domain/normalization.py": {
+    "mtime": 1790348814.1179087,
+    "seen": 1790349483.7051764,
+    "ast_hash": "bf6b4aab2383c96abda86c8196f80a24",
+    "semantic_hash": ""
+  },
+  "backend/app/domain/rules.py": {
+    "mtime": 1790348518.1997178,
+    "seen": 1790349483.7051764,
+    "ast_hash": "d718e9943156a3e76624c0e0b4e42c78",
+    "semantic_hash": ""
+  },
+  "backend/app/services/__init__.py": {
+    "mtime": 1790348530.0387545,
+    "seen": 1790349483.7051764,
+    "ast_hash": "0ca69bbf30b0a61002c92a9935a8a33a",
+    "semantic_hash": ""
+  },
+  "backend/app/services/processor.py": {
+    "mtime": 1790348888.3738248,
+    "seen": 1790349483.7051764,
+    "ast_hash": "a518c9b6fb4230e81b5c6b1b976752df",
+    "semantic_hash": ""
+  },
+  "backend/tests/__init__.py": {
+    "mtime": 1790348781.3739996,
+    "seen": 1790349483.7051764,
+    "ast_hash": "b97fddf12da0bcf0cb5b9b4226506b96",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_duplicates.py": {
+    "mtime": 1790348943.549127,
+    "seen": 1790349483.7051764,
+    "ast_hash": "5cc4158a04a79d1d85f323179a3e237b",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_engine.py": {
+    "mtime": 1790348774.2365308,
+    "seen": 1790349483.7051764,
+    "ast_hash": "b1a2e907a094df3cfe316c07eb6e07e8",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_normalization.py": {
+    "mtime": 1790348740.5045595,
+    "seen": 1790349483.7051764,
+    "ast_hash": "15413c7ac96af71f2b59279d1cb18df4",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_price_guard.py": {
+    "mtime": 1790348933.4932556,
+    "seen": 1790349483.7051764,
+    "ast_hash": "a2831e9b88d4c0c43e1464ba790c65bc",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_zero_price.py": {
+    "mtime": 1790348748.1784375,
+    "seen": 1790349483.7051764,
+    "ast_hash": "87ad76fa9941276973cce9fe6eaf455e",
+    "semantic_hash": ""
+  },
+  ".notebook/phase-1-domain-engine.md": {
+    "mtime": 1790349268.0582266,
+    "seen": 1790349483.7051764,
+    "ast_hash": "69cf54db13c9310d1a9b23b969dcf794",
     "semantic_hash": ""
   }
 }
