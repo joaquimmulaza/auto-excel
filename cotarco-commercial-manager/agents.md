@@ -142,3 +142,23 @@ Antes de realizar modificações no código ou na arquitetura, os agentes devem 
 
 ### Manutenção do Grafo
 - `graphify update .` — sincroniza e atualiza o grafo de conhecimento local a partir das alterações na codebase.
+
+## 11. Matriz de Atribuição de Skills (Isolamento por Escopo)
+
+Para evitar poluição de contexto e cruzamento indevido de regras entre camadas, cada agente/etapa opera estritamente com as suas skills atribuídas:
+
+| Agente / Escopo | Skills Atribuídas | Responsabilidade Principal |
+|---|---|---|
+| `00-bootstrap-audit` | `tlc-spec-driven`, `web-quality-audit` | Auditoria inicial de repositório, baseline e quality gates |
+| `01-domain-tdd` | `coding-guidelines`, `best-practices` | Extração do motor de domínio, regras determinísticas de negócio e TDD puro |
+| `02-database` | `security-best-practices` (Backend) | Schema Supabase/PostgreSQL, migrations, RLS e modelos relacionais |
+| `03-api` | `security-best-practices` (Next.js/FastAPI), `tlc-spec-driven` | Endpoints FastAPI, schemas Pydantic, RBAC, idempotência e rotas |
+| `04-frontend` | `shadcn-ui`, `frontend-blueprint`, `taste-design` | Interface Next.js, componentes shadcn/ui, acessibilidade e design system |
+| `05-gemini` | `technical-design-doc-creator`, `security-best-practices` | Serviços de IA assistiva (Gemini), structured outputs e sanitização |
+| `06-integrations` | `playwright-skill`, `core-web-vitals` | Testes E2E com Playwright, adapters de integração externa e performance web |
+
+### Regra de Ouro do Isolamento
+- Nenhum subagente pode invocar ou carregar skills fora do seu escopo designado.
+- Nenhuma regra financeira ou de stock pode utilizar modelos de linguagem (LLM); toda a lógica de negócio é 100% determinística em Python.
+- Nenhum teste é considerado aprovado sem log real de execução no terminal (`pytest`).
+
