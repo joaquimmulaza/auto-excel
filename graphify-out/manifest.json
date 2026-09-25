@@ -12,9 +12,9 @@
     "semantic_hash": ""
   },
   ".notebook/graphify-setup.md": {
-    "mtime": 1790325222.2059453,
-    "seen": 1790326256.4855745,
-    "ast_hash": "bb08d64e511b73af2ef39d82929f7032",
+    "mtime": 1790339161.839511,
+    "seen": 1790339720.2295308,
+    "ast_hash": "01a497384d2b758abcdace783636e6be",
     "semantic_hash": ""
   },
   "README.md": {
@@ -30,9 +30,9 @@
     "semantic_hash": ""
   },
   "cotarco-commercial-manager/README.md": {
-    "mtime": 1790178140.0,
-    "seen": 1790326256.4855745,
-    "ast_hash": "be7b6cfd7551c576a08083cae34ebf97",
+    "mtime": 1790339108.9738655,
+    "seen": 1790339720.2295308,
+    "ast_hash": "2387a5f146577e690f810b1eb8391020",
     "semantic_hash": ""
   },
   "cotarco-commercial-manager/adr/0001-architecture.md": {
@@ -48,9 +48,9 @@
     "semantic_hash": ""
   },
   "cotarco-commercial-manager/agents.md": {
-    "mtime": 1790178140.0,
-    "seen": 1790326256.4855745,
-    "ast_hash": "16361335aacc1c6fbe6439920e2689bd",
+    "mtime": 1790339060.0720043,
+    "seen": 1790339720.2295308,
+    "ast_hash": "411ebfc35d9062c8b0d8bf1a3ce11e3e",
     "semantic_hash": ""
   },
   "cotarco-commercial-manager/context.md": {
@@ -66,21 +66,21 @@
     "semantic_hash": ""
   },
   "cotarco-commercial-manager/docs/data-architecture.md": {
-    "mtime": 1790178140.0,
-    "seen": 1790326256.4855745,
-    "ast_hash": "514f073ff53a15d7cbd3d99dcf2d2a4f",
+    "mtime": 1790339014.4367013,
+    "seen": 1790339720.2295308,
+    "ast_hash": "15bd7848aaeb43915285e276c36ebf6b",
     "semantic_hash": ""
   },
   "cotarco-commercial-manager/docs/mvp-backlog.md": {
-    "mtime": 1790178140.0,
-    "seen": 1790326256.4855745,
-    "ast_hash": "ab5bef6a65e392da8d9695bc896bfc9f",
+    "mtime": 1790339068.7870977,
+    "seen": 1790339720.2295308,
+    "ast_hash": "f8ea9df6f7837da883ea32bc722a9b6e",
     "semantic_hash": ""
   },
   "cotarco-commercial-manager/docs/references.md": {
-    "mtime": 1790178140.0,
-    "seen": 1790326256.4855745,
-    "ast_hash": "a07865cf9d9e0093e30c6607afa794e5",
+    "mtime": 1790339084.3220704,
+    "seen": 1790339720.2295308,
+    "ast_hash": "a15dabec0abd924218bc40e6943e6d37",
     "semantic_hash": ""
   },
   "cotarco-commercial-manager/docs/requirements.md": {
@@ -90,9 +90,9 @@
     "semantic_hash": ""
   },
   "cotarco-commercial-manager/docs/routes-api.md": {
-    "mtime": 1790178140.0,
-    "seen": 1790326256.4855745,
-    "ast_hash": "2f9ce38677261b9f9adba5cec31ddd0f",
+    "mtime": 1790339157.799361,
+    "seen": 1790339720.2295308,
+    "ast_hash": "c0e8d02881040b335bb5a43eda63dbf1",
     "semantic_hash": ""
   },
   "cotarco-commercial-manager/docs/stack-and-guardrails.md": {
@@ -126,9 +126,9 @@
     "semantic_hash": ""
   },
   "cotarco-commercial-manager/prompts/agents/00-bootstrap-audit.md": {
-    "mtime": 1790178140.0,
-    "seen": 1790326256.4855745,
-    "ast_hash": "b147264e4c4164578365a737f3417ada",
+    "mtime": 1790339095.192533,
+    "seen": 1790339720.2295308,
+    "ast_hash": "3893a3c19e9131f670f54298aafe05e8",
     "semantic_hash": ""
   },
   "cotarco-commercial-manager/prompts/agents/01-domain-tdd.md": {
@@ -168,9 +168,9 @@
     "semantic_hash": ""
   },
   "cotarco-commercial-manager/prompts/stitch/00-design-system.md": {
-    "mtime": 1790326484.9855616,
-    "seen": 1790326525.0272617,
-    "ast_hash": "9998d7052b2027b7806398db34340e09",
+    "mtime": 1790339023.5243769,
+    "seen": 1790339720.2295308,
+    "ast_hash": "3fde1d5f074b84e1c56f3e148d5efa93",
     "semantic_hash": ""
   },
   "cotarco-commercial-manager/prompts/stitch/01-dashboard.md": {
@@ -189,6 +189,42 @@
     "mtime": 1790178140.0,
     "seen": 1790326256.4855745,
     "ast_hash": "a301f983fbe8b85e110589b8a9fdc941",
+    "semantic_hash": ""
+  },
+  "artifacts/audit-documentation.md": {
+    "mtime": 1790333892.7596326,
+    "seen": 1790339720.2295308,
+    "ast_hash": "1ac8cccf22cb82df61875b89832c0965",
+    "semantic_hash": ""
+  },
+  "artifacts/audit-git-artifacts.md": {
+    "mtime": 1790333970.0722246,
+    "seen": 1790339720.2295308,
+    "ast_hash": "b8a627c1ce1987170684aa0df7b78722",
+    "semantic_hash": ""
+  },
+  "artifacts/audit-graphify.md": {
+    "mtime": 1790333159.9234207,
+    "seen": 1790339720.2295308,
+    "ast_hash": "573df601e1b4e3f9ae96ae452c530f3b",
+    "semantic_hash": ""
+  },
+  "artifacts/audit-rules.md": {
+    "mtime": 1790333203.8380907,
+    "seen": 1790339720.2295308,
+    "ast_hash": "5c18b3dbca9d8d65dad6e1d655647942",
+    "semantic_hash": ""
+  },
+  "artifacts/remediation-cycle-1-result.md": {
+    "mtime": 1790339428.9809031,
+    "seen": 1790339720.2295308,
+    "ast_hash": "83fd11c0baa9cc60e3dd8e96304d759a",
+    "semantic_hash": ""
+  },
+  "artifacts/remediation-plan.md": {
+    "mtime": 1790334185.4079661,
+    "seen": 1790339720.2295308,
+    "ast_hash": "61bd449bc27fd7374c57322b4f1fef0c",
     "semantic_hash": ""
   }
 }
