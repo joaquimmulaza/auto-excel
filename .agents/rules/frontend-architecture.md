@@ -87,10 +87,10 @@ globs: cotarco-client//*.{js,jsx,ts,tsx}
   
   - Use Tailwind CSS for utility-first, maintainable styling
   - Leverage component libraries like Shadcn UI and Radix UI for accessible, composable UI
-  - Design with mobile-first, responsive principles
+  - Design with desktop-first, responsive principles (1440px primary baseline, 390px responsive without functional breakage) in accordance with context.md §8
   - Implement dark mode using CSS variables or Tailwind's dark mode features
   - Maintain consistent spacing values and design tokens
-  - Use Framer Motion library for the animations of components
+  - Use native CSS transitions (defined in the design system) for subtle UI feedback in accordance with context.md §8 ("sem excesso de animações"); avoid heavy animation libraries such as Framer Motion
   
   ## Error Handling - The Art of Graceful Failures
   

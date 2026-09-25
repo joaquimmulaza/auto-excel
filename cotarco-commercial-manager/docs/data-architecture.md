@@ -15,8 +15,8 @@
 
 ```mermaid
 erDiagram
-    profiles ||--o{ profile_rules : has
-    profiles ||--o{ processing_jobs : selected_for
+    commercial_profiles ||--o{ profile_rules : has
+    commercial_profiles ||--o{ processing_jobs : selected_for
     users ||--o{ processing_jobs : creates
     processing_jobs ||--o{ job_files : contains
     processing_jobs ||--o{ validation_issues : produces
@@ -27,10 +27,10 @@ erDiagram
     products ||--o{ product_identifiers : has
     products ||--o{ price_history : records
     products ||--o{ stock_history : records
-    profiles ||--o{ templates : uses
+    commercial_profiles ||--o{ templates : uses
     templates ||--o{ template_columns : defines
     integrations ||--o{ profile_integrations : supports
-    profiles ||--o{ profile_integrations : exposes
+    commercial_profiles ||--o{ profile_integrations : exposes
     ai_requests }o--|| processing_jobs : contextualizes
 ```
 
@@ -52,7 +52,7 @@ Campos:
 
 ### `commercial_profiles`
 
-Perfil de finalidade/destino da tabela.
+Perfil de finalidade/destino da tabela (a rota de API `/profiles` funciona como uma abreviatura de rota de conveniência / endpoint alias conciso para a tabela `commercial_profiles`, conforme documentado em `routes-api.md`).
 
 - `id uuid pk`;
 - `code text unique not null` — exemplo `MANO`, `WOOCOMMERCE`, `BFA`;
@@ -142,6 +142,7 @@ Núcleo operacional.
 - `status job_status`;
 - `source_name text`;
 - `source_system text`;
+- `description text`;
 - `current_file_id uuid nullable`;
 - `options jsonb not null default '{}'`;
 - `summary jsonb`;

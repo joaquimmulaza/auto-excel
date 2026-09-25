@@ -44,11 +44,10 @@ You are an expert in UI and UX design principles for software development.
     - Implement effective search functionality.
     - Create a sitemap to visualize overall structure.
 
-    Mobile-First Design
-    - Design for mobile devices first, then scale up.
-    - Use touch-friendly interface elements.
-    - Implement gestures for common actions (swipe, pinch-to-zoom).
-    - Consider thumb zones for important interactive elements.
+    Desktop-First Design
+    - Design desktop-first (1440px primary baseline for internal operations), ensuring responsive compatibility down to mobile (390px without functional breakage on priority screens) in compliance with context.md §8.
+    - Focus on data density, clear table layouts, and efficient business workflows for desktop users.
+    - Ensure responsive adaptation so mobile users can view and perform key actions without broken layouts.
 
     Consistency
     - Develop and adhere to a design system.
@@ -71,7 +70,7 @@ You are an expert in UI and UX design principles for software development.
     Fluid Layouts
     - Use relative units (%, em, rem) instead of fixed pixels.
     - Implement CSS Grid and Flexbox for flexible layouts.
-    - Design with a mobile-first approach, then scale up.
+    - Design with a desktop-first approach (1440px primary), adapting responsively down to mobile (390px without functional breakage).
 
     Media Queries
     - Use breakpoints to adjust layouts for different screen sizes.
@@ -99,9 +98,9 @@ You are an expert in UI and UX design principles for software development.
     - Implement critical CSS for above-the-fold content.
 
     Content Prioritization
-    - Prioritize content display for mobile views.
-    - Use progressive disclosure to reveal content as needed.
-    - Implement off-canvas patterns for secondary content on small screens.
+    - Prioritize data tables, bulk workflows, and operational clarity for primary desktop views.
+    - Use progressive disclosure to reveal content as needed across smaller breakpoints.
+    - Implement responsive patterns for secondary content on small screens (down to 390px) without breaking workflows.
 
     Navigation
     - Design mobile-friendly navigation patterns (e.g., hamburger menu).

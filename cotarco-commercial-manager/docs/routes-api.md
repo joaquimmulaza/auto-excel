@@ -34,10 +34,10 @@ Erros:
 | `/processamentos/[id]/arquivos` | autorizado | inputs/outputs |
 | `/historico` | Operador+ | histórico |
 | `/produtos/[ref]` | Operador+ | histórico por referência |
-| `/configuracoes/perfis` | Admin | perfis |
-| `/configuracoes/templates` | Admin | templates |
-| `/configuracoes/regras` | Admin | regras |
-| `/configuracoes/integracoes` | Admin | integrações |
+| `/configuracoes/perfis` | ADMIN | perfis |
+| `/configuracoes/templates` | ADMIN | templates |
+| `/configuracoes/regras` | ADMIN | regras |
+| `/configuracoes/integracoes` | ADMIN | integrações |
 | `/auditoria` | Operador+ | audit log |
 | `/definicoes` | autenticado | preferências |
 

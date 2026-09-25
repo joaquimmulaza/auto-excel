@@ -7,9 +7,14 @@ Antes de qualquer alteração, ler:
 1. `context.md`
 2. `agents.md`
 3. `docs/requirements.md`
-4. `docs/stack-and-guardrails.md`
-5. `docs/testing-tdd.md`
-6. o documento específico da tarefa
+4. `docs/data-architecture.md`
+5. `docs/application-flows.md`
+6. `docs/routes-api.md`
+7. `docs/stack-and-guardrails.md`
+8. `docs/ui-wireframes-and-design-system.md`
+9. `docs/testing-tdd.md`
+10. `docs/mvp-backlog.md`
+11. o documento específico da tarefa
 
 Não iniciar implementação sem compreender o estado atual do repositório.
 
@@ -86,16 +91,21 @@ Critérios mínimos:
 - desktop 1440px aceitável;
 - mobile 390px sem quebra funcional nas telas prioritárias.
 
-## 7. Evidência obrigatória
+## 7. Evidência obrigatória e Handoff
 
-Todo agente deve terminar uma tarefa fornecendo:
+Todo agente deve terminar uma tarefa fornecendo obrigatoriamente o handoff no formato canónico de 9 campos:
 
-- resumo do que mudou;
-- testes executados;
-- resultado dos testes;
-- riscos/limitações;
-- ficheiros alterados;
-- decisão que ficou pendente, se houver.
+```text
+STATUS: DONE | BLOCKED | NEEDS_REVIEW
+TASK: <id>
+SUMMARY: <resumo>
+FILES: <lista>
+TESTS: <comandos + resultado>
+QA: <resultado>
+RISKS: <lista>
+DOCS_UPDATED: <lista>
+NEXT: <próxima tarefa recomendada>
+```
 
 ## 8. Handoffs
 
@@ -120,3 +130,15 @@ Usar Conventional Commits:
 - `security:`
 
 Evitar commits gigantes.
+
+## 10. Graphify MCP e CLI — Navegação e Manutenção da Codebase
+
+Antes de realizar modificações no código ou na arquitetura, os agentes devem utilizar o Graphify (via servidor MCP ou CLI) para navegar na arquitetura e mapear dependências da codebase. Após modificações estruturais ou documentais, devem manter o grafo atualizado.
+
+### Comandos de Navegação e Análise
+- `graphify query "<pergunta ou termo>"` — pesquisa nós, conceitos e arquivos relevantes no grafo de conhecimento.
+- `graphify path "<origem>" "<destino>"` — mapeia caminhos de dependência e fluxos entre componentes ou arquivos.
+- `graphify explain "<componente>"` — detalha a responsabilidade, dependentes e dependências de um componente específico.
+
+### Manutenção do Grafo
+- `graphify update .` — sincroniza e atualiza o grafo de conhecimento local a partir das alterações na codebase.

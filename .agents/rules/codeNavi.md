@@ -17,5 +17,10 @@ Every task must follow this cycle: **BRIEFING → RECON → PLAN → EXECUTE →
 
 - **Briefing & Recon**: Always read `.notebook/INDEX.md` first if it exists. Trace the flow from the entry point.
 - **Plan**: Present a plan before executing. Each step must have a verification criterion.
-- **Execute & Verify**: Verify knowledge before applying it. Ensure the implementation solves exactly what was asked.
+- **Human Confirmation Gate (Mandatory)**: Stop and require explicit human confirmation before executing if the plan touches:
+  - Destructive changes (alterações destrutivas a ficheiros, schemas, dados ou testes);
+  - Production (operações ou configurações em ambientes de produção);
+  - Ambiguous business rules (regras de negócio ambíguas sem definição prévia no context/docs);
+  - Pending architectural decisions (decisões arquiteturais pendentes ou novas dependências estruturais).
+- **Execute & Verify**: Verify knowledge before applying it. Ensure the implementation solves exactly what was asked. Respect all human confirmation gates.
 - **Debrief**: Capture any valuable discoveries (patterns, gotchas, flows) in the `.notebook/` directory. Do not leave new intelligence undocumented.

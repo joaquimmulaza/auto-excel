@@ -22,7 +22,7 @@ Antes de redigir ou disparar qualquer prompt para o Stitch (geração de design 
      - Escala e contraste de cores (`#FF3C1D` brand, `#6B6363` secondary, `#FFFFFF` surface, `#000000` text).
      - Tipografia, alinhamento e densidade informacional para aplicações enterprise / data-heavy.
 2. **Formatar e Otimizar com `enhance-prompt`**:
-   - Executar o pipeline da skill [enhance-prompt](file:///c:/Users/MARKETING%20DESIGNER01/Downloads/up_prices/.agents/skills/enhance-prompt/SKILL.md) para transformar as diretrizes em um prompt estruturado para o Stitch:
+   - Executar o pipeline da skill [enhance-prompt](.agents/skills/enhance-prompt/SKILL.md) para transformar as diretrizes em um prompt estruturado para o Stitch:
      - Definir plataforma (Web Desktop-first) e vibe empresarial.
      - Injetar o bloco `DESIGN SYSTEM (REQUIRED)` com os tokens obrigatórios (`#FF3C1D`, `#6B6363`, `#FFFFFF`, `#000000`).
      - Estruturar a página numerada (`Page Structure`) com keywords específicos de UI/UX (evitar termos genéricos).

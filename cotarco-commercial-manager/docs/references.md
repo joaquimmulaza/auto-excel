@@ -6,7 +6,7 @@ Estas referências suportam as decisões de stack documentadas e devem ser revis
 
 Pricing/Free: https://supabase.com/pricing
 
-Snapshot consultado: plano Free com PostgreSQL, 500 MB DB/projeto, 1 GB file storage, 50.000 MAU e 5 GB egress; projetos Free podem pausar após 1 semana de inatividade e o Free não inclui backups automáticos.
+Para quotas, limites e condições atualizadas da plataforma, consultar a documentação canónica em `cotarco-commercial-manager/docs/stack-and-guardrails.md §8` e o link oficial de pricing acima, evitando duplicação sujeita a drift.
 
 ## WooCommerce
 

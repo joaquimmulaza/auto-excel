@@ -4,7 +4,7 @@ description: Activate this rule only after all tests have successfully run (gree
 ---
 
 Commit Messages must have a short description that is less than 50 characters followed by a newline and a more detailed description.
-- Commit message should have one of the following prefixes: "feat: ", "fix: ", "refactor: "
+- Commit message must have one of the canonical Conventional Commits prefixes matching `cotarco-commercial-manager/agents.md §9`: "feat: ", "fix: ", "refactor: ", "test: ", "docs: ", "chore: ", "security: " (optional scope allowed in parentheses, e.g., "feat(auth): ")
 - Use markdown syntax
 - Write concisely using an informal tone
 - List significant changes

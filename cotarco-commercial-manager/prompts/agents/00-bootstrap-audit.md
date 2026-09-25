@@ -14,7 +14,7 @@ O repositório contém o primeiro motor de automação de Excel. Precisamos tran
 
 1. Mapear ficheiros, dependências e comportamento atual.
 2. Identificar regras do `auto-excel` que precisam de preservação.
-3. Criar a estrutura inicial proposta em `docs/`.
+3. Validar e organizar a estrutura existente em `docs/`.
 4. Configurar lint/typecheck/test runners sem introduzir features.
 5. Criar um baseline test que prove que o código antigo ainda executa ou documentar por que não.
 6. Criar/ajustar `.gitignore`, `.env.example` e documentação de setup.

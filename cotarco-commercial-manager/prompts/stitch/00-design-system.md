@@ -10,7 +10,7 @@ A aplicação será usada principalmente em desktop por equipa Comercial/Operado
 
 Antes de submeter este prompt ao Stitch:
 1. Consultar o MCP `ui-skills` (skills `frontend-design`, `interface-design`, `baseline-ui` e playbooks de densidade/acessibilidade) para garantir conformidade de contrastes WCAG AA e espaçamento semântico.
-2. Processar a estrutura com a skill [enhance-prompt](file:///c:/Users/MARKETING%20DESIGNER01/Downloads/up_prices/.agents/skills/enhance-prompt/SKILL.md) para gerar a especificação formatada em `DESIGN SYSTEM (REQUIRED)` e `Page Structure` numerada com componentes de alta densidade.
+2. Processar a estrutura com a skill [enhance-prompt](.agents/skills/enhance-prompt/SKILL.md) para gerar a especificação formatada em `DESIGN SYSTEM (REQUIRED)` e `Page Structure` numerada com componentes de alta densidade.
 
 ## Branding obrigatório
 

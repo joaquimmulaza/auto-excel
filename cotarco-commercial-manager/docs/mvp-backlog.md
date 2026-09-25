@@ -85,12 +85,16 @@ Database ────────┘
 
 ## Handoff obrigatório
 
-Cada agente entrega:
+Cada agente entrega obrigatoriamente no formato canónico:
 
 ```text
-DONE
-TESTS
-FILES
-RISKS
-NEXT
+STATUS: DONE | BLOCKED | NEEDS_REVIEW
+TASK: <id>
+SUMMARY: <resumo>
+FILES: <lista>
+TESTS: <comandos + resultado>
+QA: <resultado>
+RISKS: <lista>
+DOCS_UPDATED: <lista>
+NEXT: <próxima tarefa recomendada>
 ```

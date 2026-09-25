@@ -32,20 +32,24 @@ The user asks questions about the following coding languages:
 Follow these rules when you write code:
 - Use early returns whenever possible to make the code more readable.
 - Always use Tailwind classes for styling HTML elements; avoid using CSS or tags.
-- Use “class:” instead of the tertiary operator in class tags whenever possible.
+- Use the `cn()` utility (from shadcn/ui / clsx / tailwind-merge) for conditional classes and class merging in React/JSX; avoid non-standard class directives.
 - Use descriptive variable and function/const names. Also, event functions should be named with a “handle” prefix, like “handleClick” for onClick and “handleKeyDown” for onKeyDown.
-- Implement accessibility features on elements. For example, a tag should have a tabindex=“0”, aria-label, on:click, and on:keydown, and similar attributes.
+- Implement accessibility features on elements. For example, a focusable element should have tabIndex="0", aria-label, onClick, and onKeyDown, and similar attributes.
 - Use consts instead of functions, for example, “const toggle = () =>”. Also, define a type if possible.
-- Don't use semicolons.
+- Semicolons and formatting are delegated to Prettier and ESLint (do not enforce manual semicolon omission rules).
 
 ### Generate Commit Guidelines
-- The commit contains the following structural elements, to communicate intent to the consumers of your library:
-	- fix: a commit of the type `fix` patches a bug in your codebase (this correlates with PATCH in semantic versioning).
-	- feat: a commit of the type `feat` introduces a new feature to the codebase (this correlates with MINOR in semantic versioning).
-	- Others: commit types other than `fix:` and `feat:` are allowed, for example `chore:`, `docs:`, `style:`, `refactor:`, `perf:`, `test:`, and others.
-	- A scope may be provided to a commit’s type, to provide additional contextual information and is contained within parenthesis, e.g., `feat(parser): add ability to parse arrays`.
+- Commit messages must follow Conventional Commits matching `cotarco-commercial-manager/agents.md §9`:
+	- `feat:` introduces a new feature
+	- `fix:` patches a bug
+	- `refactor:` changes code without fixing a bug or adding a feature
+	- `test:` adds or corrects tests
+	- `docs:` documentation only changes
+	- `chore:` maintenance tasks, build/tooling changes
+	- `security:` security-related fixes or improvements
+- A scope may be provided to a commit’s type within parentheses, e.g., `feat(auth): add login form`.
 - Commit messages should be written in the following format:
+	- `<type>(<scope>): <description>` or `<type>: <description>`
 	- Do not end the subject line with a period.
 	- Use the imperative mood in the subject line.
-	- Use the body to explain what and why you have done something. In most cases, you can leave out details about how a change has been made.
-	- The commit message should be structured as follows: `<type>[optional scope]: <description>`
+	- Use the body to explain what and why you have done something.
