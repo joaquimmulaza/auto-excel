@@ -1,0 +1,198 @@
+{
+  "communities": {
+    "0": [
+      "cotarco_samsung_preco_atualizado_xlsx",
+      "deteccao_automatica_cabecalho",
+      "log_decisao_samsung_xlsx",
+      "log_decisao_transparente",
+      "main",
+      "mano_preco_atualizado_final_xlsx",
+      "mano_preco_desatualizado_xlsx",
+      "mapeamento_tolerante_colunas",
+      "numpy",
+      "openpyxl",
+      "pandas",
+      "python_3_8_plus",
+      "readme",
+      "samsung_col_map"
+    ],
+    "1": [
+      "agents_rules_graphify_md",
+      "agents_workflows_graphify_md",
+      "graphify",
+      "graphify_explain_command",
+      "graphify_out_graph_html",
+      "graphify_out_graph_json",
+      "graphify_out_graph_report_md",
+      "graphify_path_command",
+      "graphify_query_command",
+      "graphify_update_command",
+      "graphifyignore",
+      "uv_tool"
+    ],
+    "2": [
+      "main_find_column",
+      "main_map_columns",
+      "main_normalize_col",
+      "main_rationale_119",
+      "main_rationale_140",
+      "main_rationale_56"
+    ],
+    "3": [
+      "main_avaliar_price_guard",
+      "main_calcular_variacao",
+      "main_rationale_189",
+      "main_rationale_195"
+    ],
+    "4": [
+      "ativacao_inativacao",
+      "filtragem_seguranca",
+      "regras_negocio_integradas"
+    ],
+    "5": [
+      "limpeza_precos",
+      "saneamento_avancado_dados",
+      "ultra_clean"
+    ],
+    "6": [
+      "git_hooks",
+      "gitattributes"
+    ],
+    "7": [
+      "main_auto_detect_header",
+      "main_rationale_88"
+    ],
+    "8": [
+      "main_criar_backup",
+      "main_rationale_241"
+    ],
+    "9": [
+      "main_limpar_preco",
+      "main_rationale_72"
+    ],
+    "10": [
+      "main_rationale_167",
+      "main_verificar_idade_ficheiro"
+    ],
+    "11": [
+      "main_rationale_218",
+      "main_registar_historico"
+    ],
+    "12": [
+      "main_rationale_64",
+      "main_ultra_clean"
+    ],
+    "13": [
+      "notebook_graphify_setup",
+      "notebook_index"
+    ]
+  },
+  "cohesion": {
+    "0": 0.14285714285714285,
+    "1": 0.16666666666666666,
+    "2": 0.4,
+    "3": 0.5,
+    "4": 0.6666666666666666,
+    "5": 0.6666666666666666,
+    "6": 1.0,
+    "7": 1.0,
+    "8": 1.0,
+    "9": 1.0,
+    "10": 1.0,
+    "11": 1.0,
+    "12": 1.0,
+    "13": 1.0
+  },
+  "gods": [
+    {
+      "id": "graphify",
+      "label": "Graphify",
+      "degree": 13
+    },
+    {
+      "id": "main_find_column",
+      "label": "find_column()",
+      "degree": 4
+    },
+    {
+      "id": "main_map_columns",
+      "label": "map_columns()",
+      "degree": 4
+    },
+    {
+      "id": "main_normalize_col",
+      "label": "normalize_col()",
+      "degree": 4
+    },
+    {
+      "id": "main_avaliar_price_guard",
+      "label": "avaliar_price_guard()",
+      "degree": 3
+    },
+    {
+      "id": "main_calcular_variacao",
+      "label": "calcular_variacao()",
+      "degree": 3
+    },
+    {
+      "id": "regras_negocio_integradas",
+      "label": "Regras de Negócio Integradas",
+      "degree": 3
+    },
+    {
+      "id": "saneamento_avancado_dados",
+      "label": "Saneamento Avançado de Dados",
+      "degree": 3
+    },
+    {
+      "id": "main_verificar_idade_ficheiro",
+      "label": "verificar_idade_ficheiro()",
+      "degree": 2
+    },
+    {
+      "id": "main_registar_historico",
+      "label": "registar_historico()",
+      "degree": 2
+    }
+  ],
+  "surprises": [
+    {
+      "source": "Notebook Index",
+      "target": "Graphify Knowledge Graph Setup",
+      "source_files": [
+        ".notebook/INDEX.md",
+        ".notebook/graphify-setup.md"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "cross-file semantic connection"
+    }
+  ],
+  "questions": [
+    {
+      "type": "bridge_node",
+      "question": "Why does `Graphify` connect `Graphify` to `Graphify Knowledge Graph Setup`, `Git Hooks`?",
+      "why": "High betweenness centrality (0.065) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `Regras de Negócio Integradas` connect `Regras de Negócio Integradas` to `main.py`?",
+      "why": "High betweenness centrality (0.049) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `Saneamento Avançado de Dados` connect `Saneamento Avançado de Dados` to `main.py`?",
+      "why": "High betweenness centrality (0.049) - this node is a cross-community bridge."
+    },
+    {
+      "type": "isolated_nodes",
+      "question": "What connects `Cotarco-Samsung-preco-atualizado.xlsx`, `Deteção Automática de Cabeçalho`, `LOG_DECISAO_SAMSUNG.xlsx` to the rest of the system?",
+      "why": "29 weakly-connected nodes found - possible documentation gaps or missing edges."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `main.py` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.14285714285714285 - nodes in this community are weakly interconnected."
+    }
+  ]
+}

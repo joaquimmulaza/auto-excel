@@ -1,0 +1,194 @@
+{
+  "main.py": {
+    "mtime": 1790088034.1508396,
+    "seen": 1790322571.936056,
+    "ast_hash": "2b6baa5670371eff116fbe79bcb484c2",
+    "semantic_hash": "2b6baa5670371eff116fbe79bcb484c2"
+  },
+  ".notebook/INDEX.md": {
+    "mtime": 1790326241.0465732,
+    "seen": 1790326256.4855745,
+    "ast_hash": "df7565dde0b40cb8ee2a0f8d3f56a9c7",
+    "semantic_hash": ""
+  },
+  ".notebook/graphify-setup.md": {
+    "mtime": 1790325222.2059453,
+    "seen": 1790326256.4855745,
+    "ast_hash": "bb08d64e511b73af2ef39d82929f7032",
+    "semantic_hash": ""
+  },
+  "README.md": {
+    "mtime": 1784281893.347398,
+    "seen": 1790325152.3757343,
+    "ast_hash": "22a43f9e9178bc7f53487328260f8a12",
+    "semantic_hash": "22a43f9e9178bc7f53487328260f8a12"
+  },
+  ".notebook/ui-skills-workflow.md": {
+    "mtime": 1790326511.02486,
+    "seen": 1790326525.0272617,
+    "ast_hash": "66887a84a76464b3eaa0b68112a05217",
+    "semantic_hash": ""
+  },
+  "cotarco-commercial-manager/README.md": {
+    "mtime": 1790178140.0,
+    "seen": 1790326256.4855745,
+    "ast_hash": "be7b6cfd7551c576a08083cae34ebf97",
+    "semantic_hash": ""
+  },
+  "cotarco-commercial-manager/adr/0001-architecture.md": {
+    "mtime": 1790178140.0,
+    "seen": 1790326256.4855745,
+    "ast_hash": "a57474eb2015503bc5a3f4c5ea5b2f87",
+    "semantic_hash": ""
+  },
+  "cotarco-commercial-manager/adr/0002-supabase-free.md": {
+    "mtime": 1790178140.0,
+    "seen": 1790326256.4855745,
+    "ast_hash": "be1511c3a7e0b2002337768a0b178ea8",
+    "semantic_hash": ""
+  },
+  "cotarco-commercial-manager/agents.md": {
+    "mtime": 1790178140.0,
+    "seen": 1790326256.4855745,
+    "ast_hash": "16361335aacc1c6fbe6439920e2689bd",
+    "semantic_hash": ""
+  },
+  "cotarco-commercial-manager/context.md": {
+    "mtime": 1790178140.0,
+    "seen": 1790326256.4855745,
+    "ast_hash": "028ac9d116bd325e8fca759aeb9127e2",
+    "semantic_hash": ""
+  },
+  "cotarco-commercial-manager/docs/application-flows.md": {
+    "mtime": 1790178140.0,
+    "seen": 1790326256.4855745,
+    "ast_hash": "c9eaabd82e8b37aff826c6ff71cd6fa5",
+    "semantic_hash": ""
+  },
+  "cotarco-commercial-manager/docs/data-architecture.md": {
+    "mtime": 1790178140.0,
+    "seen": 1790326256.4855745,
+    "ast_hash": "514f073ff53a15d7cbd3d99dcf2d2a4f",
+    "semantic_hash": ""
+  },
+  "cotarco-commercial-manager/docs/mvp-backlog.md": {
+    "mtime": 1790178140.0,
+    "seen": 1790326256.4855745,
+    "ast_hash": "ab5bef6a65e392da8d9695bc896bfc9f",
+    "semantic_hash": ""
+  },
+  "cotarco-commercial-manager/docs/references.md": {
+    "mtime": 1790178140.0,
+    "seen": 1790326256.4855745,
+    "ast_hash": "a07865cf9d9e0093e30c6607afa794e5",
+    "semantic_hash": ""
+  },
+  "cotarco-commercial-manager/docs/requirements.md": {
+    "mtime": 1790178140.0,
+    "seen": 1790326256.4855745,
+    "ast_hash": "880247d0cff341c183523c1137defc1f",
+    "semantic_hash": ""
+  },
+  "cotarco-commercial-manager/docs/routes-api.md": {
+    "mtime": 1790178140.0,
+    "seen": 1790326256.4855745,
+    "ast_hash": "2f9ce38677261b9f9adba5cec31ddd0f",
+    "semantic_hash": ""
+  },
+  "cotarco-commercial-manager/docs/stack-and-guardrails.md": {
+    "mtime": 1790178140.0,
+    "seen": 1790326256.4855745,
+    "ast_hash": "6830b6ae37f5e0c54e074f809f3b1aa9",
+    "semantic_hash": ""
+  },
+  "cotarco-commercial-manager/docs/testing-tdd.md": {
+    "mtime": 1790178140.0,
+    "seen": 1790326256.4855745,
+    "ast_hash": "f94fca38b10f93adfe77f7b2bc679c79",
+    "semantic_hash": ""
+  },
+  "cotarco-commercial-manager/docs/ui-wireframes-and-design-system.md": {
+    "mtime": 1790178140.0,
+    "seen": 1790326256.4855745,
+    "ast_hash": "4b24f5cb96f6275ef22bec8a6d7d23ec",
+    "semantic_hash": ""
+  },
+  "cotarco-commercial-manager/prompts/MASTER_ORCHESTRATOR.md": {
+    "mtime": 1790326457.9384406,
+    "seen": 1790326525.0272617,
+    "ast_hash": "617056894120d836ba62bfcdf30030cb",
+    "semantic_hash": ""
+  },
+  "cotarco-commercial-manager/prompts/README.md": {
+    "mtime": 1790178140.0,
+    "seen": 1790326256.4855745,
+    "ast_hash": "100fccf88b007b6db80bb4c6d08a73cc",
+    "semantic_hash": ""
+  },
+  "cotarco-commercial-manager/prompts/agents/00-bootstrap-audit.md": {
+    "mtime": 1790178140.0,
+    "seen": 1790326256.4855745,
+    "ast_hash": "b147264e4c4164578365a737f3417ada",
+    "semantic_hash": ""
+  },
+  "cotarco-commercial-manager/prompts/agents/01-domain-tdd.md": {
+    "mtime": 1790178140.0,
+    "seen": 1790326256.4855745,
+    "ast_hash": "454c82a8bd0256eaca5bf4c48fa45cf5",
+    "semantic_hash": ""
+  },
+  "cotarco-commercial-manager/prompts/agents/02-database.md": {
+    "mtime": 1790178140.0,
+    "seen": 1790326256.4855745,
+    "ast_hash": "8ac1bd71cbbbcfbc82f4e19f7a1cf08d",
+    "semantic_hash": ""
+  },
+  "cotarco-commercial-manager/prompts/agents/03-api.md": {
+    "mtime": 1790178140.0,
+    "seen": 1790326256.4855745,
+    "ast_hash": "a4231bb6658e5d68f6dd3896ee35443a",
+    "semantic_hash": ""
+  },
+  "cotarco-commercial-manager/prompts/agents/04-frontend.md": {
+    "mtime": 1790326176.974552,
+    "seen": 1790326256.4855745,
+    "ast_hash": "8b9a5cd1ed89bcb3d2cb3f7158780828",
+    "semantic_hash": ""
+  },
+  "cotarco-commercial-manager/prompts/agents/05-gemini.md": {
+    "mtime": 1790178140.0,
+    "seen": 1790326256.4855745,
+    "ast_hash": "cf294f396c841f500064d2c1ba7a9d6b",
+    "semantic_hash": ""
+  },
+  "cotarco-commercial-manager/prompts/agents/06-integrations-and-demo.md": {
+    "mtime": 1790178140.0,
+    "seen": 1790326256.4855745,
+    "ast_hash": "4818d09c4fa50e352f840322b464c8a0",
+    "semantic_hash": ""
+  },
+  "cotarco-commercial-manager/prompts/stitch/00-design-system.md": {
+    "mtime": 1790326484.9855616,
+    "seen": 1790326525.0272617,
+    "ast_hash": "9998d7052b2027b7806398db34340e09",
+    "semantic_hash": ""
+  },
+  "cotarco-commercial-manager/prompts/stitch/01-dashboard.md": {
+    "mtime": 1790178140.0,
+    "seen": 1790326256.4855745,
+    "ast_hash": "57c79875e294a1ff907a6506b1341ea4",
+    "semantic_hash": ""
+  },
+  "cotarco-commercial-manager/prompts/stitch/02-new-job.md": {
+    "mtime": 1790178140.0,
+    "seen": 1790326256.4855745,
+    "ast_hash": "ab17a868847acd9ff298226b2fc10775",
+    "semantic_hash": ""
+  },
+  "cotarco-commercial-manager/prompts/stitch/03-review-diff.md": {
+    "mtime": 1790178140.0,
+    "seen": 1790326256.4855745,
+    "ast_hash": "a301f983fbe8b85e110589b8a9fdc941",
+    "semantic_hash": ""
+  }
+}
