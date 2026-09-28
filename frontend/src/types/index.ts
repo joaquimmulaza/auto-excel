@@ -135,3 +135,26 @@ export interface ProfileListResponse {
   items: ProfileResponse[];
   total: number;
 }
+
+// AI Integration Types
+export interface AIExplainIssueRequest {
+  issue_code: string;
+  issue_message: string;
+  severity: string;
+  context?: Record<string, unknown>;
+  language?: string;
+}
+
+export interface AIAnomalyExplanation {
+  title: string;
+  plain_explanation: string;
+  likely_cause: string;
+  suggested_action: string;
+  is_blocker: boolean;
+}
+
+export interface AIResponse<T> {
+  is_ai_generated: boolean;
+  fallback_used: boolean;
+  data: T;
+}

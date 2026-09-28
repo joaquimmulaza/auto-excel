@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { ValidationIssueResponse } from "@/types";
+import { ValidationIssueResponse, AIAnomalyExplanation } from "@/types";
+import { explainIssueWithAi } from "@/lib/api";
 import { AlertCircle, AlertTriangle, Info, Sparkles, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,7 @@ interface ValidationIssueListProps {
 export function ValidationIssueList({ issues }: ValidationIssueListProps) {
   const [selectedIssue, setSelectedIssue] = useState<ValidationIssueResponse | null>(null);
   const [isAiExplaining, setIsAiExplaining] = useState(false);
+  const [aiExplanation, setAiExplanation] = useState<AIAnomalyExplanation | null>(null);
 
   const getSeverityBadge = (severity: string) => {
     switch (severity) {
@@ -47,13 +49,29 @@ export function ValidationIssueList({ issues }: ValidationIssueListProps) {
     }
   };
 
-  const handleExplainWithAi = (issue: ValidationIssueResponse) => {
+  const handleExplainWithAi = async (issue: ValidationIssueResponse) => {
     setSelectedIssue(issue);
     setIsAiExplaining(true);
-    // Simulate AI synthesis
-    setTimeout(() => {
+    setAiExplanation(null);
+    try {
+      const result = await explainIssueWithAi(issue.job_id, {
+        issue_code: issue.code,
+        issue_message: issue.message,
+        severity: issue.severity,
+      });
+      setAiExplanation(result.data);
+    } catch (error) {
+      console.error('Erro ao obter explicação da IA', error);
+      setAiExplanation({
+        title: 'Erro de Comunicação',
+        plain_explanation: 'Não foi possível obter a explicação da IA no momento.',
+        likely_cause: 'Serviço indisponível ou erro de rede.',
+        suggested_action: 'Tente novamente mais tarde.',
+        is_blocker: false,
+      });
+    } finally {
       setIsAiExplaining(false);
-    }, 800);
+    }
   };
 
   if (issues.length === 0) {
@@ -150,14 +168,17 @@ export function ValidationIssueList({ issues }: ValidationIssueListProps) {
               ) : (
                 <div className="space-y-2.5 text-ink/90 leading-relaxed bg-brand-subtle/30 p-3 rounded border border-brand/20">
                   <p>
-                    <strong>Causa Raiz:</strong> O preço anterior registado no catálogo era de{" "}
-                    <span className="font-mono font-semibold">Kz 2.000.000</span> e o novo ficheiro
-                    indica <span className="font-mono font-semibold">Kz 5.500.000</span> (salto de +175%).
+                    <strong>Causa Raiz:</strong> {aiExplanation?.likely_cause}
                   </p>
                   <p>
-                    <strong>Ação Recomendada:</strong> Verifique se a unidade de venda no Excel não foi
-                    alterada para caixa/conjunto (bundle) ou se ocorreu erro de digitação de zero extra.
+                    <strong>Explicação:</strong> {aiExplanation?.plain_explanation}
                   </p>
+                  <p>
+                    <strong>Ação Recomendada:</strong> {aiExplanation?.suggested_action}
+                  </p>
+                  {aiExplanation?.is_blocker && (
+                    <p className="text-error font-bold">Este problema bloqueia o processamento e requer intervenção.</p>
+                  )}
                   <p className="text-[11px] text-slateSecondary border-t border-border pt-2 italic">
                     Guardrail: De acordo com a governança CCM, anomalias de preço requerem revisão manual ou retificação da folha de cálculo pela equipa Comercial antes da aprovação do Operador.
                   </p>

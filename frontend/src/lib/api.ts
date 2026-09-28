@@ -1,4 +1,4 @@
-/**
+﻿/**
  * API client connected to Cotarco Commercial Manager FastAPI backend.
  * Base URL: http://localhost:8000/api/v1
  */
@@ -11,7 +11,7 @@ import {
   ValidationIssueResponse,
   JobSummaryResponse,
   ProfileListResponse,
-  ApprovalResponse,
+  ApprovalResponse, AIExplainIssueRequest, AIAnomalyExplanation, AIResponse,
 } from "@/types";
 
 const API_BASE_URL =
@@ -24,7 +24,7 @@ export const DEMO_PROFILES = [
     code: "MANO",
     name: "Marketplace Mano",
     type: "MARKETPLACE",
-    description: "Exportação de preços e stocks com limiar de variação de 30% e stock mínimo de 3 unidades para produtos novos.",
+    description: "ExportaÃ§Ã£o de preÃ§os e stocks com limiar de variaÃ§Ã£o de 30% e stock mÃ­nimo de 3 unidades para produtos novos.",
     active: true,
     config: { price_guard_threshold_pct: 30, new_product_min_stock: 3 },
     rules_version: 1,
@@ -36,7 +36,7 @@ export const DEMO_PROFILES = [
     code: "LOJA_ONLINE",
     name: "Loja Online Cotarco",
     type: "ECOMMERCE",
-    description: "Atualização direta de catálogo do e-commerce Cotarco com regras de margem comercial.",
+    description: "AtualizaÃ§Ã£o direta de catÃ¡logo do e-commerce Cotarco com regras de margem comercial.",
     active: true,
     config: { price_guard_threshold_pct: 25, new_product_min_stock: 1 },
     rules_version: 1,
@@ -48,7 +48,7 @@ export const DEMO_PROFILES = [
     code: "BFA",
     name: "BFA Wholesale",
     type: "PARTNER",
-    description: "Tabela institucional de fornecimento e parcerias com preços especiais.",
+    description: "Tabela institucional de fornecimento e parcerias com preÃ§os especiais.",
     active: true,
     config: { price_guard_threshold_pct: 20, new_product_min_stock: 5 },
     rules_version: 1,
@@ -65,7 +65,7 @@ export const DEMO_JOBS: JobResponse[] = [
     created_by_id: "00000000-0000-0000-0000-000000000001",
     status: "READY_FOR_REVIEW",
     source_system: "SAMSUNG",
-    description: "Tabela de Preços e Stocks Linha Branca Setembro 2026",
+    description: "Tabela de PreÃ§os e Stocks Linha Branca Setembro 2026",
     options: {},
     summary: {
       total: 1248,
@@ -84,7 +84,7 @@ export const DEMO_JOBS: JobResponse[] = [
     created_by_id: "00000000-0000-0000-0000-000000000001",
     status: "COMPLETED",
     source_system: "LG",
-    description: "Atualização Televisores e Áudio",
+    description: "AtualizaÃ§Ã£o Televisores e Ãudio",
     options: {},
     summary: {
       total: 936,
@@ -103,7 +103,7 @@ export const DEMO_JOBS: JobResponse[] = [
     created_by_id: "00000000-0000-0000-0000-000000000001",
     status: "NEEDS_CORRECTION",
     source_system: "SAMSUNG",
-    description: "Lote Inicial Smartphone Galaxy Série S",
+    description: "Lote Inicial Smartphone Galaxy SÃ©rie S",
     options: {},
     summary: {
       total: 1421,
@@ -210,7 +210,7 @@ export const DEMO_ISSUES: ValidationIssueResponse[] = [
     job_id: "00000000-0000-0000-0000-000000000184",
     severity: "BLOCKER",
     code: "PRICE_VARIATION_BLOCKED",
-    message: "A variação de preço (+175.0%) ultrapassa o limite de 30% configurado para o Marketplace Mano. Verifique a referência XXX_ANOMALY_REF.",
+    message: "A variaÃ§Ã£o de preÃ§o (+175.0%) ultrapassa o limite de 30% configurado para o Marketplace Mano. Verifique a referÃªncia XXX_ANOMALY_REF.",
     field: "price",
     row_number: 142,
     resolved: false,
@@ -221,7 +221,7 @@ export const DEMO_ISSUES: ValidationIssueResponse[] = [
     job_id: "00000000-0000-0000-0000-000000000184",
     severity: "WARNING",
     code: "STOCK_THRESHOLD_IGNORED",
-    message: "O produto DV90T6240LK foi ignorado porque o stock (1) é inferior ao mínimo configurado (3).",
+    message: "O produto DV90T6240LK foi ignorado porque o stock (1) Ã© inferior ao mÃ­nimo configurado (3).",
     field: "stock",
     row_number: 89,
     resolved: true,
@@ -349,3 +349,18 @@ export async function approveJob(jobId: string, comment?: string): Promise<Appro
   }
   return await res.json();
 }
+
+export async function explainIssueWithAi(jobId: string, payload: AIExplainIssueRequest): Promise<AIResponse<AIAnomalyExplanation>> {
+  const res = await fetch(API_BASE_URL + '/jobs/' + jobId + '/ai/explain-issue', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData?.detail?.error?.message || 'Falha ao obter explicação da IA');
+  }
+  return await res.json();
+}
+
+
