@@ -11,6 +11,14 @@ SDK: google-genai 2.x (from google import genai)
 Model: gemini-2.0-flash (rápido, custo-eficiente para assistência contextual)
 """
 from __future__ import annotations
+import os
+from pathlib import Path
+from dotenv import load_dotenv
+
+_backend_env = Path(__file__).resolve().parent.parent.parent / ".env"
+load_dotenv(_backend_env)
+load_dotenv()
+
 
 import logging
 import os
@@ -45,7 +53,7 @@ def _get_client():
 # Model constant
 # ---------------------------------------------------------------------------
 
-_MODEL = "gemini-2.0-flash"
+_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 
 # ---------------------------------------------------------------------------
 # Input sanitization
@@ -137,7 +145,7 @@ def _build_column_mapping_prompt(
         f"suggestions (list de objetos com: detected_column, suggested_mapping ou null, "
         f"confidence (HIGH|MEDIUM|LOW), rationale max 200 chars),\n"
         f"unmapped_expected (list de strings das colunas esperadas sem correspondência),\n"
-        f"disclaimer (string fixa: 'Sugestoes geradas por IA. Reveja e confirme antes "
+        f"disclaimer (string fixa: 'Sugestões geradas por IA. Reveja e confirme antes "
         f"de aplicar o mapeamento.').\n\n"
         f"Idioma da resposta: {language}\n"
         f"Colunas detetadas no ficheiro: {detected_clean}\n"
@@ -245,7 +253,7 @@ def _fallback_column_mapping(
         "suggestions": suggestions,
         "unmapped_expected": expected,
         "disclaimer": (
-            "Sugestoes geradas localmente (IA indisponível). "
+            "Sugestões geradas localmente (IA indisponível). "
             "Reveja e confirme antes de aplicar o mapeamento."
         ),
     }
@@ -341,7 +349,7 @@ def suggest_column_mapping(
         result.setdefault("unmapped_expected", [])
         result.setdefault(
             "disclaimer",
-            "Sugestoes geradas por IA. Reveja e confirme antes de aplicar o mapeamento.",
+            "Sugestões geradas por IA. Reveja e confirme antes de aplicar o mapeamento.",
         )
         return result, False
 

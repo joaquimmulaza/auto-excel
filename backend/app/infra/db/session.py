@@ -13,6 +13,13 @@ GUARDRAILS:
 from __future__ import annotations
 
 import os
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables
+_backend_env = Path(__file__).resolve().parent.parent.parent.parent / "backend" / ".env"
+load_dotenv(_backend_env)
+load_dotenv()
 from contextlib import contextmanager
 from typing import Generator
 

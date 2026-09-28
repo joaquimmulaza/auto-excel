@@ -1,17 +1,17 @@
 # Graph Report - up_prices  (2026-09-28)
 
 ## Corpus Check
-- 132 files · ~79,922 words
+- 132 files · ~80,273 words
 - Verdict: corpus is large enough that graph structure adds value.
-- Unclassified: 4 file(s) not represented in the graph (top: (none) 3, .css 1)
+- Unclassified: 5 file(s) not represented in the graph (top: (none) 3, .example 1, .css 1)
 
 ## Summary
-- 1567 nodes · 2533 edges · 104 communities (84 shown, 20 thin omitted)
+- 1568 nodes · 2542 edges · 102 communities (82 shown, 20 thin omitted)
 - Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 132 edges (avg confidence: 0.95)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `3d5a2af5`
+- Built from commit: `44b19156`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -20,13 +20,13 @@
 - Graphify
 - normalization.py
 - process_price_table
-- domain/__init__.py
-- TestSuggestColumns
+- .is_blocking
+- Ficheiros Criados
 - 3. Tabelas
-- PriceRule
+- engine.py
 - cn
 - 🟠 P1 — HIGH (Resolver antes das fases de DB/API)
-- engine.py
+- domain/__init__.py
 - 1. Bugs e Gotchas Identificados no Legado & Soluções Aplicadas
 - v1/processing.py
 - CONTEXT.md — Cotarco Commercial Manager
@@ -68,7 +68,7 @@
 - fixture
 - new/page.tsx
 - app/__init__.py
-- schemas/ai.py
+- v1/profiles.py
 - backend/__init__.py
 - tests/__init__.py
 - JobRepository
@@ -77,7 +77,7 @@
 - session.py
 - Fase 2 — Database & Supabase (Debriefing & Intelligence)
 - db/models.py
-- patch
+- approve_job
 - test_jobs_api.py
 - test_processing_api.py
 - _make_job
@@ -86,13 +86,13 @@
 - Detailed Findings
 - Detailed Findings
 - CATEGORY D — Stack Incompatibilities and Contradictions
-- react
+- AuthContext.tsx
 - _UserClient
 - Actionable Harmonization Roadmap
 - CATEGORY A — Dead / Incorrect Glob Paths
 - CATEGORY B — Git / Commit Workflow Conflicts
 - compilerOptions
-- Ficheiros Criados
+- v1/jobs.py
 - api.ts
 - Fase 6 - E2E Demo e Ajustes da Inteligência Artificial
 - package.json
@@ -102,9 +102,7 @@
 - ValidationIssueList.tsx
 - test_ai_api.py
 - dependencies
-- .test_rate_limit_triggers_429
 - Fase 4 — Frontend & Google Stitch Loop
-- TestZeroPriceNewProducts
 - devDependencies
 - scripts
 - tabs.tsx
@@ -125,16 +123,16 @@
 10. `PriceRule` - 19 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `1. `test_commercial_job_submission_and_diff.spec.ts`` --references--> `DiffViewer()`  [INFERRED]
-  .notebook/phase-6-e2e-demo.md → frontend/src/components/jobs/DiffViewer.tsx
 - `1.1 Bug do Preço Zero (Passo 4 do Legado)` --references--> `ValidationIssue`  [INFERRED]
   .notebook/phase-1-domain-engine.md → backend/app/domain/models.py
 - `1.2 Sobrescrita Silenciosa de Duplicados (Dicionário Zip)` --references--> `ValidationIssue`  [INFERRED]
   .notebook/phase-1-domain-engine.md → backend/app/domain/models.py
 - `4. Gotcha: `metadata` Reservado pelo SQLAlchemy Declarative` --references--> `AuditLogOrm`  [INFERRED]
   .notebook/phase-2-database.md → backend/app/infra/db/models.py
-- `Ficheiros Criados` --references--> `JobItemResponse`  [INFERRED]
-  .notebook/phase-3-api.md → backend/app/schemas/processing.py
+- `1. `test_commercial_job_submission_and_diff.spec.ts`` --references--> `DiffViewer()`  [INFERRED]
+  .notebook/phase-6-e2e-demo.md → frontend/src/components/jobs/DiffViewer.tsx
+- `2. Contratos e Modelos Principais` --references--> `ProcessResult`  [INFERRED]
+  .notebook/phase-1-domain-engine.md → backend/app/domain/models.py
 
 ## Import Cycles
 - None detected.
@@ -144,7 +142,7 @@
 - **Graphify Setup Components** — graphify, uv_tool, agents_rules_graphify_md, agents_workflows_graphify_md, git_hooks, gitattributes, graphifyignore [EXTRACTED 1.00]
 - **Price and Stock Updater Workflow** — cotarco_samsung_preco_atualizado_xlsx, mano_preco_desatualizado_xlsx, main, mano_preco_atualizado_final_xlsx, log_decisao_samsung_xlsx, deteccao_automatica_cabecalho, mapeamento_tolerante_colunas, saneamento_avancado_dados, regras_negocio_integradas, log_decisao_transparente [EXTRACTED 1.00]
 
-## Communities (104 total, 20 thin omitted)
+## Communities (102 total, 20 thin omitted)
 
 ### Community 0 - "main.py"
 Cohesion: 0.05
@@ -159,36 +157,32 @@ Cohesion: 0.09
 Nodes (18): calcular_variacao(), normalize_col(), Any, Domain normalization and data cleaning utilities for Cotarco Commercial…, Safely calculates relative price variation without division by zero. Returns:…, Normalizes column names and header text. Removes accents, strips…, Sanitizes catalog references deterministically. Retains strictly uppercase…, ultra_clean() (+10 more)
 
 ### Community 3 - "process_price_table"
-Cohesion: 0.11
-Nodes (11): process_price_table(), Processes source supplier/marketplace table against a target catalog…, Verifies that duplicate references in source records are caught and blocked., TestDuplicateReferences, Engine should not mutate the caller's input lists directly., Core domain processor test suite., TestDomainEngine, create_profile() (+3 more)
+Cohesion: 0.10
+Nodes (15): _find_field_value(), _find_target_key(), process_price_table(), Any, Processes source supplier/marketplace table against a target catalog…, Finds a field value in a dict using a list of case/accent-insensitive candidate…, Finds the actual key name present in target record matching candidate aliases., Verifies that duplicate references in source records are caught and blocked. (+7 more)
 
-### Community 4 - "domain/__init__.py"
-Cohesion: 0.11
-Nodes (29): Domain layer package for Cotarco Commercial Manager. Exports domain entities,…, DecisionCode, IssueSeverity, JobItemResult, Domain models and contracts for Cotarco Commercial Manager. All models are…, Severity levels for validation and business rule issues., Structured issue or violation emitted during validation or processing., Indicates whether this issue prevents automated execution. (+21 more)
-
-### Community 5 - "TestSuggestColumns"
-Cohesion: 0.17
-Nodes (7): Suite para o endpoint de sugestão de mapeamento de colunas., Deve retornar AIResponse com ColumnMapping válido., Deve usar fallback quando Gemini falha., Lista vazia de colunas deve retornar 422., 404 para job inexistente., OPERADOR pode usar suggest-columns em qualquer job., TestSuggestColumns
+### Community 5 - "Ficheiros Criados"
+Cohesion: 0.13
+Nodes (17): Factory that returns a FastAPI dependency checking the user has one of the…, require_role(), http_exception_handler(), make_error_body(), Standardized HTTP error handlers., validation_exception_handler(), Aggregator for all v1 routes., health_check() (+9 more)
 
 ### Community 6 - "3. Tabelas"
 Cohesion: 0.07
 Nodes (28): 1. Princípios, 2. Modelo lógico, 3. Tabelas, 4. Enums mínimos, 5. Índices importantes, 6. RLS / autorização, 7. Integridade de ficheiros, 8. Retenção (+20 more)
 
-### Community 7 - "PriceRule"
-Cohesion: 0.16
-Nodes (21): CommercialProfile, PriceRule, Product, Canonical domain product entity representing a commercial catalog item., Configuration rules for price validation and thresholds., Configuration rules for stock management and product activation., Commercial profile defining destination channel settings and rules., StockRule (+13 more)
+### Community 7 - "engine.py"
+Cohesion: 0.10
+Nodes (40): Domain processing engine for Cotarco Commercial Manager. Fully deterministic,…, CommercialProfile, DecisionCode, IssueSeverity, PriceRule, Domain models and contracts for Cotarco Commercial Manager. All models are…, Severity levels for validation and business rule issues., Structured issue or violation emitted during validation or processing. (+32 more)
 
 ### Community 8 - "cn"
-Cohesion: 0.16
-Nodes (21): FilterType, Alert, AlertDescription, AlertTitle, alertVariants, Badge(), BadgeProps, badgeVariants (+13 more)
+Cohesion: 0.14
+Nodes (26): DiffViewer(), FilterType, Alert, AlertDescription, AlertTitle, alertVariants, Badge(), BadgeProps (+18 more)
 
 ### Community 9 - "🟠 P1 — HIGH (Resolver antes das fases de DB/API)"
 Cohesion: 0.22
 Nodes (9): 🟠 P1 — HIGH (Resolver antes das fases de DB/API), REM-011, REM-012, REM-013, REM-014, REM-015, REM-016, REM-017 (+1 more)
 
-### Community 10 - "engine.py"
-Cohesion: 0.11
-Nodes (17): _find_field_value(), _find_target_key(), Any, Domain processing engine for Cotarco Commercial Manager. Fully deterministic,…, Class wrapper providing a stateless engine processor instance., Executes table processing using the configured CommercialProfile., Finds a field value in a dict using a list of case/accent-insensitive candidate…, Finds the actual key name present in target record matching candidate aliases. (+9 more)
+### Community 10 - "domain/__init__.py"
+Cohesion: 0.07
+Nodes (23): Class wrapper providing a stateless engine processor instance., Executes table processing using the configured CommercialProfile., TableProcessor, Domain layer package for Cotarco Commercial Manager. Exports domain entities,…, JobItemResult, ProcessResult, Product, Canonical domain product entity representing a commercial catalog item. (+15 more)
 
 ### Community 11 - "1. Bugs e Gotchas Identificados no Legado & Soluções Aplicadas"
 Cohesion: 0.22
@@ -335,12 +329,12 @@ Cohesion: 0.15
 Nodes (16): create_all_tables(), drop_all_tables(), Create all ORM-mapped tables in the given engine. Intended for testing only.…, Drop all ORM-mapped tables — TEST USE ONLY., db_session(), Creates a single in-memory SQLite engine shared across ALL test connections via…, Seed baseline users and profile before each test., seed_db() (+8 more)
 
 ### Community 50 - "new/page.tsx"
-Cohesion: 0.14
-Nodes (20): NewJobPage(), DashboardPage(), UploadZone(), UploadZoneProps, Button, ButtonProps, buttonVariants, Card (+12 more)
-
-### Community 52 - "schemas/ai.py"
 Cohesion: 0.18
-Nodes (10): ColumnMapping, ExecutiveSummary, Pydantic v2 schemas for Gemini AI Assistive endpoints. GUARDRAIL (Regra de Ouro…, Resumo executivo assistivo de um processamento. Gerado pelo Gemini com base nos…, Resultado completo de sugestão de mapeamento de colunas. GUARDRAIL: Sugestões…, Payload para POST /jobs/{id}/ai/summary. Envia os dados quantitativos do job…, Payload para POST /jobs/{id}/ai/suggest-columns. Envia cabeçalhos desconhecidos…, SuggestColumnsRequest (+2 more)
+Nodes (17): DashboardPage(), UploadZone(), UploadZoneProps, Button, ButtonProps, buttonVariants, Card, CardContent (+9 more)
+
+### Community 52 - "v1/profiles.py"
+Cohesion: 0.23
+Nodes (13): get_profile(), list_profiles(), DbDep, get, UserDep, UUID, GET /profiles, GET /profiles/{id}, List all active commercial profiles. Any authenticated user. (+5 more)
 
 ### Community 55 - "JobRepository"
 Cohesion: 0.07
@@ -366,9 +360,9 @@ Nodes (17): _JsonColumn, Maps to JSONB on PostgreSQL, native JSON on everything 
 Cohesion: 0.09
 Nodes (24): ApprovalOrm, Base, JobFileOrm, ProfileRuleOrm, SQLAlchemy 2.0 ORM models for Cotarco Commercial Manager. Mapped to PostgreSQL…, Versioned rule configuration attached to a commercial profile. Unique per…, Versioned file record for inputs, outputs, logs, and reports. The actual binary…, Immutable record of an approval, rejection, or cancellation action. Append-only… (+16 more)
 
-### Community 61 - "patch"
-Cohesion: 0.22
-Nodes (7): Suite para o endpoint de resumo executivo., Deve retornar AIResponse com ExecutiveSummary quando Gemini responde., Deve usar fallback quando Gemini está indisponível., 404 para job inexistente., COMERCIAL recebe 403 ao tentar aceder ao job de outro utilizador., TestAISummary, patch
+### Community 61 - "approve_job"
+Cohesion: 0.33
+Nodes (6): approve_job(), DbDep, post, UserDep, UUID, Approve a job for processing. OPERADOR/ADMIN only — COMERCIAL gets HTTP 403.
 
 ### Community 62 - "test_jobs_api.py"
 Cohesion: 0.15
@@ -379,8 +373,8 @@ Cohesion: 0.15
 Nodes (4): Tests for POST /jobs/{id}/validate, GET /jobs/{id}/summary, items, issues., TestItemsAndIssuesEndpoints, TestSummaryEndpoint, TestValidateEndpoint
 
 ### Community 64 - "_make_job"
-Cohesion: 0.14
-Nodes (11): _make_job(), Deve retornar AIResponse com fallback quando Gemini falha., Deve retornar 404 para job_id inexistente., COMERCIAL não pode aceder ao job de outro utilizador., OPERADOR pode aceder a qualquer job., Payload inválido (sem campos obrigatórios) deve retornar 422., Severity inválido deve retornar 422., Insere um job na DB de teste e retorna o ID. (+3 more)
+Cohesion: 0.06
+Nodes (28): _make_job(), Deve retornar AIResponse com fallback quando Gemini falha., Deve retornar 404 para job_id inexistente., COMERCIAL não pode aceder ao job de outro utilizador., OPERADOR pode aceder a qualquer job., Payload inválido (sem campos obrigatórios) deve retornar 422., Severity inválido deve retornar 422., Suite para o endpoint de resumo executivo. (+20 more)
 
 ### Community 69 - "limpar_preco"
 Cohesion: 0.33
@@ -402,9 +396,9 @@ Nodes (7): CATEGORY C — Autonomy vs. Human Approval Gate Conflicts, CATEGORY E
 Cohesion: 0.29
 Nodes (7): CATEGORY D — Stack Incompatibilities and Contradictions, FIND-011, FIND-012, FIND-013, FIND-014, FIND-015, FIND-016
 
-### Community 74 - "react"
+### Community 74 - "AuthContext.tsx"
 Cohesion: 0.19
-Nodes (14): frontend_src_app_globals, metadata, Providers(), Header(), UserSwitcher(), AuthContext, AuthContextType, AuthProvider() (+6 more)
+Nodes (13): frontend_src_app_globals, metadata, Providers(), Header(), UserSwitcher(), AuthContext, AuthContextType, AuthProvider() (+5 more)
 
 ### Community 75 - "_UserClient"
 Cohesion: 0.06
@@ -426,13 +420,13 @@ Nodes (5): CATEGORY B — Git / Commit Workflow Conflicts, FIND-005, FIND-006, F
 Cohesion: 0.11
 Nodes (18): compilerOptions, allowJs, esModuleInterop, incremental, isolatedModules, jsx, lib, module (+10 more)
 
-### Community 84 - "Ficheiros Criados"
-Cohesion: 0.06
-Nodes (57): Factory that returns a FastAPI dependency checking the user has one of the…, require_role(), http_exception_handler(), make_error_body(), Standardized HTTP error handlers., validation_exception_handler(), approve_job(), DbDep (+49 more)
+### Community 84 - "v1/jobs.py"
+Cohesion: 0.16
+Nodes (21): POST /jobs/{id}/approve — OPERADOR/ADMIN only., create_job(), get_job(), list_jobs(), DbDep, get, post, UserDep (+13 more)
 
 ### Community 85 - "api.ts"
 Cohesion: 0.14
-Nodes (19): DiffViewerProps, JobTableProps, DEMO_ISSUES, DEMO_ITEMS, DEMO_JOBS, DEMO_PROFILES, AIAnomalyExplanation, AIExplainIssueRequest (+11 more)
+Nodes (20): DiffViewerProps, JobTableProps, DEMO_ISSUES, DEMO_ITEMS, DEMO_JOBS, DEMO_PROFILES, AIAnomalyExplanation, AIExplainIssueRequest (+12 more)
 
 ### Community 86 - "Fase 6 - E2E Demo e Ajustes da Inteligência Artificial"
 Cohesion: 0.22
@@ -443,8 +437,8 @@ Cohesion: 0.12
 Nodes (14): name, private, version, config, autoprefixer, postcss, react-dom, tailwindcss (+6 more)
 
 ### Community 88 - "[id]/page.tsx"
-Cohesion: 0.23
-Nodes (14): JobDetailPage(), DiffViewer(), JobTable(), approveJob(), fetchJob(), fetchJobIssues(), fetchJobItems(), fetchJobSummary() (+6 more)
+Cohesion: 0.29
+Nodes (13): JobDetailPage(), NewJobPage(), JobTable(), approveJob(), createJob(), fetchJob(), fetchJobIssues(), fetchJobItems() (+5 more)
 
 ### Community 90 - "ProcessSummary"
 Cohesion: 0.33
@@ -455,16 +449,12 @@ Cohesion: 0.26
 Nodes (11): ValidationIssueList(), ValidationIssueListProps, Dialog(), DialogContent(), DialogDescription, DialogFooter(), DialogHeader(), DialogProps (+3 more)
 
 ### Community 92 - "test_ai_api.py"
-Cohesion: 0.12
-Nodes (17): AIResponse, AnomalyExplanation, ColumnSuggestion, ExplainIssueRequest, Explicação assistiva de uma anomalia/erro de validação. Gerado pelo Gemini em…, Sugestão de mapeamento para uma coluna desconhecida., Envelope genérico para todas as respostas de IA assistiva. O campo…, Payload para POST /jobs/{id}/ai/explain-issue. O frontend envia o código de… (+9 more)
+Cohesion: 0.09
+Nodes (28): AIResponse, AnomalyExplanation, ColumnMapping, ColumnSuggestion, ExecutiveSummary, ExplainIssueRequest, Pydantic v2 schemas for Gemini AI Assistive endpoints. GUARDRAIL (Regra de Ouro…, Explicação assistiva de uma anomalia/erro de validação. Gerado pelo Gemini em… (+20 more)
 
 ### Community 93 - "dependencies"
 Cohesion: 0.18
 Nodes (11): dependencies, class-variance-authority, clsx, lucide-react, next, react, react-dom, tailwind-merge (+3 more)
-
-### Community 94 - ".test_rate_limit_triggers_429"
-Cohesion: 0.50
-Nodes (3): Testa o rate limit de chamadas de IA por utilizador., Após 20 chamadas num minuto, deve retornar 429., TestRateLimit
 
 ### Community 95 - "Fase 4 — Frontend & Google Stitch Loop"
 Cohesion: 0.25
@@ -483,24 +473,24 @@ Cohesion: 0.20
 Nodes (9): Tabs(), TabsContent, TabsContentProps, TabsContext, TabsContextValue, TabsList, TabsProps, TabsTrigger (+1 more)
 
 ## Knowledge Gaps
-- **575 isolated node(s):** `Resumo Executivo`, `Ajustes da Inteligência Artificial`, `2. `test_operator_approval_workflow.spec.ts``, `3. `test_accessibility_and_responsive_audit.spec.ts``, `Declaração de Prontidão (MVP Completion Statement)` (+570 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 932 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **576 isolated node(s):** `metadata`, `ValidationIssueListProps`, `DEMO_PROFILES`, `DEMO_JOBS`, `DEMO_ITEMS` (+571 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 933 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **20 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `ProfileRepository` connect `ProfileRepository` to `fixture`, `Ficheiros Criados`, `test_schema.py`, `Fase 2 — Database & Supabase (Debriefing & Intelligence)`, `db/models.py`?**
-  _High betweenness centrality (0.027) - this node is a cross-community bridge._
-- **Why does `JobRepository` connect `JobRepository` to `fixture`, `Ficheiros Criados`, `test_schema.py`, `Fase 2 — Database & Supabase (Debriefing & Intelligence)`, `db/models.py`?**
-  _High betweenness centrality (0.013) - this node is a cross-community bridge._
-- **Why does `ProcessingJobOrm` connect `JobRepository` to `_make_job`, `test_schema.py`, `Ficheiros Criados`, `db/models.py`?**
-  _High betweenness centrality (0.013) - this node is a cross-community bridge._
+- **Why does `process_price_table()` connect `process_price_table` to `normalization.py`, `limpar_preco`, `engine.py`, `domain/__init__.py`, `ProcessSummary`?**
+  _High betweenness centrality (0.019) - this node is a cross-community bridge._
+- **Why does `_make_job()` connect `_make_job` to `test_ai_api.py`, `JobRepository`?**
+  _High betweenness centrality (0.016) - this node is a cross-community bridge._
+- **Why does `JobRepository` connect `JobRepository` to `fixture`, `v1/jobs.py`, `test_schema.py`, `Fase 2 — Database & Supabase (Debriefing & Intelligence)`, `db/models.py`, `approve_job`?**
+  _High betweenness centrality (0.015) - this node is a cross-community bridge._
 - **Are the 14 inferred relationships involving `JobRepository` (e.g. with `ApprovalOrm` and `AuditLogOrm`) actually correct?**
   _`JobRepository` has 14 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 3 inferred relationships involving `process_price_table()` (e.g. with `CommercialProfile` and `DecisionCode`) actually correct?**
   _`process_price_table()` has 3 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 5 inferred relationships involving `ProfileRepository` (e.g. with `CommercialProfileOrm` and `ProfileRuleOrm`) actually correct?**
   _`ProfileRepository` has 5 INFERRED edges - model-reasoned connections that need verification._
-- **What connects `Resumo Executivo`, `Ajustes da Inteligência Artificial`, `2. `test_operator_approval_workflow.spec.ts`` to the rest of the system?**
-  _575 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **What connects `metadata`, `ValidationIssueListProps`, `DEMO_PROFILES` to the rest of the system?**
+  _576 weakly-connected nodes found - possible documentation gaps or missing edges._

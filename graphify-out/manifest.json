@@ -342,9 +342,9 @@
     "semantic_hash": ""
   },
   "backend/app/infra/db/session.py": {
-    "mtime": 1790350005.4030175,
-    "seen": 1790350811.677728,
-    "ast_hash": "b4bb4218293b531d7367930f71d654e2",
+    "mtime": 1790605319.936726,
+    "seen": 1790608630.1255937,
+    "ast_hash": "b48fb8952db632a9b86e65905c60b810",
     "semantic_hash": ""
   },
   "backend/app/infra/repositories/__init__.py": {
@@ -390,9 +390,9 @@
     "semantic_hash": ""
   },
   "backend/app/api/deps.py": {
-    "mtime": 1790583260.832245,
-    "seen": 1790584061.802999,
-    "ast_hash": "1376bdbb365de11e1930b36705d2ce3b",
+    "mtime": 1790607176.934414,
+    "seen": 1790608630.1255937,
+    "ast_hash": "f975056c8c9c5be0157ba3fb9dd89816",
     "semantic_hash": ""
   },
   "backend/app/api/errors.py": {
@@ -414,15 +414,15 @@
     "semantic_hash": ""
   },
   "backend/app/api/v1/jobs.py": {
-    "mtime": 1790583298.984703,
-    "seen": 1790584061.802999,
-    "ast_hash": "90c448cc42d83cb333b5b237d472a233",
+    "mtime": 1790604960.101453,
+    "seen": 1790608630.1255937,
+    "ast_hash": "d87f0f3d11b7c63a8617d3195ffe57c7",
     "semantic_hash": ""
   },
   "backend/app/api/v1/processing.py": {
-    "mtime": 1790583323.880351,
-    "seen": 1790584061.802999,
-    "ast_hash": "317168b452ca1e817eaeee81c6e53add",
+    "mtime": 1790604984.1812043,
+    "seen": 1790608630.1255937,
+    "ast_hash": "d37a31ab46434b396d3761b8475a7b41",
     "semantic_hash": ""
   },
   "backend/app/api/v1/profiles.py": {
@@ -438,9 +438,9 @@
     "semantic_hash": ""
   },
   "backend/app/main.py": {
-    "mtime": 1790583336.8060417,
-    "seen": 1790584061.802999,
-    "ast_hash": "0bb0309d6dddcc802805d10312d0dc62",
+    "mtime": 1790606913.1380298,
+    "seen": 1790608630.1255937,
+    "ast_hash": "65e25fac22566b335fcec6799ff710fb",
     "semantic_hash": ""
   },
   "backend/app/schemas/__init__.py": {
@@ -564,9 +564,9 @@
     "semantic_hash": ""
   },
   "frontend/src/app/layout.tsx": {
-    "mtime": 1790585759.837342,
-    "seen": 1790588004.4417708,
-    "ast_hash": "3e03a1579c8ca399ad735d62b8aa9637",
+    "mtime": 1790604777.2306707,
+    "seen": 1790608630.1255937,
+    "ast_hash": "942c54d52ed3048c02cc3160794236f1",
     "semantic_hash": ""
   },
   "frontend/src/app/page.tsx": {
@@ -600,9 +600,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/jobs/ValidationIssueList.tsx": {
-    "mtime": 1790593171.3143141,
-    "seen": 1790597450.5160441,
-    "ast_hash": "3769bf1302a457bea2cf287805526c7c",
+    "mtime": 1790606990.7047281,
+    "seen": 1790608630.1255937,
+    "ast_hash": "cfeb2b176e902d591091130de7b6ea86",
     "semantic_hash": ""
   },
   "frontend/src/components/layout/Header.tsx": {
@@ -678,15 +678,15 @@
     "semantic_hash": ""
   },
   "frontend/src/context/AuthContext.tsx": {
-    "mtime": 1790585628.7725651,
-    "seen": 1790588004.4417708,
+    "mtime": 1790602056.7425516,
+    "seen": 1790608630.1255937,
     "ast_hash": "71453211b6b281ac9f22929bb98830d0",
     "semantic_hash": ""
   },
   "frontend/src/lib/api.ts": {
-    "mtime": 1790593105.2001178,
-    "seen": 1790597450.5160441,
-    "ast_hash": "89cda5e895af82787928c2a77203425f",
+    "mtime": 1790606932.4880002,
+    "seen": 1790608630.1255937,
+    "ast_hash": "60e373fc506faddb14f149eeff07d494",
     "semantic_hash": ""
   },
   "frontend/src/lib/utils.ts": {
@@ -720,9 +720,9 @@
     "semantic_hash": ""
   },
   "backend/app/api/v1/ai.py": {
-    "mtime": 1790598214.741567,
-    "seen": 1790600231.1878426,
-    "ast_hash": "06477896cf844493f95dd13926141ea7",
+    "mtime": 1790605164.9897811,
+    "seen": 1790608630.1255937,
+    "ast_hash": "c177bb782a5123a7f771fb56f69eed8f",
     "semantic_hash": ""
   },
   "backend/app/schemas/ai.py": {
@@ -732,14 +732,14 @@
     "semantic_hash": ""
   },
   "backend/app/services/ai_service.py": {
-    "mtime": 1790598208.821329,
-    "seen": 1790600231.1889136,
-    "ast_hash": "eedd5ebe28e69ab451cd834be52da7aa",
+    "mtime": 1790605457.652316,
+    "seen": 1790608630.1255937,
+    "ast_hash": "a4d3953cb30a6cf26969b2bf29365470",
     "semantic_hash": ""
   },
   "backend/tests/test_api/test_ai_api.py": {
-    "mtime": 1790589607.6914494,
-    "seen": 1790597450.5160441,
+    "mtime": 1790602896.5789113,
+    "seen": 1790608630.1255937,
     "ast_hash": "0ae2e1f241128d40ba562d4f4cebdd8b",
     "semantic_hash": ""
   },
