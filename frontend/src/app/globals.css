@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 20% 98%;      /* #F8F9FA Soft Neutral */
+    --foreground: 0 0% 0%;          /* #000000 Deep Ink Black */
+
+    --card: 0 0% 100%;              /* #FFFFFF Pure Surface */
+    --card-foreground: 0 0% 0%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 0%;
+
+    --primary: 8 100% 55%;          /* #FF3C1D Cotarco Red */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 4% 41%;          /* #6B6363 Slate Secondary */
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 210 16% 93%;           /* #ECEFF1 */
+    --muted-foreground: 0 4% 41%;   /* #6B6363 */
+
+    --accent: 8 100% 97%;           /* #FFF1EF Cotarco Red subtle */
+    --accent-foreground: 8 100% 55%;
+
+    --destructive: 0 84% 60%;       /* #DC2626 */
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 13% 91%;          /* #E5E7EB */
+    --input: 220 13% 91%;
+    --ring: 8 100% 55%;             /* Cotarco Red focus ring */
+
+    --radius: 0.375rem;             /* 6px rounded-md */
+  }
+
+  .dark {
+    --background: 224 71% 4%;
+    --foreground: 213 31% 91%;
+
+    --card: 224 71% 7%;
+    --card-foreground: 213 31% 91%;
+
+    --popover: 224 71% 7%;
+    --popover-foreground: 213 31% 91%;
+
+    --primary: 8 100% 55%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 215 27.9% 16.9%;
+    --secondary-foreground: 210 20% 98%;
+
+    --muted: 215 27.9% 16.9%;
+    --muted-foreground: 217.9 10.6% 64.9%;
+
+    --accent: 215 27.9% 16.9%;
+    --accent-foreground: 210 20% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 20% 98%;
+
+    --border: 215 27.9% 16.9%;
+    --input: 215 27.9% 16.9%;
+    --ring: 8 100% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+  
+  /* UI-Skills Enforcement: High-density data formatting */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
