@@ -52,7 +52,7 @@ router = APIRouter(prefix="/jobs", tags=["ai"])
 # ---------------------------------------------------------------------------
 
 _rate_store: dict[str, list[float]] = defaultdict(list)
-_RATE_LIMIT = 20  # max calls per user per minute
+_RATE_LIMIT = 12  # max calls per user per minute (15 RPM Free Tier limit)
 _RATE_WINDOW = 60.0  # seconds
 
 
@@ -173,6 +173,7 @@ def explain_issue(
         severity=payload.severity.value,
         context=payload.context,
         language=payload.language,
+        job_id=str(job_id),
     )
 
     _append_audit(

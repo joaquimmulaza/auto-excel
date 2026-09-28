@@ -256,12 +256,15 @@ def _fallback_column_mapping(
 # ---------------------------------------------------------------------------
 
 
+_explain_cache: dict[str, dict[str, Any]] = {}
+
 def explain_issue(
     issue_code: str,
     issue_message: str,
     severity: str,
     context: dict[str, Any],
     language: str = "pt",
+    job_id: str = "",
 ) -> tuple[dict[str, Any], bool]:
     """Explica uma anomalia de validação usando Gemini.
 
@@ -269,6 +272,10 @@ def explain_issue(
         (data_dict, fallback_used): data_dict conforme AnomalyExplanation;
         fallback_used=True se usámos o fallback determinístico.
     """
+    cache_key = f"{job_id}:{issue_code}:{language}"
+    if job_id and cache_key in _explain_cache:
+        return _explain_cache[cache_key], False
+
     prompt = _build_explain_prompt(
         issue_code, issue_message, severity, context, language
     )
@@ -280,6 +287,8 @@ def explain_issue(
     ):
         # Enforce is_blocker to match severity (deterministic override)
         result["is_blocker"] = severity == "BLOCKER"
+        if job_id:
+            _explain_cache[cache_key] = result
         return result, False
 
     return _fallback_explanation(issue_code, issue_message, severity), True
