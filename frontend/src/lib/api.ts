@@ -1,8 +1,7 @@
-﻿/**
+/**
  * API client connected to Cotarco Commercial Manager FastAPI backend.
  * Base URL: http://localhost:8000/api/v1
  */
-
 import {
   JobResponse,
   JobListResponse,
@@ -13,10 +12,15 @@ import {
   ProfileListResponse,
   ApprovalResponse, AIExplainIssueRequest, AIAnomalyExplanation, AIResponse,
 } from "@/types";
-
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
-
+export function getAuthHeaders(): HeadersInit {
+  const role = typeof window !== "undefined" ? localStorage.getItem("ccm_active_role") || "COMERCIAL" : "COMERCIAL";
+  const id = role === "OPERADOR" ? "00000000-0000-0000-0000-000000000002" : 
+             role === "ADMIN" ? "00000000-0000-0000-0000-000000000003" : 
+             "00000000-0000-0000-0000-000000000001";
+  return { "X-User-Id": id };
+}
 // Fallback demo data for immediate testing and resilience
 export const DEMO_PROFILES = [
   {
@@ -24,7 +28,7 @@ export const DEMO_PROFILES = [
     code: "MANO",
     name: "Marketplace Mano",
     type: "MARKETPLACE",
-    description: "ExportaÃ§Ã£o de preÃ§os e stocks com limiar de variaÃ§Ã£o de 30% e stock mÃ­nimo de 3 unidades para produtos novos.",
+    description: "Exportação de preços e stocks com limiar de variação de 30% e stock mínimo de 3 unidades para produtos novos.",
     active: true,
     config: { price_guard_threshold_pct: 30, new_product_min_stock: 3 },
     rules_version: 1,
@@ -36,7 +40,7 @@ export const DEMO_PROFILES = [
     code: "LOJA_ONLINE",
     name: "Loja Online Cotarco",
     type: "ECOMMERCE",
-    description: "AtualizaÃ§Ã£o direta de catÃ¡logo do e-commerce Cotarco com regras de margem comercial.",
+    description: "Atualização direta de catálogo do e-commerce Cotarco com regras de margem comercial.",
     active: true,
     config: { price_guard_threshold_pct: 25, new_product_min_stock: 1 },
     rules_version: 1,
@@ -48,7 +52,7 @@ export const DEMO_PROFILES = [
     code: "BFA",
     name: "BFA Wholesale",
     type: "PARTNER",
-    description: "Tabela institucional de fornecimento e parcerias com preÃ§os especiais.",
+    description: "Tabela institucional de fornecimento e parcerias com preços especiais.",
     active: true,
     config: { price_guard_threshold_pct: 20, new_product_min_stock: 5 },
     rules_version: 1,
@@ -56,7 +60,6 @@ export const DEMO_PROFILES = [
     updated_at: new Date().toISOString(),
   },
 ];
-
 export const DEMO_JOBS: JobResponse[] = [
   {
     id: "00000000-0000-0000-0000-000000000184",
@@ -65,7 +68,7 @@ export const DEMO_JOBS: JobResponse[] = [
     created_by_id: "00000000-0000-0000-0000-000000000001",
     status: "READY_FOR_REVIEW",
     source_system: "SAMSUNG",
-    description: "Tabela de PreÃ§os e Stocks Linha Branca Setembro 2026",
+    description: "Tabela de Preços e Stocks Linha Branca Setembro 2026",
     options: {},
     summary: {
       total: 1248,
@@ -84,7 +87,7 @@ export const DEMO_JOBS: JobResponse[] = [
     created_by_id: "00000000-0000-0000-0000-000000000001",
     status: "COMPLETED",
     source_system: "LG",
-    description: "AtualizaÃ§Ã£o Televisores e Ãudio",
+    description: "Atualização Televisores e Áudio",
     options: {},
     summary: {
       total: 936,
@@ -103,7 +106,7 @@ export const DEMO_JOBS: JobResponse[] = [
     created_by_id: "00000000-0000-0000-0000-000000000001",
     status: "NEEDS_CORRECTION",
     source_system: "SAMSUNG",
-    description: "Lote Inicial Smartphone Galaxy SÃ©rie S",
+    description: "Lote Inicial Smartphone Galaxy Série S",
     options: {},
     summary: {
       total: 1421,
@@ -116,7 +119,6 @@ export const DEMO_JOBS: JobResponse[] = [
     updated_at: new Date(Date.now() - 86400000 * 3 + 3600000).toISOString(),
   },
 ];
-
 export const DEMO_ITEMS: JobItemResponse[] = [
   {
     id: "item-1",
@@ -203,14 +205,13 @@ export const DEMO_ITEMS: JobItemResponse[] = [
     created_at: new Date().toISOString(),
   },
 ];
-
 export const DEMO_ISSUES: ValidationIssueResponse[] = [
   {
     id: "issue-1",
     job_id: "00000000-0000-0000-0000-000000000184",
     severity: "BLOCKER",
     code: "PRICE_VARIATION_BLOCKED",
-    message: "A variaÃ§Ã£o de preÃ§o (+175.0%) ultrapassa o limite de 30% configurado para o Marketplace Mano. Verifique a referÃªncia XXX_ANOMALY_REF.",
+    message: "A variação de preço (+175.0%) ultrapassa o limite de 30% configurado para o Marketplace Mano. Verifique a referência XXX_ANOMALY_REF.",
     field: "price",
     row_number: 142,
     resolved: false,
@@ -221,37 +222,34 @@ export const DEMO_ISSUES: ValidationIssueResponse[] = [
     job_id: "00000000-0000-0000-0000-000000000184",
     severity: "WARNING",
     code: "STOCK_THRESHOLD_IGNORED",
-    message: "O produto DV90T6240LK foi ignorado porque o stock (1) Ã© inferior ao mÃ­nimo configurado (3).",
+    message: "O produto DV90T6240LK foi ignorado porque o stock (1) é inferior ao mínimo configurado (3).",
     field: "stock",
     row_number: 89,
     resolved: true,
     created_at: new Date().toISOString(),
   },
 ];
-
 export async function fetchProfiles(): Promise<ProfileListResponse> {
   try {
-    const res = await fetch(`${API_BASE_URL}/profiles`, { cache: "no-store" });
+    const res = await fetch(`${API_BASE_URL}/profiles`, { cache: "no-store", headers: getAuthHeaders() });
     if (!res.ok) throw new Error("API offline");
     return await res.json();
   } catch {
     return { items: DEMO_PROFILES, total: DEMO_PROFILES.length };
   }
 }
-
 export async function fetchJobs(): Promise<JobListResponse> {
   try {
-    const res = await fetch(`${API_BASE_URL}/jobs`, { cache: "no-store" });
+    const res = await fetch(`${API_BASE_URL}/jobs`, { cache: "no-store", headers: getAuthHeaders() });
     if (!res.ok) throw new Error("API offline");
     return await res.json();
   } catch {
     return { items: DEMO_JOBS, total: DEMO_JOBS.length };
   }
 }
-
 export async function fetchJob(jobId: string): Promise<JobResponse> {
   try {
-    const res = await fetch(`${API_BASE_URL}/jobs/${jobId}`, { cache: "no-store" });
+    const res = await fetch(`${API_BASE_URL}/jobs/${jobId}`, { cache: "no-store", headers: getAuthHeaders() });
     if (!res.ok) throw new Error("API offline");
     return await res.json();
   } catch {
@@ -259,12 +257,11 @@ export async function fetchJob(jobId: string): Promise<JobResponse> {
     return found;
   }
 }
-
 export async function createJob(data: JobCreateRequest): Promise<JobResponse> {
   try {
     const res = await fetch(`${API_BASE_URL}/jobs`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...getAuthHeaders() },
       body: JSON.stringify(data),
     });
     if (!res.ok) throw new Error("API offline");
@@ -272,7 +269,7 @@ export async function createJob(data: JobCreateRequest): Promise<JobResponse> {
   } catch {
     // Return created mock job
     const newJob: JobResponse = {
-      id: `job-${Date.now()}`,
+      id: typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : "00000000-0000-0000-0000-" + String(Date.now()).padStart(12, "0"),
       job_number: Math.floor(Math.random() * 1000) + 185,
       profile_id: data.profile_id,
       created_by_id: "00000000-0000-0000-0000-000000000001",
@@ -294,10 +291,9 @@ export async function createJob(data: JobCreateRequest): Promise<JobResponse> {
     return newJob;
   }
 }
-
 export async function fetchJobSummary(jobId: string): Promise<JobSummaryResponse> {
   try {
-    const res = await fetch(`${API_BASE_URL}/jobs/${jobId}/summary`, { cache: "no-store" });
+    const res = await fetch(`${API_BASE_URL}/jobs/${jobId}/summary`, { cache: "no-store", headers: getAuthHeaders() });
     if (!res.ok) throw new Error("API offline");
     return await res.json();
   } catch {
@@ -315,31 +311,28 @@ export async function fetchJobSummary(jobId: string): Promise<JobSummaryResponse
     };
   }
 }
-
 export async function fetchJobItems(jobId: string): Promise<JobItemResponse[]> {
   try {
-    const res = await fetch(`${API_BASE_URL}/jobs/${jobId}/items`, { cache: "no-store" });
+    const res = await fetch(`${API_BASE_URL}/jobs/${jobId}/items`, { cache: "no-store", headers: getAuthHeaders() });
     if (!res.ok) throw new Error("API offline");
     return await res.json();
   } catch {
     return DEMO_ITEMS;
   }
 }
-
 export async function fetchJobIssues(jobId: string): Promise<ValidationIssueResponse[]> {
   try {
-    const res = await fetch(`${API_BASE_URL}/jobs/${jobId}/issues`, { cache: "no-store" });
+    const res = await fetch(`${API_BASE_URL}/jobs/${jobId}/issues`, { cache: "no-store", headers: getAuthHeaders() });
     if (!res.ok) throw new Error("API offline");
     return await res.json();
   } catch {
     return DEMO_ISSUES;
   }
 }
-
 export async function approveJob(jobId: string, comment?: string): Promise<ApprovalResponse> {
   const res = await fetch(`${API_BASE_URL}/jobs/${jobId}/approve`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...getAuthHeaders() },
     body: JSON.stringify({ comment }),
   });
   if (!res.ok) {
@@ -349,18 +342,33 @@ export async function approveJob(jobId: string, comment?: string): Promise<Appro
   }
   return await res.json();
 }
-
 export async function explainIssueWithAi(jobId: string, payload: AIExplainIssueRequest): Promise<AIResponse<AIAnomalyExplanation>> {
-  const res = await fetch(API_BASE_URL + '/jobs/' + jobId + '/ai/explain-issue', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData?.detail?.error?.message || 'Falha ao obter explicação da IA');
+  try {
+    const res = await fetch(API_BASE_URL + '/jobs/' + jobId + '/ai/explain-issue', {
+      method: 'POST',
+      headers: { "Content-Type": "application/json", ...getAuthHeaders() },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      throw new Error(errorData?.detail?.error?.message || 'Falha ao obter explicação da IA');
+    }
+    return await res.json();
+  } catch (err) {
+    // Deterministic fallback — backend or network unavailable.
+    // The UI (ValidationIssueList.tsx) shows a graceful error state from this.
+    const isBlocker = payload.severity === 'BLOCKER';
+    return {
+      is_ai_generated: false,
+      fallback_used: true,
+      data: {
+        title: `Problema detectado: ${payload.issue_code}`,
+        plain_explanation: payload.issue_message,
+        likely_cause: 'Serviço de IA temporariamente indisponível.',
+        suggested_action: 'Reveja manualmente os dados da tabela e corrija o valor indicado.',
+        is_blocker: isBlocker,
+      },
+    };
   }
-  return await res.json();
 }
-
 

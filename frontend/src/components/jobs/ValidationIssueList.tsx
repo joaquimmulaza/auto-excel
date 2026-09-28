@@ -23,6 +23,7 @@ export function ValidationIssueList({ issues }: ValidationIssueListProps) {
   const [selectedIssue, setSelectedIssue] = useState<ValidationIssueResponse | null>(null);
   const [isAiExplaining, setIsAiExplaining] = useState(false);
   const [aiExplanation, setAiExplanation] = useState<AIAnomalyExplanation | null>(null);
+  const [aiIsRealResponse, setAiIsRealResponse] = useState(true);
 
   const getSeverityBadge = (severity: string) => {
     switch (severity) {
@@ -53,26 +54,17 @@ export function ValidationIssueList({ issues }: ValidationIssueListProps) {
     setSelectedIssue(issue);
     setIsAiExplaining(true);
     setAiExplanation(null);
-    try {
-      const result = await explainIssueWithAi(issue.job_id, {
-        issue_code: issue.code,
-        issue_message: issue.message,
-        severity: issue.severity,
-      });
-      setAiExplanation(result.data);
-    } catch (error) {
-      console.error('Erro ao obter explicação da IA', error);
-      setAiExplanation({
-        title: 'Erro de Comunicação',
-        plain_explanation: 'Não foi possível obter a explicação da IA no momento.',
-        likely_cause: 'Serviço indisponível ou erro de rede.',
-        suggested_action: 'Tente novamente mais tarde.',
-        is_blocker: false,
-      });
-    } finally {
-      setIsAiExplaining(false);
-    }
+    setAiIsRealResponse(true);
+    const result = await explainIssueWithAi(issue.job_id, {
+      issue_code: issue.code,
+      issue_message: issue.message,
+      severity: issue.severity,
+    });
+    setAiExplanation(result.data);
+    setAiIsRealResponse(!result.fallback_used);
+    setIsAiExplaining(false);
   };
+
 
   if (issues.length === 0) {
     return (
@@ -157,9 +149,16 @@ export function ValidationIssueList({ issues }: ValidationIssueListProps) {
             </div>
 
             <div className="space-y-2">
-              <span className="font-bold text-ink block">
-                Parecer de IA (Gemini Commercial Assistant):
-              </span>
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-ink block">
+                  Parecer de IA (Gemini Commercial Assistant):
+                </span>
+                {!isAiExplaining && aiExplanation && !aiIsRealResponse && (
+                  <span className="text-[10px] text-slateSecondary bg-canvas border border-border rounded px-1.5 py-0.5">
+                    Análise local · IA indisponível
+                  </span>
+                )}
+              </div>
               {isAiExplaining ? (
                 <div className="flex items-center gap-2 text-slateSecondary py-4">
                   <div className="h-4 w-4 rounded-full border-2 border-brand border-t-transparent animate-spin" />
@@ -185,6 +184,7 @@ export function ValidationIssueList({ issues }: ValidationIssueListProps) {
                 </div>
               )}
             </div>
+
           </div>
         )}
 
