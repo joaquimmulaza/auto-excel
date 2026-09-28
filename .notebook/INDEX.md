@@ -4,4 +4,5 @@
 - [UI Skills MCP & Workflow Integration](file:///c:/Users/MARKETING%20DESIGNER01/Downloads/up_prices/.notebook/ui-skills-workflow.md): Mandatory quality gates before Stitch prompts and before frontend code implementation.
 - [Fase 1 — Extração do Engine de Domínio](file:///c:/up_prices/.notebook/phase-1-domain-engine.md): Arquitetura, resolução dos 4 bugs do legado, contratos Pydantic v2 e evidências de testes TDD.
 - [Fase 2 — Database & Supabase](file:///c:/up_prices/.notebook/phase-2-database.md): Schema relacional PostgreSQL, modelos SQLAlchemy 2.0, políticas RLS, seed de perfis comerciais e suite de testes (35 passed).
+- [Fase 3 — FastAPI & Endpoints](file:///c:/up_prices/.notebook/phase-3-api.md): 20 ficheiros criados, 11 endpoints REST, RBAC completo (COMERCIAL→403 no approve), StaticPool + ContextVar gotchas. 96 testes passados.
 
