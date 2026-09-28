@@ -540,9 +540,9 @@
     "semantic_hash": ""
   },
   "frontend/package.json": {
-    "mtime": 1790585562.0985,
-    "seen": 1790588004.4417708,
-    "ast_hash": "c0fe8a73154adae8b2c90fd5d34750f2",
+    "mtime": 1790598298.954427,
+    "seen": 1790600231.1889136,
+    "ast_hash": "4c70c9f614e34bdadb94141080d8a361",
     "semantic_hash": ""
   },
   "frontend/postcss.config.js": {
@@ -720,9 +720,9 @@
     "semantic_hash": ""
   },
   "backend/app/api/v1/ai.py": {
-    "mtime": 1790589522.379279,
-    "seen": 1790597450.5160441,
-    "ast_hash": "5ddd54dab63ffcee45df960b998072d9",
+    "mtime": 1790598214.741567,
+    "seen": 1790600231.1878426,
+    "ast_hash": "06477896cf844493f95dd13926141ea7",
     "semantic_hash": ""
   },
   "backend/app/schemas/ai.py": {
@@ -732,9 +732,9 @@
     "semantic_hash": ""
   },
   "backend/app/services/ai_service.py": {
-    "mtime": 1790589480.7971835,
-    "seen": 1790597450.5160441,
-    "ast_hash": "7c3f722996adf1cc96081e7c889ffe07",
+    "mtime": 1790598208.821329,
+    "seen": 1790600231.1889136,
+    "ast_hash": "eedd5ebe28e69ab451cd834be52da7aa",
     "semantic_hash": ""
   },
   "backend/tests/test_api/test_ai_api.py": {
@@ -753,6 +753,48 @@
     "mtime": 1790592523.3984785,
     "seen": 1790597450.5160441,
     "ast_hash": "2777fd0824fcfdc5b9b3ef59cc57bc89",
+    "semantic_hash": ""
+  },
+  "frontend/playwright.config.ts": {
+    "mtime": 1790598713.792128,
+    "seen": 1790600231.1889136,
+    "ast_hash": "a9f6d8d73ca2db1914520e14f7e0e8e4",
+    "semantic_hash": ""
+  },
+  "frontend/test-results/.last-run.json": {
+    "mtime": 1790599004.0647292,
+    "seen": 1790600231.1889136,
+    "ast_hash": "f196824657d8858bc7fa44eecbba38b1",
+    "semantic_hash": ""
+  },
+  "frontend/tests/e2e/test_accessibility_and_responsive_audit.spec.ts": {
+    "mtime": 1790598596.1062973,
+    "seen": 1790600231.1889136,
+    "ast_hash": "4ec2101874fd896b49d6883dd35e1420",
+    "semantic_hash": ""
+  },
+  "frontend/tests/e2e/test_commercial_job_submission_and_diff.spec.ts": {
+    "mtime": 1790598989.271083,
+    "seen": 1790600231.1889136,
+    "ast_hash": "4edfe8f05a0079d66681dafef0fdd118",
+    "semantic_hash": ""
+  },
+  "frontend/tests/e2e/test_operator_approval_workflow.spec.ts": {
+    "mtime": 1790598894.5199294,
+    "seen": 1790600231.1889136,
+    "ast_hash": "dd742f141f3738b523ea3067ff26f596",
+    "semantic_hash": ""
+  },
+  ".notebook/phase-6-e2e-demo.md": {
+    "mtime": 1790599026.0144112,
+    "seen": 1790600231.1889136,
+    "ast_hash": "5d777c3ff7f3a69c93c08b0d3e799f0d",
+    "semantic_hash": ""
+  },
+  "frontend/playwright-report/index.html": {
+    "mtime": 1790599004.0637298,
+    "seen": 1790600231.1889136,
+    "ast_hash": "424b8a3d1fef40073077646f8ee384b4",
     "semantic_hash": ""
   }
 }
