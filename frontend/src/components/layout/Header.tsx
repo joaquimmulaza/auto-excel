@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { UserSwitcher } from "./UserSwitcher";
 import { useAuth } from "@/context/AuthContext";
@@ -13,7 +14,7 @@ export function Header() {
   const { user } = useAuth();
 
   const isNavActive = (path: string) => {
-    if (path === "/" && pathname === "/") return true;
+    if (path === "/") return true;
     if (path !== "/" && pathname.startsWith(path)) return true;
     return false;
   };
@@ -23,15 +24,28 @@ export function Header() {
       <div className="flex h-14 items-center justify-between px-6">
         {/* Left: Brand Identity */}
         <div className="flex items-center gap-6">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="flex h-7 w-7 items-center justify-center rounded bg-brand text-white font-bold text-xs tracking-wider shadow-sm transition-transform group-hover:scale-105">
-              CCM
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="flex items-center transition-transform group-hover:scale-[1.02]">
+              <Image
+                src="/cotarco-logo.png"
+                alt="Cotarco"
+                width={104}
+                height={32}
+                className="h-8 w-auto object-contain"
+                priority
+              />
             </div>
+            <div className="h-6 w-[1px] bg-border hidden sm:block" />
             <div className="flex flex-col">
-              <span className="text-sm font-bold tracking-tight text-ink leading-none">
-                Cotarco Commercial Manager
-              </span>
-              <span className="text-[10px] text-slateSecondary font-medium leading-tight">
+              <div className="flex items-center gap-1.5">
+                <span className="text-sm font-bold tracking-tight text-ink leading-none">
+                  Commercial Manager
+                </span>
+                <span className="text-[10px] font-semibold text-brand bg-brand-subtle px-1.5 py-0.5 rounded leading-none">
+                  MVP
+                </span>
+              </div>
+              <span className="text-[10px] text-slateSecondary font-medium leading-tight mt-0.5">
                 Gestão de Preços & Stock • v1.0
               </span>
             </div>

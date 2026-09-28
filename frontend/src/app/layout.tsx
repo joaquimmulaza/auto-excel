@@ -7,6 +7,11 @@ export const metadata: Metadata = {
   title: "Cotarco Commercial Manager | Gestão de Tabelas",
   description:
     "Plataforma web interna para recepção, validação, comparação e auditoria de tabelas comerciais de preços e stock.",
+  icons: {
+    icon: "/cotarco-logo.png",
+    shortcut: "/cotarco-logo.png",
+    apple: "/cotarco-logo.png",
+  },
 };
 
 export default function RootLayout({
