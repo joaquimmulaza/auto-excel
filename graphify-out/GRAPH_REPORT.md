@@ -1,17 +1,17 @@
-# Graph Report - up_prices  (2026-09-25)
+# Graph Report - up_prices  (2026-09-28)
 
 ## Corpus Check
-- 67 files · ~53,246 words
+- 88 files · ~56,909 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 3 file(s) not represented in the graph (top: (none) 3)
 
 ## Summary
-- 1021 nodes · 1453 edges · 69 communities (57 shown, 12 thin omitted)
-- Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 78 edges (avg confidence: 0.95)
+- 1212 nodes · 1829 edges · 83 communities (67 shown, 16 thin omitted)
+- Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 123 edges (avg confidence: 0.95)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `82605556`
+- Built from commit: `830f7f18`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -21,14 +21,14 @@
 - normalization.py
 - process_price_table
 - domain/__init__.py
-- engine.py
+- deps.py
 - 3. Tabelas
 - PriceRule
 - ProcessSummary
 - 🟠 P1 — HIGH (Resolver antes das fases de DB/API)
-- CommercialProfile
+- engine.py
 - 1. Bugs e Gotchas Identificados no Legado & Soluções Aplicadas
-- create_profile
+- v1/processing.py
 - CONTEXT.md — Cotarco Commercial Manager
 - 4. Requisitos funcionais
 - Stack Tecnológica & Regras de Ouro (Tech Stack & Guardrails)
@@ -65,7 +65,7 @@
 - Cotarco Commercial Manager — Remediation Plan
 - 🟡 P2 — MEDIUM (Resolver antes das fases de UI)
 - 🔴 P0 — CRITICAL (Must resolve before implementation begins)
-- ProcessResult
+- conftest.py
 - TestZeroPriceNewProducts
 - app/__init__.py
 - services/__init__.py
@@ -74,37 +74,47 @@
 - JobRepository
 - ProfileRepository
 - session
-- session.py
-- Fase 2 — Database & Supabase (Debriefing & Intelligence)
 - test_schema.py
+- Fase 2 — Database & Supabase (Debriefing & Intelligence)
+- db/models.py
 - TestSeedProfilesShape
-- AuditLogOrm
-- JobItemOrm
-- _get_session_factory
+- test_jobs_api.py
+- test_processing_api.py
+- _UserClient
+- uuid
+- TestApprovalRBAC
+- Detailed Findings
+- Detailed Findings
+- CATEGORY D — Stack Incompatibilities and Contradictions
+- Fase 3 — FastAPI & Endpoints
+- get_current_user
+- Actionable Harmonization Roadmap
+- CATEGORY A — Dead / Incorrect Glob Paths
+- CATEGORY B — Git / Commit Workflow Conflicts
 
 ## God Nodes (most connected - your core abstractions)
-1. `JobRepository` - 44 edges
+1. `JobRepository` - 48 edges
 2. `process_price_table()` - 41 edges
 3. `session()` - 39 edges
-4. `ProfileRepository` - 24 edges
+4. `ProfileRepository` - 27 edges
 5. `Stack Tecnológica & Regras de Ouro (Tech Stack & Guardrails)` - 22 edges
 6. `3. Tabelas` - 20 edges
-7. `PriceRule` - 19 edges
-8. `StockRule` - 19 edges
-9. `4. Requisitos funcionais` - 19 edges
-10. `ProcessingJobOrm` - 18 edges
+7. `ProcessingJobOrm` - 19 edges
+8. `PriceRule` - 19 edges
+9. `StockRule` - 19 edges
+10. `4. Requisitos funcionais` - 19 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `4. Gotcha: `metadata` Reservado pelo SQLAlchemy Declarative` --references--> `AuditLogOrm`  [INFERRED]
-  .notebook/phase-2-database.md → backend/app/infra/db/models.py
 - `1.1 Bug do Preço Zero (Passo 4 do Legado)` --references--> `ValidationIssue`  [INFERRED]
   .notebook/phase-1-domain-engine.md → backend/app/domain/models.py
 - `1.2 Sobrescrita Silenciosa de Duplicados (Dicionário Zip)` --references--> `ValidationIssue`  [INFERRED]
   .notebook/phase-1-domain-engine.md → backend/app/domain/models.py
-- `1. Ficheiros Criados` --references--> `JobRepository`  [INFERRED]
-  .notebook/phase-2-database.md → backend/app/infra/repositories/jobs.py
-- `1. Ficheiros Criados` --references--> `ProfileRepository`  [INFERRED]
-  .notebook/phase-2-database.md → backend/app/infra/repositories/profiles.py
+- `4. Gotcha: `metadata` Reservado pelo SQLAlchemy Declarative` --references--> `AuditLogOrm`  [INFERRED]
+  .notebook/phase-2-database.md → backend/app/infra/db/models.py
+- `Ficheiros Criados` --references--> `CurrentUser`  [INFERRED]
+  .notebook/phase-3-api.md → backend/app/api/deps.py
+- `Ficheiros Criados` --references--> `get_current_user()`  [INFERRED]
+  .notebook/phase-3-api.md → backend/app/api/deps.py
 
 ## Import Cycles
 - None detected.
@@ -114,7 +124,7 @@
 - **Graphify Setup Components** — graphify, uv_tool, agents_rules_graphify_md, agents_workflows_graphify_md, git_hooks, gitattributes, graphifyignore [EXTRACTED 1.00]
 - **Price and Stock Updater Workflow** — cotarco_samsung_preco_atualizado_xlsx, mano_preco_desatualizado_xlsx, main, mano_preco_atualizado_final_xlsx, log_decisao_samsung_xlsx, deteccao_automatica_cabecalho, mapeamento_tolerante_colunas, saneamento_avancado_dados, regras_negocio_integradas, log_decisao_transparente [EXTRACTED 1.00]
 
-## Communities (69 total, 12 thin omitted)
+## Communities (83 total, 16 thin omitted)
 
 ### Community 0 - "main.py"
 Cohesion: 0.05
@@ -130,15 +140,15 @@ Nodes (22): calcular_variacao(), limpar_preco(), normalize_col(), Any, Domain no
 
 ### Community 3 - "process_price_table"
 Cohesion: 0.11
-Nodes (13): _find_field_value(), _find_target_key(), process_price_table(), Any, Processes source supplier/marketplace table against a target catalog…, Executes table processing using the configured CommercialProfile., Finds a field value in a dict using a list of case/accent-insensitive candidate…, Finds the actual key name present in target record matching candidate aliases. (+5 more)
+Nodes (11): process_price_table(), Processes source supplier/marketplace table against a target catalog…, Verifies that duplicate references in source records are caught and blocked., TestDuplicateReferences, Engine should not mutate the caller's input lists directly., Core domain processor test suite., TestDomainEngine, create_profile() (+3 more)
 
 ### Community 4 - "domain/__init__.py"
-Cohesion: 0.15
-Nodes (18): Domain layer package for Cotarco Commercial Manager. Exports domain entities,…, Structured issue or violation emitted during validation or processing., Indicates whether this issue prevents automated execution., ValidationIssue, calculate_price_variation(), clean_price_value(), evaluate_new_product_eligibility(), evaluate_price_guard() (+10 more)
+Cohesion: 0.13
+Nodes (25): Domain layer package for Cotarco Commercial Manager. Exports domain entities,…, DecisionCode, IssueSeverity, Domain models and contracts for Cotarco Commercial Manager. All models are…, Severity levels for validation and business rule issues., Structured issue or violation emitted during validation or processing., Indicates whether this issue prevents automated execution., Standardized decision outcome codes for item evaluation. (+17 more)
 
-### Community 5 - "engine.py"
-Cohesion: 0.19
-Nodes (15): Domain processing engine for Cotarco Commercial Manager. Fully deterministic,…, DecisionCode, IssueSeverity, Domain models and contracts for Cotarco Commercial Manager. All models are…, Severity levels for validation and business rule issues., Standardized decision outcome codes for item evaluation., Unit tests for duplicate reference detection in source dataset. Tests Bug 2…, Unit tests for the core domain engine: TableProcessor / process_price_table.… (+7 more)
+### Community 5 - "deps.py"
+Cohesion: 0.05
+Nodes (63): get_db(), Dependency injection for FastAPI routes. Provides: get_db, get_current_user,…, Factory that returns a FastAPI dependency checking the user has one of the…, require_role(), http_exception_handler(), make_error_body(), Standardized HTTP error handlers., validation_exception_handler() (+55 more)
 
 ### Community 6 - "3. Tabelas"
 Cohesion: 0.07
@@ -146,7 +156,7 @@ Nodes (28): 1. Princípios, 2. Modelo lógico, 3. Tabelas, 4. Enums mínimos, 5.
 
 ### Community 7 - "PriceRule"
 Cohesion: 0.20
-Nodes (14): PriceRule, Configuration rules for price validation and thresholds., Configuration rules for stock management and product activation., StockRule, profile(), fixture, profile(), fixture (+6 more)
+Nodes (14): PriceRule, Configuration rules for price validation and thresholds., Configuration rules for stock management and product activation., StockRule, profile(), fixture, Unit tests for duplicate reference detection in source dataset. Tests Bug 2…, fixture (+6 more)
 
 ### Community 8 - "ProcessSummary"
 Cohesion: 0.18
@@ -156,17 +166,17 @@ Nodes (9): JobItemResult, ProcessSummary, Product, Canonical domain product enti
 Cohesion: 0.22
 Nodes (9): 🟠 P1 — HIGH (Resolver antes das fases de DB/API), REM-011, REM-012, REM-013, REM-014, REM-015, REM-016, REM-017 (+1 more)
 
-### Community 10 - "CommercialProfile"
-Cohesion: 0.25
-Nodes (6): Class wrapper providing a stateless engine processor instance., TableProcessor, CommercialProfile, Commercial profile defining destination channel settings and rules., Services layer entry point for table processing., TableProcessor class can be instantiated and executed cleanly.
+### Community 10 - "engine.py"
+Cohesion: 0.10
+Nodes (21): _find_field_value(), _find_target_key(), Any, Domain processing engine for Cotarco Commercial Manager. Fully deterministic,…, Class wrapper providing a stateless engine processor instance., Executes table processing using the configured CommercialProfile., Finds a field value in a dict using a list of case/accent-insensitive candidate…, Finds the actual key name present in target record matching candidate aliases. (+13 more)
 
 ### Community 11 - "1. Bugs e Gotchas Identificados no Legado & Soluções Aplicadas"
 Cohesion: 0.22
 Nodes (8): 1.1 Bug do Preço Zero (Passo 4 do Legado), 1.2 Sobrescrita Silenciosa de Duplicados (Dicionário Zip), 1.3 Price Guard Hardcoded vs Dinâmico, 1.4 Higienização e Normalização Determinística, 1. Bugs e Gotchas Identificados no Legado & Soluções Aplicadas, 3. Evidência de Testes TDD, Fase 1 — Extração do Engine de Domínio (Debriefing & Intelligence), Resumo Executivo
 
-### Community 12 - "create_profile"
-Cohesion: 0.39
-Nodes (3): create_profile(), Verifies that the price variation threshold is dynamically evaluated from…, TestConfigurablePriceGuard
+### Community 12 - "v1/processing.py"
+Cohesion: 0.19
+Nodes (22): _check_access(), get_issues(), get_items(), _get_job_or_404(), get_summary(), DbDep, get, post (+14 more)
 
 ### Community 13 - "CONTEXT.md — Cotarco Commercial Manager"
 Cohesion: 0.08
@@ -277,12 +287,12 @@ Cohesion: 0.17
 Nodes (12): 🟢 P3 — LOW (Housekeeping — antes do MVP Demo), REM-030, REM-031, REM-032, REM-033, REM-034, REM-035, REM-036 (+4 more)
 
 ### Community 43 - "Rules Auditor — Audit Report"
-Cohesion: 0.06
-Nodes (32): Autonomy vs. Human Approval Conflict Analysis, CATEGORY A — Dead / Incorrect Glob Paths, CATEGORY B — Git / Commit Workflow Conflicts, CATEGORY C — Autonomy vs. Human Approval Gate Conflicts, CATEGORY D — Stack Incompatibilities and Contradictions, CATEGORY E — Legacy / Obsolete / Underspecified Patterns, Conclusion, Detailed Findings (+24 more)
+Cohesion: 0.25
+Nodes (8): Autonomy vs. Human Approval Conflict Analysis, Conclusion, Executive Summary, Files Audited, Git / Commit Workflow Conflict Analysis, Legacy / Obsolete Patterns Summary, Recommendations Priority Matrix, Rules Auditor — Audit Report
 
 ### Community 44 - "Documentation Audit Report — Cotarco Commercial Manager"
-Cohesion: 0.07
-Nodes (22): Actionable Harmonization Roadmap, ADR Gap Analysis, CATEGORY A — Naming & Terminology Inconsistencies, CATEGORY B — Missing Document Linkage / Dead References, CATEGORY C — Schema / Data Model Ambiguities, CATEGORY D — Duplicate / Drifting Rules, CATEGORY E — Workflow / Flow Gaps, CATEGORY F — Document Precedence Ambiguities (+14 more)
+Cohesion: 0.20
+Nodes (10): ADR Gap Analysis, Current State, Documentation Audit Report — Cotarco Commercial Manager, Executive Summary, Gaps in Precedence, Inventory of Documentation Audited, Observed Implied Hierarchy, Precedence & Hierarchy Assessment (+2 more)
 
 ### Community 45 - "Cotarco Commercial Manager — Remediation Cycle 1 Result"
 Cohesion: 0.14
@@ -300,69 +310,109 @@ Nodes (12): 🟡 P2 — MEDIUM (Resolver antes das fases de UI), REM-019, REM-02
 Cohesion: 0.18
 Nodes (11): 🔴 P0 — CRITICAL (Must resolve before implementation begins), REM-001, REM-002, REM-003, REM-004, REM-005, REM-006, REM-007 (+3 more)
 
-### Community 49 - "ProcessResult"
-Cohesion: 0.33
-Nodes (4): ProcessResult, Aggregate processing output containing items, issues, summary, and final…, Returns True if any blocker issues exist., Returns total evaluated items.
+### Community 49 - "conftest.py"
+Cohesion: 0.14
+Nodes (17): CurrentUser, UUID, Minimal representation of the authenticated user for route handlers., comercial_client(), db_session(), operador_client(), Test fixtures for API layer — Phase 3. Strategy: - Uses FastAPI TestClient with…, Install the shared db and user overrides (idempotent — called once per test). (+9 more)
 
 ### Community 55 - "JobRepository"
-Cohesion: 0.09
-Nodes (23): PriceHistoryOrm, ProcessingJobOrm, Core operational entity — one job per submitted price/stock table.…, Structured validation or business rule violation for a job. Aligned with domain…, Immutable price change record — append-only historical ledger.…, ValidationIssueOrm, JobRepository, Session (+15 more)
+Cohesion: 0.07
+Nodes (28): AuditLogOrm, JobItemOrm, PriceHistoryOrm, Per-reference evaluation result from the domain engine. Stores both raw and…, Immutable price change record — append-only historical ledger.…, Immutable audit trail for all administrative and critical actions. SECURITY:…, JobRepository, Session (+20 more)
 
 ### Community 56 - "ProfileRepository"
 Cohesion: 0.08
-Nodes (21): CommercialProfileOrm, ProfileRuleOrm, Commercial profile defining channel / destination / rule-set. ``code`` is the…, Versioned rule configuration attached to a commercial profile. Unique per…, ProfileRepository, Session, UUID, Repository for CommercialProfile data access. Follows the Repository pattern:… (+13 more)
+Nodes (21): CommercialProfileOrm, Commercial profile defining channel / destination / rule-set. ``code`` is the…, ProfileRepository, Session, UUID, Data access layer for ``commercial_profiles`` and ``profile_rules``., Fetch a profile by its UUID primary key., Fetch an active profile by its unique machine code (e.g. 'MANO'). (+13 more)
 
 ### Community 57 - "session"
-Cohesion: 0.11
-Nodes (22): Local representation of an authenticated Supabase user. The ``id`` aligns with…, UserOrm, job_repo(), make_job(), make_profile(), make_user(), profile_repo(), UUID (+14 more)
+Cohesion: 0.12
+Nodes (20): ProcessingJobOrm, Local representation of an authenticated Supabase user. The ``id`` aligns with…, Core operational entity — one job per submitted price/stock table.…, Structured validation or business rule violation for a job. Aligned with domain…, UserOrm, ValidationIssueOrm, make_job(), make_user() (+12 more)
 
-### Community 58 - "session.py"
-Cohesion: 0.09
-Nodes (25): create_all_tables(), create_db_engine(), drop_all_tables(), _get_database_url(), _get_engine(), get_test_engine(), ping_database(), SQLAlchemy 2.0 session and engine management. Supports two modes: -… (+17 more)
+### Community 58 - "test_schema.py"
+Cohesion: 0.08
+Nodes (36): _get_session_factory(), create_all_tables(), create_db_engine(), drop_all_tables(), _get_database_url(), get_db_session(), _get_engine(), _get_session_factory() (+28 more)
 
 ### Community 59 - "Fase 2 — Database & Supabase (Debriefing & Intelligence)"
 Cohesion: 0.10
 Nodes (17): _JsonColumn, Maps to JSONB on PostgreSQL, native JSON on everything else (SQLite for tests)., Maps to native UUID on PostgreSQL, String(36) on SQLite (tests)., _UuidColumn, 1. Ficheiros Criados, 2. DDL Summary — Tabelas e Chaves Estrangeiras, 3. Gotcha: `_JsonColumn` / `_UuidColumn` Dialect-Aware Types, 4. Gotcha: `metadata` Reservado pelo SQLAlchemy Declarative (+9 more)
 
-### Community 60 - "test_schema.py"
-Cohesion: 0.14
-Nodes (17): ApprovalOrm, Base, JobFileOrm, SQLAlchemy 2.0 ORM models for Cotarco Commercial Manager. Mapped to PostgreSQL…, Versioned file record for inputs, outputs, logs, and reports. The actual binary…, Immutable record of an approval, rejection, or cancellation action. Append-only…, # NOTE: 'metadata' is reserved in SQLAlchemy Declarative; mapped to DB col…, Shared declarative base for all ORM models. (+9 more)
+### Community 60 - "db/models.py"
+Cohesion: 0.12
+Nodes (19): ApprovalOrm, Base, JobFileOrm, ProfileRuleOrm, SQLAlchemy 2.0 ORM models for Cotarco Commercial Manager. Mapped to PostgreSQL…, Versioned rule configuration attached to a commercial profile. Unique per…, Versioned file record for inputs, outputs, logs, and reports. The actual binary…, Immutable record of an approval, rejection, or cancellation action. Append-only… (+11 more)
 
 ### Community 61 - "TestSeedProfilesShape"
 Cohesion: 0.22
 Nodes (5): Validates that the expected seed profiles can be created and configured., MANO profile config must have stock_min=3 and variation=30%., BFA must have a 10% threshold (not the default 30%)., WooCommerce live push starts disabled (Guardrail #14)., TestSeedProfilesShape
 
-### Community 62 - "AuditLogOrm"
-Cohesion: 0.32
-Nodes (5): AuditLogOrm, Immutable audit trail for all administrative and critical actions. SECURITY:…, Insert an audit log entry — NEVER update or delete. Application code must only…, System-generated audit logs have no actor_id (nullable)., TestAuditLogOrm
+### Community 62 - "test_jobs_api.py"
+Cohesion: 0.15
+Nodes (4): Tests for POST /jobs, GET /jobs, GET /jobs/{id} with RBAC., TestCreateJob, TestGetJobById, TestListJobs
 
-### Community 63 - "JobItemOrm"
-Cohesion: 0.32
-Nodes (5): JobItemOrm, Per-reference evaluation result from the domain engine. Stores both raw and…, Bulk-insert job item rows without individual flushes., Blocked items with BLOCKED_PRICE_VARIATION code are stored correctly., TestJobItemOrm
+### Community 63 - "test_processing_api.py"
+Cohesion: 0.15
+Nodes (4): Tests for POST /jobs/{id}/validate, GET /jobs/{id}/summary, items, issues., TestItemsAndIssuesEndpoints, TestSummaryEndpoint, TestValidateEndpoint
 
-### Community 64 - "_get_session_factory"
-Cohesion: 0.50
-Nodes (5): get_db_session(), _get_session_factory(), Session, Context manager yielding a transactional database session. Usage:: with…, sessionmaker
+### Community 64 - "_UserClient"
+Cohesion: 0.29
+Nodes (4): Thin wrapper that sets the ContextVar before each HTTP call., _UserClient, 2. Dois clientes ativos no mesmo teste (RBAC), TestClient
+
+### Community 69 - "uuid"
+Cohesion: 0.18
+Nodes (4): Tests for POST /jobs/{id}/approve — RBAC critical. CRITICAL: COMERCIAL must…, Tests for GET /api/v1/profiles and GET /api/v1/profiles/{id}., TestProfilesEndpoint, uuid
+
+### Community 70 - "TestApprovalRBAC"
+Cohesion: 0.22
+Nodes (5): RBAC EVIDENCE: COMERCIAL role is forbidden from approving jobs., Operador can call approve but job is in UPLOADED state → 409 INVALID_STATE., Operador can approve a job that is READY_FOR_REVIEW., TestApprovalRBAC, RBAC EVIDENCE
+
+### Community 71 - "Detailed Findings"
+Cohesion: 0.29
+Nodes (7): CATEGORY A — Naming & Terminology Inconsistencies, CATEGORY B — Missing Document Linkage / Dead References, CATEGORY C — Schema / Data Model Ambiguities, CATEGORY D — Duplicate / Drifting Rules, CATEGORY E — Workflow / Flow Gaps, CATEGORY F — Document Precedence Ambiguities, Detailed Findings
+
+### Community 72 - "Detailed Findings"
+Cohesion: 0.29
+Nodes (7): CATEGORY C — Autonomy vs. Human Approval Gate Conflicts, CATEGORY E — Legacy / Obsolete / Underspecified Patterns, Detailed Findings, FIND-009, FIND-010, FIND-017, FIND-018
+
+### Community 73 - "CATEGORY D — Stack Incompatibilities and Contradictions"
+Cohesion: 0.29
+Nodes (7): CATEGORY D — Stack Incompatibilities and Contradictions, FIND-011, FIND-012, FIND-013, FIND-014, FIND-015, FIND-016
+
+### Community 74 - "Fase 3 — FastAPI & Endpoints"
+Cohesion: 0.29
+Nodes (6): 3. sessionmaker() como context manager, 4. Legacy main.py intacto, Contagem Final de Testes, Endpoints Implementados, Fase 3 — FastAPI & Endpoints, Gotchas & Decisões de Arquitetura
+
+### Community 75 - "get_current_user"
+Cohesion: 0.33
+Nodes (6): get_current_user(), DbDep, In production: validates Supabase JWT and extracts user_id + role. In tests:…, _bearer, Depends, HTTPAuthorizationCredentials
+
+### Community 77 - "Actionable Harmonization Roadmap"
+Cohesion: 0.40
+Nodes (5): Actionable Harmonization Roadmap, 🔴 Priority 1 — Critical (fix before any agent begins implementation), 🟠 Priority 2 — Important (fix before Phase 2 Database and Phase 3 API agents begin), 🟡 Priority 3 — Recommended (fix before Phase 5 Frontend and Phase 7 Integration agents begin), 🟢 Priority 4 — Housekeeping (low risk, improve maintainability)
+
+### Community 78 - "CATEGORY A — Dead / Incorrect Glob Paths"
+Cohesion: 0.40
+Nodes (5): CATEGORY A — Dead / Incorrect Glob Paths, FIND-001, FIND-002, FIND-003, FIND-004
+
+### Community 79 - "CATEGORY B — Git / Commit Workflow Conflicts"
+Cohesion: 0.40
+Nodes (5): CATEGORY B — Git / Commit Workflow Conflicts, FIND-005, FIND-006, FIND-007, FIND-008
 
 ## Knowledge Gaps
-- **485 isolated node(s):** `Resumo Executivo`, `2. DDL Summary — Tabelas e Chaves Estrangeiras`, `5. RLS Audit — Políticas Aplicadas`, `6. Seed dos Perfis Iniciais`, `ADR-implícita: Sem Alembic no MVP` (+480 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 684 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **12 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **489 isolated node(s):** `Endpoints Implementados`, `3. sessionmaker() como context manager`, `4. Legacy main.py intacto`, `Contagem Final de Testes`, `1.3 Price Guard Hardcoded vs Dinâmico` (+484 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 771 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **16 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `JobRepository` connect `JobRepository` to `session`, `Fase 2 — Database & Supabase (Debriefing & Intelligence)`, `test_schema.py`, `AuditLogOrm`, `JobItemOrm`?**
-  _High betweenness centrality (0.029) - this node is a cross-community bridge._
-- **Why does `process_price_table()` connect `process_price_table` to `normalization.py`, `domain/__init__.py`, `engine.py`, `PriceRule`, `ProcessSummary`, `CommercialProfile`, `create_profile`, `ProcessResult`, `TestZeroPriceNewProducts`?**
-  _High betweenness centrality (0.025) - this node is a cross-community bridge._
-- **Why does `session()` connect `session` to `JobRepository`, `ProfileRepository`, `test_schema.py`, `TestSeedProfilesShape`, `AuditLogOrm`, `JobItemOrm`?**
-  _High betweenness centrality (0.014) - this node is a cross-community bridge._
+- **Why does `JobRepository` connect `JobRepository` to `deps.py`, `session`, `test_schema.py`, `Fase 2 — Database & Supabase (Debriefing & Intelligence)`, `db/models.py`?**
+  _High betweenness centrality (0.018) - this node is a cross-community bridge._
+- **Why does `process_price_table()` connect `process_price_table` to `normalization.py`, `domain/__init__.py`, `PriceRule`, `ProcessSummary`, `engine.py`, `TestZeroPriceNewProducts`?**
+  _High betweenness centrality (0.018) - this node is a cross-community bridge._
+- **Why does `Git & Artifacts Audit Report` connect `7. Proposed Remediation Steps (DO NOT EXECUTE — Reference Only)` to `remediation-plan.md`?**
+  _High betweenness centrality (0.016) - this node is a cross-community bridge._
 - **Are the 14 inferred relationships involving `JobRepository` (e.g. with `ApprovalOrm` and `AuditLogOrm`) actually correct?**
   _`JobRepository` has 14 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 3 inferred relationships involving `process_price_table()` (e.g. with `CommercialProfile` and `DecisionCode`) actually correct?**
   _`process_price_table()` has 3 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 5 inferred relationships involving `ProfileRepository` (e.g. with `CommercialProfileOrm` and `ProfileRuleOrm`) actually correct?**
   _`ProfileRepository` has 5 INFERRED edges - model-reasoned connections that need verification._
-- **What connects `Resumo Executivo`, `2. DDL Summary — Tabelas e Chaves Estrangeiras`, `5. RLS Audit — Políticas Aplicadas` to the rest of the system?**
-  _485 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **What connects `Endpoints Implementados`, `3. sessionmaker() como context manager`, `4. Legacy main.py intacto` to the rest of the system?**
+  _489 weakly-connected nodes found - possible documentation gaps or missing edges._
