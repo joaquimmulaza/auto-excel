@@ -56,9 +56,8 @@ export function UploadZone({ onFileSelect, selectedFile }: UploadZoneProps) {
         ref={inputRef}
         type="file"
         accept=".xlsx,.xls"
-        className="hidden"
+        className="sr-only"
         onChange={handleChange}
-        id="file-upload-input"
       />
 
       {!selectedFile ? (

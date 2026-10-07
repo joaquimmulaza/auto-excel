@@ -1,14 +1,19 @@
-"""POST /jobs/{id}/validate, GET /jobs/{id}/summary, GET /jobs/{id}/items, GET /jobs/{id}/issues"""
+"""Validate, summary, items, issues, process, receipt."""
 from __future__ import annotations
+
 import uuid
-from fastapi import APIRouter, HTTPException, status
-from backend.app.api.deps import DbDep, UserDep
+
+from fastapi import APIRouter, HTTPException, Query, status
+
+from backend.app.api.deps import DbDep, UserDep, require_role
 from backend.app.infra.repositories.jobs import JobRepository
 from backend.app.schemas.processing import (
     JobItemResponse,
     JobSummaryResponse,
     ValidationIssueResponse,
 )
+from backend.app.services.job_pipeline import build_receipt, process_job, validate_job
+from fastapi import Depends
 
 router = APIRouter(prefix="/jobs", tags=["processing"])
 
@@ -16,13 +21,6 @@ router = APIRouter(prefix="/jobs", tags=["processing"])
 def _get_job_or_404(job_id: uuid.UUID, repo: JobRepository):
     job = repo.get_by_id(job_id)
     if not job:
-        if str(job_id) == "00000000-0000-0000-0000-000000000184":
-            class DemoJob:
-                id = job_id
-                created_by_id = uuid.UUID("00000000-0000-0000-0000-000000000001")
-                status = "READY_FOR_REVIEW"
-                summary = {"total": 1248, "updated": 843, "new": 102, "ignored": 271, "blocked": 20}
-            return DemoJob()
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail={
@@ -38,22 +36,26 @@ def _get_job_or_404(job_id: uuid.UUID, repo: JobRepository):
 
 def _check_access(job, current_user):
     if current_user.role == "COMERCIAL" and job.created_by_id != current_user.id:
-        if str(job.id) != "00000000-0000-0000-0000-000000000184":
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail={
-                    "error": {
-                        "code": "FORBIDDEN",
-                        "message": "Cannot access this job",
-                        "request_id": "",
-                    }
-                },
-            )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={
+                "error": {
+                    "code": "FORBIDDEN",
+                    "message": "Cannot access this job",
+                    "request_id": "",
+                }
+            },
+        )
 
 
-@router.post("/{job_id}/validate", status_code=status.HTTP_202_ACCEPTED)
-def trigger_validate(job_id: uuid.UUID, current_user: UserDep, db: DbDep):
-    """Trigger validation of an uploaded job. Changes status to VALIDATING."""
+@router.post("/{job_id}/validate")
+def trigger_validate(
+    job_id: uuid.UUID,
+    current_user: UserDep,
+    db: DbDep,
+    dry_run: bool | None = Query(default=None),
+):
+    """Run domain engine against uploaded files and persist preview results."""
     repo = JobRepository(db)
     job = _get_job_or_404(job_id, repo)
     _check_access(job, current_user)
@@ -69,23 +71,29 @@ def trigger_validate(job_id: uuid.UUID, current_user: UserDep, db: DbDep):
                 }
             },
         )
-    repo.update_status(job_id, "VALIDATING")
-    return {"job_id": str(job_id), "status": "VALIDATING", "message": "Validation queued"}
+    try:
+        result = validate_job(db, job, actor_id=current_user.id, dry_run=dry_run)
+    except ValueError as exc:
+        code = str(exc)
+        status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+        if code == "MISSING_INPUT_FILE":
+            status_code = status.HTTP_409_CONFLICT
+        raise HTTPException(
+            status_code=status_code,
+            detail={"error": {"code": code, "message": code, "request_id": ""}},
+        ) from exc
+    return result
 
 
 @router.get("/{job_id}/summary", response_model=JobSummaryResponse)
 def get_summary(job_id: uuid.UUID, current_user: UserDep, db: DbDep):
-    """Get processing summary for a job."""
     repo = JobRepository(db)
     job = _get_job_or_404(job_id, repo)
     _check_access(job, current_user)
-
-    # Count issues by severity
     issues = repo.list_issues(job_id)
     severity_counts: dict[str, int] = {}
     for issue in issues:
         severity_counts[issue.severity] = severity_counts.get(issue.severity, 0) + 1
-
     return JobSummaryResponse(
         job_id=job.id,
         status=job.status,
@@ -96,7 +104,6 @@ def get_summary(job_id: uuid.UUID, current_user: UserDep, db: DbDep):
 
 @router.get("/{job_id}/items", response_model=list[JobItemResponse])
 def get_items(job_id: uuid.UUID, current_user: UserDep, db: DbDep):
-    """Get all item-level results for a job (diff/preview)."""
     repo = JobRepository(db)
     job = _get_job_or_404(job_id, repo)
     _check_access(job, current_user)
@@ -111,9 +118,33 @@ def get_issues(
     db: DbDep,
     severity: str | None = None,
 ):
-    """Get validation issues for a job, optionally filtered by severity."""
     repo = JobRepository(db)
     job = _get_job_or_404(job_id, repo)
     _check_access(job, current_user)
     issues = repo.list_issues(job_id, severity=severity)
     return [ValidationIssueResponse.model_validate(i) for i in issues]
+
+
+@router.post(
+    "/{job_id}/process",
+    dependencies=[Depends(require_role("OPERADOR", "ADMIN"))],
+)
+def trigger_process(job_id: uuid.UUID, current_user: UserDep, db: DbDep):
+    repo = JobRepository(db)
+    job = _get_job_or_404(job_id, repo)
+    try:
+        return process_job(db, job, actor_id=current_user.id)
+    except ValueError as exc:
+        code = str(exc)
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail={"error": {"code": code, "message": code, "request_id": ""}},
+        ) from exc
+
+
+@router.get("/{job_id}/receipt")
+def get_receipt(job_id: uuid.UUID, current_user: UserDep, db: DbDep):
+    repo = JobRepository(db)
+    job = _get_job_or_404(job_id, repo)
+    _check_access(job, current_user)
+    return build_receipt(job, db)

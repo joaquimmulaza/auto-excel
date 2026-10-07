@@ -13,6 +13,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { formatCurrency, formatPercent } from "@/lib/utils";
+import { explainBlockCode } from "@/lib/api";
 import { Search, ShieldAlert, ArrowUpRight, ArrowDownRight, Minus, AlertOctagon } from "lucide-react";
 
 interface DiffViewerProps {
@@ -248,7 +249,14 @@ export function DiffViewer({ items }: DiffViewerProps) {
                     )}
                   </TableCell>
                   <TableCell className="text-center">
-                    {renderDecisionBadge(item.decision)}
+                    <div className="flex flex-col items-center gap-1">
+                      {renderDecisionBadge(item.decision)}
+                      {isBlocked && (
+                        <span className="text-[10px] text-red-700 max-w-[160px] leading-tight">
+                          {explainBlockCode(item.decision_code)}
+                        </span>
+                      )}
+                    </div>
                   </TableCell>
                 </TableRow>
               );

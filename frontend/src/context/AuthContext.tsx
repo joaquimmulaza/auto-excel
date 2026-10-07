@@ -1,56 +1,58 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { CurrentUser, UserRole } from "@/types";
+import { fetchMe, login as apiLogin, setStoredToken, getStoredToken } from "@/lib/api";
 
 interface AuthContextType {
-  user: CurrentUser;
-  setRole: (role: UserRole) => void;
+  user: CurrentUser | null;
+  loading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => void;
   isOperador: boolean;
   isComercial: boolean;
   isAdmin: boolean;
   canApprove: boolean;
 }
 
-const PRESET_USERS: Record<UserRole, CurrentUser> = {
-  COMERCIAL: {
-    id: "00000000-0000-0000-0000-000000000001",
-    name: "Joaquim Silva",
-    email: "joaquim.silva@cotarco.ao",
-    role: "COMERCIAL",
-  },
-  OPERADOR: {
-    id: "00000000-0000-0000-0000-000000000002",
-    name: "António Ferreira",
-    email: "antonio.ferreira@cotarco.ao",
-    role: "OPERADOR",
-  },
-  ADMIN: {
-    id: "00000000-0000-0000-0000-000000000003",
-    name: "Administrador Geral",
-    email: "admin@cotarco.ao",
-    role: "ADMIN",
-  },
-};
-
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [role, setRoleState] = useState<UserRole>("COMERCIAL");
+  const [user, setUser] = useState<CurrentUser | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const saved = localStorage.getItem("ccm_active_role") as UserRole | null;
-    if (saved && PRESET_USERS[saved]) {
-      setRoleState(saved);
+    const token = getStoredToken();
+    if (!token) {
+      setLoading(false);
+      return;
     }
+    fetchMe()
+      .then(setUser)
+      .catch(() => {
+        setStoredToken(null);
+        setUser(null);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
-  const setRole = (newRole: UserRole) => {
-    setRoleState(newRole);
-    localStorage.setItem("ccm_active_role", newRole);
-  };
+  const login = useCallback(async (email: string, password: string) => {
+    const result = await apiLogin(email, password);
+    setUser(result.user);
+  }, []);
 
-  const user = PRESET_USERS[role];
+  const logout = useCallback(() => {
+    setStoredToken(null);
+    setUser(null);
+  }, []);
+
+  const role = user?.role as UserRole | undefined;
   const isOperador = role === "OPERADOR";
   const isComercial = role === "COMERCIAL";
   const isAdmin = role === "ADMIN";
@@ -60,7 +62,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     <AuthContext.Provider
       value={{
         user,
-        setRole,
+        loading,
+        login,
+        logout,
         isOperador,
         isComercial,
         isAdmin,

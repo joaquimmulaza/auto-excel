@@ -112,6 +112,7 @@ class UserOrm(Base):
     )
     email: Mapped[str] = mapped_column(Text, unique=True, nullable=False)
     display_name: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    password_hash: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     # COMERCIAL | OPERADOR | ADMIN
     role: Mapped[str] = mapped_column(
         String(20), nullable=False, server_default="COMERCIAL"

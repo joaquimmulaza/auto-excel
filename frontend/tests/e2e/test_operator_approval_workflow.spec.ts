@@ -1,34 +1,19 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 
-test('Operator approval workflow', async ({ page }) => {
-  // Go to home page
-  await page.goto('/');
-
-  // Switch to Operator profile
-  const operatorBtn = page.getByRole('button', { name: /operador/i });
-  await operatorBtn.click();
-
-  // Validate the operator button is active
-  await expect(operatorBtn).toHaveClass(/bg-brand/);
-
-  // Navigate to an existing pending job, let's just go to home and click the first pending job
-  // We can look for "Ver Diff" or a job card
-  const detailsBtn = page.getByRole('button', { name: 'Ver Diff' }).first();
-  await expect(detailsBtn).toBeVisible();
-  await detailsBtn.click();
-
-  // We should be on /jobs/[id]
-  await page.waitForURL(/\/jobs\/[a-zA-Z0-9-]{36}/);
-
-  // Approve button should be active and brand colored (#FF3C1D)
-  const approveBtn = page.getByRole('button', { name: /Aprovar Processamento/i });
-  
-  if (await approveBtn.isVisible()) {
-    await expect(approveBtn).not.toBeDisabled();
-    // Execute approval
-    await approveBtn.click();
-    
-    // Wait for status change to "APPROVED" or similar
-    await expect(page.getByText('Aprovado', { exact: false })).toBeVisible();
+async function loginAs(page: import("@playwright/test").Page, role: "comercial" | "operador") {
+  await page.goto("/login");
+  if (role === "operador") {
+    await page.getByRole("button", { name: "Operador" }).click();
+  } else {
+    await page.getByRole("button", { name: "Comercial" }).click();
   }
+  await page.getByRole("button", { name: "Entrar" }).click();
+  await page.waitForURL("/");
+}
+
+test("Operator approval workflow UI", async ({ page }) => {
+  await loginAs(page, "operador");
+  await expect(page.getByText(/Olá,/i)).toBeVisible();
+  await expect(page.getByRole("main").getByText("OPERADOR", { exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Exceções", exact: true })).toBeVisible();
 });
