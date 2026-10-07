@@ -17,10 +17,26 @@ import {
   CurrentUser,
 } from "@/types";
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
-
 const TOKEN_KEY = "ccm_access_token";
+
+/**
+ * Resolve API base URL.
+ * - Explicit NEXT_PUBLIC_API_URL wins
+ * - On Vercel / non-localhost hosts, use same-origin `/api/v1` (Vercel Services rewrite)
+ * - Local dev defaults to FastAPI on :8000
+ */
+export function getApiBaseUrl(): string {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "");
+  }
+  if (typeof window !== "undefined") {
+    const host = window.location.hostname;
+    if (host !== "localhost" && host !== "127.0.0.1") {
+      return `${window.location.origin}/api/v1`;
+    }
+  }
+  return "http://localhost:8000/api/v1";
+}
 
 export function getStoredToken(): string | null {
   if (typeof window === "undefined") return null;
@@ -60,38 +76,62 @@ async function parseError(res: Response): Promise<ApiError> {
   return err;
 }
 
+function networkError(err: unknown): ApiError {
+  const raw = err instanceof Error ? err.message : String(err);
+  const friendly =
+    raw === "Load failed" ||
+    raw === "Failed to fetch" ||
+    raw.includes("NetworkError") ||
+    raw.includes("fetch")
+      ? "Não foi possível contactar a API. Confirme que o backend está a correr (local: :8000) ou que o deploy Vercel inclui o serviço backend."
+      : raw;
+  const e = new Error(friendly) as ApiError;
+  e.code = "NETWORK_ERROR";
+  return e;
+}
+
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_BASE_URL}${path}`, {
-    ...init,
-    headers: getAuthHeaders(init?.headers),
-    cache: "no-store",
-  });
-  if (!res.ok) throw await parseError(res);
-  if (res.status === 204) return undefined as T;
-  return res.json();
+  try {
+    const res = await fetch(`${getApiBaseUrl()}${path}`, {
+      ...init,
+      headers: getAuthHeaders(init?.headers),
+      cache: "no-store",
+    });
+    if (!res.ok) throw await parseError(res);
+    if (res.status === 204) return undefined as T;
+    return res.json();
+  } catch (err) {
+    if (err instanceof Error && (err as ApiError).status) throw err;
+    throw networkError(err);
+  }
 }
 
 export async function login(
   email: string,
   password: string
 ): Promise<{ access_token: string; user: CurrentUser }> {
-  const res = await fetch(`${API_BASE_URL}/auth/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-  });
-  if (!res.ok) throw await parseError(res);
-  const data = await res.json();
-  setStoredToken(data.access_token);
-  return {
-    access_token: data.access_token,
-    user: {
-      id: data.user.id,
-      email: data.user.email,
-      name: data.user.name || data.user.email,
-      role: data.user.role,
-    },
-  };
+  try {
+    const res = await fetch(`${getApiBaseUrl()}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    if (!res.ok) throw await parseError(res);
+    const data = await res.json();
+    setStoredToken(data.access_token);
+    return {
+      access_token: data.access_token,
+      user: {
+        id: data.user.id,
+        email: data.user.email,
+        name: data.user.name || data.user.email,
+        role: data.user.role,
+      },
+    };
+  } catch (err) {
+    if (err instanceof Error && (err as ApiError).status) throw err;
+    throw networkError(err);
+  }
 }
 
 export async function fetchMe(): Promise<CurrentUser> {
@@ -149,7 +189,7 @@ export async function uploadJobFile(
   const form = new FormData();
   form.append("file", file);
   const res = await fetch(
-    `${API_BASE_URL}/jobs/${jobId}/files?kind=${encodeURIComponent(kind)}`,
+    `${getApiBaseUrl()}/jobs/${jobId}/files?kind=${encodeURIComponent(kind)}`,
     {
       method: "POST",
       headers: getAuthHeaders(),
@@ -167,7 +207,7 @@ export async function listJobFiles(
 }
 
 export async function downloadJobFile(jobId: string, fileId: string, filename: string): Promise<void> {
-  const res = await fetch(`${API_BASE_URL}/jobs/${jobId}/files/${fileId}/download`, {
+  const res = await fetch(`${getApiBaseUrl()}/jobs/${jobId}/files/${fileId}/download`, {
     headers: getAuthHeaders(),
   });
   if (!res.ok) throw await parseError(res);
