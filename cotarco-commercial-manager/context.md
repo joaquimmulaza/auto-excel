@@ -183,9 +183,12 @@ Quando gerar dados estruturados, preferir schema JSON/Pydantic/Zod.
 - Supabase PostgreSQL;
 - Supabase Auth;
 - Supabase Storage;
-- Vercel para frontend;
-- Cloud Run para backend;
+- Vercel para frontend (root `frontend/` — sem FastAPI na Vercel);
+- Render Free Web Service para backend (`cotarco-ccm-api`);
 - GitHub Actions para CI.
+
+Projecto Supabase dedicado: `cotarco-ccm` (`eu-west-1`). Ver `docs/deployment.md`.
+Cloud Run / GCP não é o caminho de deploy do MVP.
 
 ### IA
 
