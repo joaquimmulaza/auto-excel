@@ -8,30 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle, LogIn } from "lucide-react";
 
-/** Local AUTH_MODE fixtures (FastAPI). Supabase seeds use *@cotarco.ao below when configured. */
-const LOCAL_DEMO_ACCOUNTS = [
-  { email: "joaquim.silva@cotarco.ao", password: "comercial123", label: "Comercial" },
-  { email: "antonio.ferreira@cotarco.ao", password: "operador123", label: "Operador" },
-  { email: "admin@cotarco.ao", password: "admin123", label: "Admin" },
-];
-
-const SUPABASE_DEMO_ACCOUNTS = [
-  { email: "comercial@cotarco.ao", password: "ComercialTest123!", label: "Comercial" },
-  { email: "operador@cotarco.ao", password: "OperadorTest123!", label: "Operador" },
-  { email: "admin@cotarco.ao", password: "AdminTest123!", label: "Admin" },
-];
-
-const DEMO_ACCOUNTS =
-  typeof process !== "undefined" &&
-  process.env.NEXT_PUBLIC_SUPABASE_URL &&
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    ? SUPABASE_DEMO_ACCOUNTS
-    : LOCAL_DEMO_ACCOUNTS;
-
 export default function LoginPage() {
   const { login } = useAuth();
-  const [email, setEmail] = useState(DEMO_ACCOUNTS[0].email);
-  const [password, setPassword] = useState(DEMO_ACCOUNTS[0].password);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
@@ -104,27 +84,6 @@ export default function LoginPage() {
               Entrar
             </Button>
           </form>
-
-          <div className="mt-6 pt-4 border-t border-border space-y-2">
-            <p className="text-[11px] font-semibold text-slateSecondary uppercase tracking-wider">
-              Contas de demonstração
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {DEMO_ACCOUNTS.map((acc) => (
-                <button
-                  key={acc.email}
-                  type="button"
-                  className="text-[11px] px-2 py-1 rounded border border-border bg-canvas hover:bg-surface text-ink"
-                  onClick={() => {
-                    setEmail(acc.email);
-                    setPassword(acc.password);
-                  }}
-                >
-                  {acc.label}
-                </button>
-              ))}
-            </div>
-          </div>
         </CardContent>
       </Card>
     </div>

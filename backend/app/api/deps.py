@@ -44,8 +44,8 @@ def _get_session_factory():
                     c.execute("PRAGMA foreign_keys=ON")
                     c.close()
 
-        # create_all only for local/test — production uses SQL migrations
-        if settings.environment in {"local", "test"} or is_sqlite:
+        # create_all ONLY for local/test — production schema comes from Supabase migrations
+        if settings.environment in {"local", "test"}:
             from backend.app.infra.db.session import create_all_tables
 
             create_all_tables(_engine)

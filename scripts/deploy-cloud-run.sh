@@ -30,13 +30,15 @@ gcloud artifacts repositories describe cotarco --location="${REGION}" >/dev/null
        --location="${REGION}" \
        --description="Cotarco CCM images"
 
-echo "==> Building image ${IMAGE}"
+echo "==> Building image ${IMAGE} (Dockerfile at repo root)"
+# Single source of truth: /Dockerfile (not backend/Dockerfile)
 gcloud builds submit "${ROOT}" \
   --tag "${IMAGE}" \
   --timeout=1200s
 
 echo "==> Deploying Cloud Run service"
-# Secrets must already exist in Secret Manager (do not pass raw secrets here).
+# Secrets must already exist in Secret Manager (do not pass raw secret values here).
+# JWT verification uses JWKS (ES256) from SUPABASE_URL — SUPABASE_JWT_SECRET is optional legacy only.
 gcloud run deploy "${SERVICE}" \
   --image="${IMAGE}" \
   --region="${REGION}" \
@@ -49,7 +51,7 @@ gcloud run deploy "${SERVICE}" \
   --min-instances=0 \
   --max-instances=3 \
   --set-env-vars="ENVIRONMENT=production,AUTH_MODE=supabase,STORAGE_BACKEND=supabase,STORAGE_BUCKET=job-files" \
-  --set-secrets="DATABASE_URL=cotarco-database-url:latest,SUPABASE_URL=cotarco-supabase-url:latest,SUPABASE_ANON_KEY=cotarco-supabase-anon:latest,SUPABASE_SERVICE_ROLE_KEY=cotarco-supabase-service-role:latest,SUPABASE_JWT_SECRET=cotarco-supabase-jwt-secret:latest,GEMINI_API_KEY=cotarco-gemini-api-key:latest,ALLOWED_ORIGINS=cotarco-allowed-origins:latest"
+  --set-secrets="DATABASE_URL=cotarco-database-url:latest,SUPABASE_URL=cotarco-supabase-url:latest,SUPABASE_ANON_KEY=cotarco-supabase-anon:latest,SUPABASE_SERVICE_ROLE_KEY=cotarco-supabase-service-role:latest,GEMINI_API_KEY=cotarco-gemini-api-key:latest,ALLOWED_ORIGINS=cotarco-allowed-origins:latest"
 
 URL="$(gcloud run services describe "${SERVICE}" --region="${REGION}" --format='value(status.url)')"
 echo "==> Service URL: ${URL}"
