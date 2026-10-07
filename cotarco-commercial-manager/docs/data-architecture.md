@@ -42,9 +42,10 @@ Representação local do utilizador autenticado.
 
 Campos:
 
-- `id uuid pk` — alinhado com identidade do Auth quando possível;
+- `id uuid pk` — alinhado com `auth.users.id` (Supabase Auth);
 - `email text unique not null`;
 - `display_name text`;
+- `password_hash text` — opcional; só para `AUTH_MODE=local` (dev/test);
 - `role user_role not null default 'COMERCIAL'`;
 - `is_active boolean not null default true`;
 - `created_at timestamptz not null`;

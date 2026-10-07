@@ -45,8 +45,9 @@ Erros:
 
 | Método | Endpoint | Papel | Resultado |
 |---|---|---|---|
-| GET | `/auth/me` | autenticado | utilizador atual |
-| POST | `/auth/logout` | autenticado | sessão revogada conforme estratégia |
+| POST | `/auth/login` | público | **apenas `AUTH_MODE=local`** (dev/test). Produção: login via Supabase Auth no frontend |
+| GET | `/auth/me` | autenticado (Bearer Supabase JWT ou JWT local) | utilizador + role de `public.users` |
+| POST | `/auth/logout` | autenticado | no-op API; sessão limpa no cliente Supabase |
 
 ## 4. Profiles
 
