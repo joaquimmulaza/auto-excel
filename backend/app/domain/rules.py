@@ -17,6 +17,7 @@ from backend.app.domain.models import (
     StockRule,
     ValidationIssue,
 )
+from backend.app.domain.normalization import format_currency
 
 
 def normalize_reference(text: Any) -> str:
@@ -106,7 +107,10 @@ def evaluate_price_guard(
         issue = ValidationIssue(
             severity=IssueSeverity.BLOCKER,
             code="BLOCKED_NEGATIVE_PRICE",
-            message=f"Referência '{ref}': Preço negativo ({new_price:.2f} EUR) rejeitado por regra de segurança.",
+            message=(
+                f"Referência '{ref}': Preço negativo ({format_currency(new_price)}) "
+                "rejeitado por regra de segurança."
+            ),
             field="price",
             row_number=row_number,
             details={"reference": ref, "new_price": new_price, "old_price": old_price},
@@ -118,7 +122,10 @@ def evaluate_price_guard(
         issue = ValidationIssue(
             severity=IssueSeverity.BLOCKER,
             code="BLOCKED_ZERO_PRICE",
-            message=f"Referência '{ref}': Preço zero (0.00 EUR) não permitido pelas regras do perfil.",
+            message=(
+                f"Referência '{ref}': Preço zero ({format_currency(0)}) "
+                "não permitido pelas regras do perfil."
+            ),
             field="price",
             row_number=row_number,
             details={"reference": ref, "new_price": new_price, "old_price": old_price},
@@ -140,7 +147,8 @@ def evaluate_price_guard(
                 code="BLOCKED_PRICE_VARIATION",
                 message=(
                     f"Referência '{ref}': Variação de preço de {variation_pct:+.1f}% "
-                    f"({old_price:.2f} EUR -> {new_price:.2f} EUR) excede o limiar de segurança de {threshold_pct:.0f}%."
+                    f"({format_currency(old_price)} -> {format_currency(new_price)}) "
+                    f"excede o limiar de segurança de {threshold_pct:.0f}%."
                 ),
                 field="price",
                 row_number=row_number,
@@ -209,7 +217,10 @@ def evaluate_new_product_eligibility(
         issue = ValidationIssue(
             severity=IssueSeverity.INFO,
             code="IGNORED_ZERO_PRICE",
-            message=f"Referência '{ref_orig}': Produto ignorado pois o preço é zero (0.00 EUR).",
+            message=(
+                f"Referência '{ref_orig}': Produto ignorado pois o preço é zero "
+                f"({format_currency(0)})."
+            ),
             field="price",
             row_number=row_number,
             details={"reference": ref_orig, "price": price},

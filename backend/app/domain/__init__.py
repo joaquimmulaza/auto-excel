@@ -21,6 +21,7 @@ from backend.app.domain.engine import (
 )
 from backend.app.domain.normalization import (
     calcular_variacao,
+    format_currency,
     limpar_preco,
     normalize_col,
     ultra_clean,
@@ -56,6 +57,7 @@ __all__ = [
     "evaluate_new_product_eligibility",
     "evaluate_price_guard",
     "evaluate_stock_activation",
+    "format_currency",
     "limpar_preco",
     "normalize_col",
     "normalize_reference",

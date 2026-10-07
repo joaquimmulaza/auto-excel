@@ -5,6 +5,7 @@ import pytest
 
 from backend.app.domain.normalization import (
     calcular_variacao,
+    format_currency,
     limpar_preco,
     normalize_col,
     ultra_clean,
@@ -91,6 +92,20 @@ class TestLimparPreco:
         assert limpar_preco("invalid_price") == 0.00
 
 
+class TestFormatCurrency:
+    """Tests for Kwanza (Kz) currency formatting."""
+
+    def test_formats_zero_as_kz(self):
+        assert format_currency(0) == "0.00 Kz"
+        assert "EUR" not in format_currency(0)
+
+    def test_formats_positive_value(self):
+        assert format_currency(1250.5) == "1250.50 Kz"
+
+    def test_formats_none(self):
+        assert format_currency(None) == "— Kz"
+
+
 class TestCalcularVariacao:
     """Tests for calcular_variacao calculation and zero-division protection."""
 
@@ -109,6 +124,13 @@ class TestCalcularVariacao:
     def test_calculates_zero_variation(self):
         var = calcular_variacao(50.0, 50.0)
         assert var == 0.0
+
+    def test_preserves_small_ratio_on_high_prices(self):
+        # Early round(..., 4) used to collapse 50/85000 ≈ 0.000588 → 0.0000
+        var = calcular_variacao(85000.0, 85050.0)
+        assert var is not None
+        assert var > 0
+        assert math.isclose(var * 100.0, 0.0588235, rel_tol=1e-4)
 
     def test_protection_against_division_by_zero(self):
         # Zero old price should not raise ZeroDivisionError

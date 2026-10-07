@@ -120,6 +120,13 @@ def test_full_pipeline_happy_path(comercial_client, operador_client):
     assert receipt.status_code == 200
     assert receipt.json()["status"] == "COMPLETED"
 
+    history = operador_client.get("/api/v1/history/prices", params={"reference": "AAA-1"})
+    assert history.status_code == 200, history.text
+    hist_items = history.json()["items"]
+    assert len(hist_items) >= 1
+    assert hist_items[0]["change_type"] in ("UPDATED", "NEW")
+    assert hist_items[0]["new_price"] is not None
+
 
 def test_dry_run_cannot_approve(comercial_client, operador_client):
     created = comercial_client.post(
