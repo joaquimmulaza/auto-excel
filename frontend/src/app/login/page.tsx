@@ -45,6 +45,7 @@ export default function LoginPage() {
               height={42}
               className="h-10 w-auto object-contain"
               priority
+              unoptimized
             />
           </div>
           <CardTitle className="text-lg">Commercial Manager</CardTitle>
