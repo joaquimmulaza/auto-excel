@@ -110,15 +110,28 @@ def limpar_preco(val: Any) -> float:
         return 0.0
 
 
+def format_currency(value: float | int | None) -> str:
+    """Formats a monetary value in Angolan Kwanza (Kz).
+
+    Matches the frontend display convention (AOA shown as Kz).
+    """
+    if value is None:
+        return "— Kz"
+    return f"{float(value):.2f} Kz"
+
+
 def calcular_variacao(old_price: Optional[float], new_price: float) -> Optional[float]:
     """Safely calculates relative price variation without division by zero.
 
     Returns:
         float representing relative variation (e.g. 0.30 for +30%, -0.20 for -20%),
         or None if old_price is None, <= 0.0, or invalid.
+
+    Does not round the ratio early — callers that need a percent should convert
+    with ``round(ratio * 100, 2)`` (or use ``calculate_price_variation``).
     """
     if old_price is None or old_price <= 0.0:
         return None
 
     delta = new_price - old_price
-    return round(delta / old_price, 4)
+    return delta / old_price

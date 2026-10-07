@@ -94,6 +94,30 @@ class TestDomainEngine:
         assert item_res.new_price == 110.0
         assert item_res.old_stock == 1
         assert item_res.new_stock == 5
+        assert item_res.price_variation_pct == 10.0
+
+    def test_small_variation_on_high_aoa_price_is_not_zero(self, profile):
+        """High Kwanza prices must still surface non-zero percent changes."""
+        source_records = [
+            {"REFERENCIA": "HW-B450FXA", "PRECO": 85050.0, "STOCK": 5}
+        ]
+        target_catalog = [
+            {
+                "internal_identifier": "HW-B450FXA",
+                "original_price": 85000.0,
+                "quantity": 5,
+                "is_active": True,
+                "sold_out": False,
+            }
+        ]
+
+        result = process_price_table(source_records, target_catalog, profile)
+
+        item_res = result.items[0]
+        assert item_res.decision_code == DecisionCode.UPDATE
+        assert item_res.price_variation_pct is not None
+        assert item_res.price_variation_pct != 0.0
+        assert abs(item_res.price_variation_pct - 0.06) < 0.01
 
     def test_existing_product_deactivates_when_stock_below_threshold(self, profile):
         # Product had stock 10; now gets stock 2 (< min_stock_activation 3) -> should deactivate
