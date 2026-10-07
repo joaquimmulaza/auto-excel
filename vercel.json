@@ -8,7 +8,7 @@
     "backend": {
       "root": "backend",
       "framework": "fastapi",
-      "entrypoint": "vercel_app.py",
+      "entrypoint": "vercel_app:app",
       "installCommand": "pip install -r requirements.txt"
     }
   },

@@ -24,6 +24,7 @@ export function Header() {
             height={32}
             className="h-8 w-auto object-contain"
             priority
+            unoptimized
           />
         </div>
       </header>
@@ -48,6 +49,7 @@ export function Header() {
                 height={32}
                 className="h-8 w-auto object-contain"
                 priority
+                unoptimized
               />
             </div>
             <div className="h-6 w-[1px] bg-border hidden sm:block" />
