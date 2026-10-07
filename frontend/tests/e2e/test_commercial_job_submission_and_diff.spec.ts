@@ -8,7 +8,9 @@ test("Commercial job submission with fixture upload", async ({ page }) => {
   await page.waitForURL("/");
 
   await page.goto("/jobs/new");
-  await expect(page.getByText("Novo Processamento")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Novo Processamento" })).toBeVisible({
+    timeout: 15000,
+  });
 
   const fixture = path.join(
     __dirname,
@@ -19,8 +21,8 @@ test("Commercial job submission with fixture upload", async ({ page }) => {
     "../../../fixtures/excel/sample_catalog.xlsx"
   );
 
-  // First upload zone = INPUT; second = CATALOG
   const fileInputs = page.locator('input[type="file"]');
+  await expect(fileInputs).toHaveCount(2);
   await fileInputs.nth(0).setInputFiles(fixture);
   await fileInputs.nth(1).setInputFiles(catalog);
 
@@ -29,4 +31,5 @@ test("Commercial job submission with fixture upload", async ({ page }) => {
   await expect(page.getByText(/Diferencial de Preços/i)).toBeVisible({
     timeout: 30000,
   });
+  await expect(page.getByText(/Porque foi bloqueado/i)).toBeVisible();
 });

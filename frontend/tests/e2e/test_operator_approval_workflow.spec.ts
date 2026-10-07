@@ -14,5 +14,6 @@ async function loginAs(page: import("@playwright/test").Page, role: "comercial" 
 test("Operator approval workflow UI", async ({ page }) => {
   await loginAs(page, "operador");
   await expect(page.getByText(/Olá,/i)).toBeVisible();
-  await expect(page.getByText("OPERADOR")).toBeVisible();
+  await expect(page.getByRole("main").getByText("OPERADOR", { exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Exceções", exact: true })).toBeVisible();
 });
