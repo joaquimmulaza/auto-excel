@@ -19,12 +19,16 @@ test("Accessibility and Responsive Audit", async ({ page }) => {
   expect(btnBox?.height).toBeGreaterThanOrEqual(30);
 
   const cls = await page.evaluate(() => {
-    return new Promise((resolve) => {
+    return new Promise<number>((resolve) => {
       let clsValue = 0;
       new PerformanceObserver((entryList) => {
         for (const entry of entryList.getEntries()) {
-          if (!(entry as { hadRecentInput?: boolean }).hadRecentInput) {
-            clsValue += (entry as { value: number }).value;
+          const layoutShift = entry as PerformanceEntry & {
+            hadRecentInput?: boolean;
+            value?: number;
+          };
+          if (!layoutShift.hadRecentInput) {
+            clsValue += layoutShift.value ?? 0;
           }
         }
       }).observe({ type: "layout-shift", buffered: true });
@@ -33,3 +37,4 @@ test("Accessibility and Responsive Audit", async ({ page }) => {
   });
   expect(cls).toBeLessThan(0.25);
 });
+
