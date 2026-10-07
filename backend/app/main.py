@@ -4,19 +4,29 @@ GUARDRAIL: This is backend/app/main.py - NOT the legacy main.py at the repo root
 The legacy main.py MUST remain untouched.
 """
 from __future__ import annotations
+
 import json
 import logging
-import os
 import typing
+import uuid
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
-from fastapi.responses import JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.exceptions import HTTPException, RequestValidationError
-from backend.app.api.v1.router import v1_router
-from backend.app.api.errors import http_exception_handler, validation_exception_handler
 
+from fastapi import FastAPI, Request
+from fastapi.exceptions import HTTPException, RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from starlette.middleware.base import BaseHTTPMiddleware
+
+from backend.app.api.errors import http_exception_handler, validation_exception_handler
+from backend.app.api.v1.router import v1_router
+from backend.app.core.settings import get_settings
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s %(message)s",
+)
 logger = logging.getLogger(__name__)
+
 
 class UTF8JSONResponse(JSONResponse):
     media_type = "application/json; charset=utf-8"
@@ -31,66 +41,67 @@ class UTF8JSONResponse(JSONResponse):
         ).encode("utf-8")
 
 
+class RequestIdMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        request_id = request.headers.get("x-request-id") or str(uuid.uuid4())
+        request.state.request_id = request_id
+        response = await call_next(request)
+        response.headers["X-Request-Id"] = request_id
+        return response
+
+
 @asynccontextmanager
 async def lifespan(application: FastAPI):
-    """Eagerly initialise the database on every startup / hot-reload.
-
-    The session factory in deps.py uses a module-level singleton that is
-    created lazily on the first request.  When uvicorn --reload restarts the
-    worker the old singleton may point to a stale in-memory engine whose
-    tables were never (re)created, causing 'no such table' OperationalErrors
-    (HTTP 500).  Calling _get_session_factory() here forces table creation
-    before the first request arrives.
-    """
-    from backend.app.api.deps import _get_session_factory  # local import avoids circular
+    from backend.app.api.deps import _get_session_factory
     from backend.app.services.bootstrap import bootstrap_database
 
     factory = _get_session_factory()
     db = factory()
     try:
         bootstrap_database(db)
-        logger.info("Database initialised — tables and seeds ready.")
+        logger.info("Database initialised — bootstrap complete.")
     finally:
         db.close()
     yield
 
 
+settings = get_settings()
+
 app = FastAPI(
     title="Cotarco Commercial Manager API",
     description="Internal API for managing commercial price/stock tables.",
     version="1.0.0",
-    docs_url="/docs",
+    docs_url="/docs" if not settings.is_production else "/docs",
     redoc_url="/redoc",
     default_response_class=UTF8JSONResponse,
     lifespan=lifespan,
 )
 
+app.add_middleware(RequestIdMiddleware)
 
-_cors_origins = [
-    o.strip()
-    for o in os.getenv(
-        "ALLOWED_ORIGINS",
-        "http://localhost:3000,http://127.0.0.1:3000",
-    ).split(",")
-    if o.strip()
-]
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=_cors_origins or ["http://localhost:3000"],
-    # Preview/production frontends on Vercel (separate API host or local tunnel)
-    allow_origin_regex=r"https://.*\.vercel\.app",
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+_cors_kwargs: dict = {
+    "allow_origins": list(settings.allowed_origins) or ["http://localhost:3000"],
+    "allow_credentials": True,
+    "allow_methods": ["*"],
+    "allow_headers": ["*"],
+}
+if settings.cors_allow_vercel_preview:
+    _cors_kwargs["allow_origin_regex"] = r"https://.*\.vercel\.app"
 
-# Error handlers
+app.add_middleware(CORSMiddleware, **_cors_kwargs)
+
 app.add_exception_handler(HTTPException, http_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 
-# Routes
 app.include_router(v1_router)
+
 
 @app.get("/health", tags=["health"])
 def health_check():
-    return {"status": "ok", "service": "cotarco-commercial-manager"}
+    return {
+        "status": "ok",
+        "service": "cotarco-commercial-manager",
+        "environment": settings.environment,
+        "auth_mode": settings.auth_mode,
+        "storage_backend": settings.storage_backend,
+    }

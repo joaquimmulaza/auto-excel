@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from sqlalchemy.orm import Session
 
 from backend.app.api.v1.auth import ensure_demo_users
+from backend.app.core.settings import get_settings
 from backend.app.infra.db.models import CommercialProfileOrm
 
 
@@ -30,7 +31,7 @@ SEED_PROFILES = [
     ),
     (
         uuid.UUID("22222222-2222-2222-2222-222222222222"),
-        "LOJA_ONLINE",
+        "WOOCOMMERCE",
         "Loja Online Cotarco",
         "STORE",
         "Catálogo e-commerce Cotarco. Stock mínimo 1. Variação 30%.",
@@ -42,6 +43,7 @@ SEED_PROFILES = [
             "new_product_min_stock": 1,
             "allow_zero_price": False,
             "woocommerce_enabled": False,
+            "feature_flags": {"woocommerce_live_push": False},
         },
     ),
     (
@@ -57,7 +59,7 @@ SEED_PROFILES = [
             "price_guard_threshold_pct": 10,
             "new_product_min_stock": 5,
             "allow_zero_price": False,
-            "rules_confirmed": False,
+            "business_rules_confirmed": False,
         },
     ),
     (
@@ -72,7 +74,7 @@ SEED_PROFILES = [
             "price_variation_threshold": 0.20,
             "price_guard_threshold_pct": 20,
             "new_product_min_stock": 2,
-            "rules_confirmed": False,
+            "business_rules_confirmed": False,
         },
     ),
     (
@@ -87,7 +89,7 @@ SEED_PROFILES = [
             "price_variation_threshold": 0.15,
             "price_guard_threshold_pct": 15,
             "new_product_min_stock": 2,
-            "rules_confirmed": False,
+            "business_rules_confirmed": False,
         },
     ),
 ]
@@ -124,6 +126,9 @@ def ensure_seed_profiles(db: Session) -> None:
 
 
 def bootstrap_database(db: Session) -> None:
-    ensure_demo_users(db)
-    ensure_seed_profiles(db)
+    settings = get_settings()
+    if settings.auth_mode == "local":
+        ensure_demo_users(db)
+    if settings.environment in {"local", "test"} or settings.is_sqlite:
+        ensure_seed_profiles(db)
     db.commit()

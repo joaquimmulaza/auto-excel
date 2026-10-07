@@ -1,61 +1,31 @@
 """SQLAlchemy 2.0 session and engine management.
 
-Supports two modes:
-  - ``ASYNC_DATABASE_URL`` / ``DATABASE_URL``  → PostgreSQL / Supabase (production)
-  - SQLite in-memory                            → tests (via ``get_test_engine()``)
+Supports:
+  - PostgreSQL / Supabase (staging/production) via DATABASE_URL
+  - SQLite (local/tests)
 
 GUARDRAILS:
-  - SUPABASE_SERVICE_ROLE_KEY is never exposed in client-accessible code.
-  - Connection strings are loaded from environment variables only.
-  - ``poolclass=NullPool`` is used in test mode to avoid connection leaks.
+  - SUPABASE_SERVICE_ROLE_KEY is never used for DB connections.
+  - Connection strings come from environment only.
+  - Production must not rely on create_all — use SQL migrations.
 """
 
 from __future__ import annotations
 
-import os
-from pathlib import Path
-from dotenv import load_dotenv
-
-# Load environment variables
-_backend_env = Path(__file__).resolve().parent.parent.parent.parent / "backend" / ".env"
-load_dotenv(_backend_env)
-load_dotenv()
 from contextlib import contextmanager
 from typing import Generator
 
 from sqlalchemy import create_engine, event, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.pool import NullPool
 
+from backend.app.core.settings import get_settings
 
-# ---------------------------------------------------------------------------
-# Connection URL resolution
-# ---------------------------------------------------------------------------
 
 def _get_database_url() -> str:
-    """Resolve the database URL from environment.
+    return get_settings().database_url
 
-    Priority:
-      1. ``DATABASE_URL`` env var  (PostgreSQL / Supabase connection string)
-      2. SQLite in-memory fallback for local development without Supabase
-
-    Never use SUPABASE_SERVICE_ROLE_KEY here — that key must stay server-side
-    only and is NOT used for standard DB connections.
-    """
-    url = os.getenv("DATABASE_URL")
-    if url:
-        # Supabase / PostgreSQL connection pooler uses ``postgresql+psycopg2://``
-        # or ``postgresql://`` — normalise the scheme for SQLAlchemy 2.x
-        if url.startswith("postgres://"):
-            url = url.replace("postgres://", "postgresql+psycopg2://", 1)
-        return url
-    # Fallback: SQLite in-memory for local development / testing
-    return "sqlite+pysqlite:///:memory:"
-
-
-# ---------------------------------------------------------------------------
-# Engine factory
-# ---------------------------------------------------------------------------
 
 def create_db_engine(
     url: str | None = None,
@@ -64,26 +34,22 @@ def create_db_engine(
     pool_size: int = 5,
     max_overflow: int = 10,
 ) -> Engine:
-    """Create a SQLAlchemy engine.
-
-    Args:
-        url: Database URL. Defaults to ``_get_database_url()``.
-        echo: Enable SQL logging (never enable in production with sensitive data).
-        pool_size: Connection pool size (ignored for SQLite).
-        max_overflow: Pool overflow (ignored for SQLite).
-
-    Returns:
-        Configured ``Engine`` instance.
-    """
-    resolved_url = url or _get_database_url()
+    """Create a SQLAlchemy engine tuned for local or Cloud Run usage."""
+    settings = get_settings()
+    resolved_url = url or settings.database_url
     is_sqlite = resolved_url.startswith("sqlite")
 
     connect_args: dict = {}
     extra_kwargs: dict = {}
 
     if is_sqlite:
-        # SQLite requires check_same_thread=False for multi-threaded usage
         connect_args["check_same_thread"] = False
+    elif settings.is_production or settings.environment in {"staging", "production"}:
+        # Serverless/container: avoid large persistent pools
+        extra_kwargs = {
+            "poolclass": NullPool,
+            "pool_pre_ping": True,
+        }
     else:
         extra_kwargs = {
             "pool_size": pool_size,
@@ -98,7 +64,6 @@ def create_db_engine(
         **extra_kwargs,
     )
 
-    # For SQLite: enable foreign key enforcement (OFF by default in SQLite)
     if is_sqlite:
         @event.listens_for(engine, "connect")
         def _set_sqlite_pragma(dbapi_connection, _connection_record):  # type: ignore[misc]
@@ -108,10 +73,6 @@ def create_db_engine(
 
     return engine
 
-
-# ---------------------------------------------------------------------------
-# Global engine & session factory (lazily initialised)
-# ---------------------------------------------------------------------------
 
 _engine: Engine | None = None
 _SessionLocal: sessionmaker[Session] | None = None
@@ -136,22 +97,8 @@ def _get_session_factory() -> sessionmaker[Session]:
     return _SessionLocal
 
 
-# ---------------------------------------------------------------------------
-# Public API
-# ---------------------------------------------------------------------------
-
 @contextmanager
 def get_db_session() -> Generator[Session, None, None]:
-    """Context manager yielding a transactional database session.
-
-    Usage::
-
-        with get_db_session() as session:
-            session.add(entity)
-            session.commit()
-
-    Rolls back automatically on exception.
-    """
     factory = _get_session_factory()
     session: Session = factory()
     try:
@@ -165,34 +112,21 @@ def get_db_session() -> Generator[Session, None, None]:
 
 
 def get_test_engine(url: str = "sqlite+pysqlite:///:memory:") -> Engine:
-    """Create an isolated test engine.
-
-    Uses SQLite in-memory by default. Can be overridden with a PostgreSQL
-    URL to run integration tests against a real Supabase project.
-
-    Must be used with ``create_all_tables()`` to set up the schema.
-    """
     return create_db_engine(url=url, echo=False)
 
 
 def create_all_tables(engine: Engine) -> None:
-    """Create all ORM-mapped tables in the given engine.
-
-    Intended for testing only. Production schema is managed by
-    ``backend/migrations/`` SQL scripts executed in Supabase SQL Editor.
-    """
+    """Create ORM tables — intended for local/tests only."""
     from backend.app.infra.db.models import Base
     Base.metadata.create_all(bind=engine)
 
 
 def drop_all_tables(engine: Engine) -> None:
-    """Drop all ORM-mapped tables — TEST USE ONLY."""
     from backend.app.infra.db.models import Base
     Base.metadata.drop_all(bind=engine)
 
 
 def ping_database(engine: Engine) -> bool:
-    """Verify database connectivity. Returns True if reachable."""
     try:
         with engine.connect() as conn:
             conn.execute(text("SELECT 1"))

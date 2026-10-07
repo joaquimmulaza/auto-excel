@@ -1,10 +1,11 @@
-"""Local login / me endpoints."""
+"""Auth endpoints — local login (dev/test) + /me for all modes."""
 from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, EmailStr, Field
 
 from backend.app.api.deps import DbDep, UserDep
+from backend.app.core.settings import get_settings
 from backend.app.infra.db.models import UserOrm
 from backend.app.services.auth_tokens import (
     create_access_token,
@@ -35,6 +36,24 @@ class MeResponse(BaseModel):
 
 @router.post("/login", response_model=LoginResponse)
 def login(payload: LoginRequest, db: DbDep):
+    """Password login — available only when AUTH_MODE=local.
+
+    Production uses Supabase Auth in the frontend; the access token is then
+    sent as Bearer to the API.
+    """
+    settings = get_settings()
+    if settings.auth_mode != "local":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={
+                "error": {
+                    "code": "LOCAL_LOGIN_DISABLED",
+                    "message": "Use Supabase Auth login; /auth/login is disabled in this environment",
+                    "request_id": "",
+                }
+            },
+        )
+
     user = db.query(UserOrm).filter(UserOrm.email == payload.email.lower()).first()
     if not user or not user.is_active or not verify_password(payload.password, user.password_hash):
         raise HTTPException(
@@ -59,6 +78,12 @@ def login(payload: LoginRequest, db: DbDep):
     )
 
 
+@router.post("/logout")
+def logout():
+    """Client-side session clear; kept for API symmetry."""
+    return {"ok": True}
+
+
 @router.get("/me", response_model=MeResponse)
 def me(current_user: UserDep, db: DbDep):
     user = db.get(UserOrm, current_user.id)
@@ -71,9 +96,12 @@ def me(current_user: UserDep, db: DbDep):
 
 
 def ensure_demo_users(db) -> None:
-    """Seed default users with passwords if missing (local/dev)."""
+    """Seed default users with passwords if missing (local/test only)."""
     import uuid
     from datetime import datetime, timezone
+
+    if get_settings().auth_mode != "local":
+        return
 
     seeds = [
         (

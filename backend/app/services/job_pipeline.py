@@ -25,6 +25,7 @@ from backend.app.services.excel_io import (
     write_excel_bytes,
 )
 from backend.app.services.profile_adapter import orm_profile_to_domain
+from backend.app.services.observability import log_event
 from backend.app.services.storage import read_bytes, store_bytes
 
 
@@ -161,6 +162,7 @@ def validate_job(
 
     job.status = "VALIDATING"
     db.flush()
+    log_event("VALIDATION_STARTED", job_id=job.id)
 
     # Clear previous validation artefacts
     db.query(JobItemOrm).filter(JobItemOrm.job_id == job.id).delete()
@@ -297,6 +299,7 @@ def process_job(
     job.status = "PROCESSING"
     job.started_at = now
     db.flush()
+    log_event("PROCESSING_STARTED", job_id=job.id, actor_id=actor_id)
 
     report = get_file(db, job.id, "REPORT")
     items = repo.list_items(job.id)
@@ -374,6 +377,7 @@ def process_job(
     job.summary = summary
     job.status = "COMPLETED"
     job.completed_at = now
+    log_event("PROCESSING_COMPLETED", job_id=job.id, actor_id=actor_id)
 
     repo.append_audit_log(
         AuditLogOrm(

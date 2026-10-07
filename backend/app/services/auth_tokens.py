@@ -1,7 +1,6 @@
-"""JWT helpers for local auth (Supabase Auth can replace later)."""
+"""JWT helpers for local/test auth (AUTH_MODE=local)."""
 from __future__ import annotations
 
-import os
 import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Any
@@ -9,12 +8,15 @@ from typing import Any
 import jwt
 from passlib.context import CryptContext
 
+from backend.app.core.settings import get_settings
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 ALGORITHM = "HS256"
+LOCAL_ISSUER = "cotarco-local"
 
 
 def _secret() -> str:
-    return os.getenv("AUTH_SECRET", "cotarco-dev-secret-change-me")
+    return get_settings().auth_secret
 
 
 def hash_password(password: str) -> str:
@@ -32,6 +34,7 @@ def create_access_token(*, user_id: uuid.UUID, email: str, role: str, hours: int
         "sub": str(user_id),
         "email": email,
         "role": role,
+        "iss": LOCAL_ISSUER,
         "exp": datetime.now(timezone.utc) + timedelta(hours=hours),
         "iat": datetime.now(timezone.utc),
     }
