@@ -64,6 +64,66 @@ class TestDomainEngine:
         assert result.summary.updated == 1
         assert result.has_blockers is False
 
+    def test_excel_catalog_preco_com_iva_maps_old_price(self, profile):
+        """Samsung/Cotarco catalogs use 'Preço com IVA', not original_price."""
+        source_records = [
+            {
+                "REFERÊNCIA": "AR09TQGAWKFA/FA",
+                "PREÇO COM IVA": 420000.0,
+                "STOCK": 600,
+            }
+        ]
+        target_catalog = [
+            {
+                "REFERÊNCIA": "AR09TQGAWKFA/FA",
+                "Preço com IVA": 400000.0,
+                "STOCK": 600,
+            }
+        ]
+
+        result = process_price_table(source_records, target_catalog, profile)
+        item = result.items[0]
+        assert item.decision_code == DecisionCode.UPDATE
+        assert item.old_price == 400000.0
+        assert item.new_price == 420000.0
+        assert item.price_variation_pct is not None
+
+    def test_catalog_nan_stock_does_not_crash_validate(self, profile):
+        """Excel blank stock cells become float NaN; must not raise ValueError/422."""
+        source_records = [
+            {"REFERENCIA": "NV7B41403AS/FA", "PRECO": 110.0, "STOCK": 5}
+        ]
+        target_catalog = [
+            {
+                "internal_identifier": "NV7B41403AS/FA",
+                "original_price": 100.0,
+                "quantity": float("nan"),
+                "is_active": True,
+                "sold_out": False,
+            }
+        ]
+
+        result = process_price_table(source_records, target_catalog, profile)
+        assert result.items[0].old_stock == 0
+        assert result.items[0].new_stock == 5
+        assert result.summary.updated == 1
+
+    def test_source_nan_stock_treated_as_zero(self, profile):
+        source_records = [
+            {"REFERENCIA": "REF-NAN-STOCK", "PRECO": 50.0, "STOCK": float("nan")}
+        ]
+        target_catalog = [
+            {
+                "internal_identifier": "REF-NAN-STOCK",
+                "original_price": 50.0,
+                "quantity": 10,
+                "is_active": True,
+                "sold_out": False,
+            }
+        ]
+        result = process_price_table(source_records, target_catalog, profile)
+        assert result.items[0].new_stock == 0
+
     def test_updates_existing_product_and_activates_stock(self, profile):
         # Product had stock 1 (< 3) and was inactive; now gets stock 5 (>= 3) -> should activate
         source_records = [

@@ -23,6 +23,7 @@ from backend.app.domain.normalization import (
     calcular_variacao,
     format_currency,
     limpar_preco,
+    limpar_stock,
     normalize_col,
     ultra_clean,
 )
@@ -59,6 +60,7 @@ __all__ = [
     "evaluate_stock_activation",
     "format_currency",
     "limpar_preco",
+    "limpar_stock",
     "normalize_col",
     "normalize_reference",
     "ultra_clean",

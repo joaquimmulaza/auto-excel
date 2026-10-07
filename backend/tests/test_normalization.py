@@ -7,6 +7,7 @@ from backend.app.domain.normalization import (
     calcular_variacao,
     format_currency,
     limpar_preco,
+    limpar_stock,
     normalize_col,
     ultra_clean,
 )
@@ -90,6 +91,21 @@ class TestLimparPreco:
         assert limpar_preco("nan") == 0.00
         assert limpar_preco("-") == 0.00
         assert limpar_preco("invalid_price") == 0.00
+
+
+class TestLimparStock:
+    """Stock coercion must tolerate Excel NaN (truthy float)."""
+
+    def test_nan_and_none_become_zero(self):
+        assert limpar_stock(float("nan")) == 0
+        assert limpar_stock(None) == 0
+        assert limpar_stock("") == 0
+        assert limpar_stock("N/A") == 0
+
+    def test_numeric_values(self):
+        assert limpar_stock(25) == 25
+        assert limpar_stock(25.0) == 25
+        assert limpar_stock("12") == 12
 
 
 class TestFormatCurrency:
