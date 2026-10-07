@@ -110,6 +110,31 @@ def limpar_preco(val: Any) -> float:
         return 0.0
 
 
+def limpar_stock(val: Any) -> int:
+    """Coerce stock-like Excel values to int.
+
+    Handles None, blank strings, and float NaN (which is truthy in Python, so
+    ``nan or 0`` must never be used before ``int()``).
+    """
+    if val is None:
+        return 0
+    if isinstance(val, bool):
+        return int(val)
+    if isinstance(val, int):
+        return val
+    if isinstance(val, float):
+        if math.isnan(val) or math.isinf(val):
+            return 0
+        return int(val)
+    parsed = limpar_preco(val)
+    if isinstance(parsed, float) and (math.isnan(parsed) or math.isinf(parsed)):
+        return 0
+    try:
+        return int(parsed)
+    except (ValueError, TypeError, OverflowError):
+        return 0
+
+
 def calcular_variacao(old_price: Optional[float], new_price: float) -> Optional[float]:
     """Safely calculates relative price variation without division by zero.
 

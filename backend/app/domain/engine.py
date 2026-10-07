@@ -24,6 +24,7 @@ from backend.app.domain.models import (
 from backend.app.domain.normalization import (
     calcular_variacao,
     limpar_preco,
+    limpar_stock,
     normalize_col,
     ultra_clean,
 )
@@ -190,10 +191,7 @@ def process_price_table(
         designation = str(_find_field_value(src_row, src_name_aliases, default="") or "")
 
         new_price = limpar_preco(raw_price)
-        try:
-            new_stock = int(limpar_preco(raw_stock))
-        except (ValueError, TypeError):
-            new_stock = 0
+        new_stock = limpar_stock(raw_stock)
 
         # Handle empty/invalid reference
         if not norm_ref:
@@ -241,7 +239,8 @@ def process_price_table(
 
             raw_old_price = target_item.get(target_price_key)
             old_price = limpar_preco(raw_old_price) if raw_old_price is not None else None
-            old_stock = int(target_item.get(target_stock_key) or 0)
+            # NaN is truthy in Python — never use `nan or 0` before int().
+            old_stock = limpar_stock(target_item.get(target_stock_key))
 
             # Security Check 1: Negative Price
             if price_rule.reject_negative and new_price < 0.0:
