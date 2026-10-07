@@ -29,9 +29,16 @@ Pirâmide:
 - pytest-cov;
 - httpx/TestClient;
 - fixtures;
-- test DB isolada;
+- test DB isolada (SQLite); PostgreSQL/Supabase em staging;
 - Ruff;
 - mypy/pyright.
+
+### Auth / Storage
+
+- `AUTH_MODE=local` + JWT HS256 nos testes de API;
+- verificação Supabase JWT mockada (`test_supabase_auth.py`);
+- adapters de storage local (`test_storage_adapters.py`);
+- produção: Bearer Supabase + `STORAGE_BACKEND=supabase`.
 
 ### Testes de domínio obrigatórios
 

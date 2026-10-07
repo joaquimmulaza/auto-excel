@@ -10,6 +10,7 @@ from fastapi.responses import Response
 from backend.app.api.deps import DbDep, UserDep
 from backend.app.infra.db.models import AuditLogOrm, JobFileOrm
 from backend.app.infra.repositories.jobs import JobRepository
+from backend.app.services.observability import log_event
 from backend.app.services.storage import read_bytes, store_bytes
 
 router = APIRouter(prefix="/jobs", tags=["files"])
@@ -110,6 +111,7 @@ async def upload_file(
         )
     )
     db.flush()
+    log_event("FILE_UPLOADED", job_id=job_id, kind=kind, sha256=meta["sha256"])
     return {
         "id": str(row.id),
         "job_id": str(job_id),
@@ -164,6 +166,7 @@ def download_file(job_id: uuid.UUID, file_id: uuid.UUID, current_user: UserDep, 
             status_code=status.HTTP_404_NOT_FOUND,
             detail={"error": {"code": "FILE_MISSING_ON_DISK", "message": "File missing on storage", "request_id": ""}},
         )
+    log_event("FILE_DOWNLOADED", job_id=job_id, file_id=file_id, kind=row.kind)
     return Response(
         content=content,
         media_type=row.mime_type or "application/octet-stream",

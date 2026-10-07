@@ -1,0 +1,12 @@
+# Prefer the repository-root Dockerfile for Cloud Run builds.
+# This file is kept only if someone builds with context=backend/.
+__pycache__
+*.pyc
+.pytest_cache
+.venv
+venv
+.env
+.env.*
+!.env.example
+tests
+*.md
