@@ -143,7 +143,16 @@ Antes de realizar modificações no código ou na arquitetura, os agentes devem 
 ### Manutenção do Grafo
 - `graphify update .` — sincroniza e atualiza o grafo de conhecimento local a partir das alterações na codebase.
 
-## 11. Matriz de Atribuição de Skills (Isolamento por Escopo)
+## 11. Render MCP — ops obrigatório
+
+Para o backend em Render (`cotarco-ccm-api`), seguir `.agents/rules/render-mcp-ops.md`:
+
+- Usar Render MCP (`list_deploys`, `get_deploy`, `list_logs`, `update_environment_variables`, `trigger_deploy`) com `workspaceId` explícito.
+- Após qualquer alteração de env ou deploy: esperar status terminal + ler logs de erro + smoke `/health`.
+- Secrets (`DATABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `GEMINI_API_KEY`) só no Dashboard Render — nunca no chat nem no git.
+- Docs: https://render.com/docs/mcp-server
+
+## 12. Matriz de Atribuição de Skills (Isolamento por Escopo)
 
 Para evitar poluição de contexto e cruzamento indevido de regras entre camadas, cada agente/etapa opera estritamente com as suas skills atribuídas:
 
