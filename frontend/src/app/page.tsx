@@ -28,7 +28,7 @@ export default function DashboardPage() {
     queryFn: fetchJobs,
   });
 
-  const jobs = data?.items ?? [];
+  const jobs = useMemo(() => data?.items ?? [], [data?.items]);
 
   const kpis = useMemo(() => {
     let products = 0;

@@ -133,11 +133,15 @@ export default function JobDetailPage() {
   };
 
   const isDryRun = Boolean(job?.options?.dry_run || summary?.dry_run);
-  const status = job?.status || "UPLOADED";
-  const canApproveNow = canApprove && status === "READY_FOR_REVIEW" && !isDryRun;
-  const canProcessNow = canApprove && status === "APPROVED" && !isDryRun;
-  const canRejectNow =
-    canApprove && (status === "READY_FOR_REVIEW" || status === "NEEDS_CORRECTION");
+  const status = String(job?.status || "UPLOADED");
+  const canApproveNow = Boolean(canApprove && status === "READY_FOR_REVIEW" && !isDryRun);
+  const canProcessNow = Boolean(canApprove && status === "APPROVED" && !isDryRun);
+  const canRejectNow = Boolean(
+    canApprove && (status === "READY_FOR_REVIEW" || status === "NEEDS_CORRECTION")
+  );
+  const approveDisabled = !canApproveNow || approveMutation.isPending || ["COMPLETED", "CANCELLED", "FAILED"].includes(status);
+  const approveLabel =
+    status === "COMPLETED" ? "Concluído" : status === "APPROVED" ? "Aprovado" : "Aprovar Processamento";
 
   const outputFiles = useMemo(
     () => (filesData?.items || []).filter((f) => f.kind === "OUTPUT" || f.kind === "LOG"),
@@ -438,21 +442,20 @@ export default function JobDetailPage() {
           ) : (
             <Button
               type="button"
-              disabled={!canApproveNow || approveMutation.isPending || status === "COMPLETED"}
+              disabled={approveDisabled}
               onClick={() => approveMutation.mutate()}
               className="gap-2 font-bold px-6 min-w-[200px]"
             >
               {approveMutation.isPending ? (
                 "A aprovar…"
-              ) : status === "APPROVED" || status === "COMPLETED" ? (
-                <>
-                  <CheckCircle2 className="h-4 w-4" />
-                  {status === "COMPLETED" ? "Concluído" : "Aprovado"}
-                </>
               ) : (
                 <>
-                  <FileCheck2 className="h-4 w-4" />
-                  Aprovar Processamento
+                  {approveLabel === "Aprovar Processamento" ? (
+                    <FileCheck2 className="h-4 w-4" />
+                  ) : (
+                    <CheckCircle2 className="h-4 w-4" />
+                  )}
+                  {approveLabel}
                 </>
               )}
             </Button>
