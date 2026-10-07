@@ -23,7 +23,7 @@
 | Typing | mypy/pyright | contratos |
 | CI | GitHub Actions | quality gate |
 | Frontend hosting | Vercel (`frontend/`) | deploy UI only |
-| Backend hosting | Cloud Run | FastAPI + Excel engine |
+| Backend hosting | Render Free (`cotarco-ccm-api`) | FastAPI + Excel engine |
 | Auth runtime | Supabase Auth JWT → FastAPI | produção; `AUTH_MODE=local` só em tests/dev |
 | Object storage | Supabase Storage (`job-files`) | produção; filesystem local em tests |
 | AI | Gemini + Google GenAI SDK | assistência |

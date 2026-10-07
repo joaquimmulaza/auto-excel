@@ -1,4 +1,5 @@
-# Cotarco Commercial Manager — FastAPI for Google Cloud Run
+# Cotarco Commercial Manager — FastAPI container image (local / optional).
+# Production target for MVP: Render Free Web Service (native Python via render.yaml).
 # Build from repository root: docker build -t cotarco-ccm-api .
 FROM python:3.12-slim
 

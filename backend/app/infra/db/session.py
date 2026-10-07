@@ -34,7 +34,7 @@ def create_db_engine(
     pool_size: int = 5,
     max_overflow: int = 10,
 ) -> Engine:
-    """Create a SQLAlchemy engine tuned for local or Cloud Run usage."""
+    """Create a SQLAlchemy engine tuned for local or serverless/container usage."""
     settings = get_settings()
     resolved_url = url or settings.database_url
     is_sqlite = resolved_url.startswith("sqlite")

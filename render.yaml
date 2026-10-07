@@ -1,0 +1,38 @@
+# Cotarco Commercial Manager — Render Blueprint
+# Production backend: Free Web Service (native Python).
+# Auto-deploy off until secrets are configured and first deploy is authorized.
+# Do not deploy from this file until secrets are set in the Dashboard.
+
+services:
+  - type: web
+    name: cotarco-ccm-api
+    runtime: python
+    plan: free
+    region: frankfurt
+    branch: cursor/prod-architecture-supabase-7a1e
+    rootDir: .
+    buildCommand: pip install --upgrade pip && pip install -r backend/requirements.txt
+    startCommand: PYTHONPATH=. uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    autoDeploy: false
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: AUTH_MODE
+        value: supabase
+      - key: STORAGE_BACKEND
+        value: supabase
+      - key: STORAGE_BUCKET
+        value: job-files
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false

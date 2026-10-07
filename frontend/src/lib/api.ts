@@ -21,7 +21,7 @@ const TOKEN_KEY = "ccm_access_token";
 
 /**
  * Resolve API base URL.
- * - Explicit NEXT_PUBLIC_API_URL wins (required for Vercel → Cloud Run)
+ * - Explicit NEXT_PUBLIC_API_URL wins (required for Vercel → Render)
  * - Local / unset defaults to FastAPI on :8000
  * - Same-origin `/api` rewrites are no longer the production path
  */
@@ -77,7 +77,7 @@ function networkError(err: unknown): ApiError {
     raw === "Failed to fetch" ||
     raw.includes("NetworkError") ||
     raw.includes("fetch")
-      ? "Não foi possível contactar a API. Confirme NEXT_PUBLIC_API_URL (Cloud Run) ou que o backend local está em :8000."
+      ? "Não foi possível contactar a API. Confirme NEXT_PUBLIC_API_URL (Render) ou que o backend local está em :8000."
       : raw;
   const e = new Error(friendly) as ApiError;
   e.code = "NETWORK_ERROR";

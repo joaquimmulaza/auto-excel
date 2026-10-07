@@ -3,7 +3,7 @@
 ## Arquitetura alvo
 
 ```text
-Vercel (frontend/)  →  HTTPS  →  Cloud Run (FastAPI)
+Vercel (frontend/)  →  HTTPS  →  Render Free (FastAPI)
                                       ↓
                                Supabase (PostgreSQL + Auth + Storage)
 ```
@@ -17,17 +17,22 @@ Vercel (frontend/)  →  HTTPS  →  Cloud Run (FastAPI)
 | Região Supabase | `eu-west-1` (Irlanda) |
 | Storage bucket | `job-files` (privado) |
 | JWT | **ES256** via JWKS (Signing Keys) |
-| Cloud Run region (recomendado) | `europe-west1` |
+| Backend hosting | **Render Free Web Service** |
+| Render service | `cotarco-ccm-api` (`srv-db3clte0tbcc73d73et0`) |
+| Render URL | `https://cotarco-ccm-api.onrender.com` |
+| Render dashboard | `https://dashboard.render.com/web/srv-db3clte0tbcc73d73et0` |
+| Render region | `frankfurt` |
+| Auto-Deploy | Off (`autoDeploy=no`) |
 | Vercel root directory | `frontend/` |
-| Container SoT | `Dockerfile` na raiz do repo |
+| Container | `Dockerfile` na raiz — só local/opcional; produção = Python nativo no Render |
 
-Não reutilizar os projetos Supabase/Vercel `boleia` ou `Makini`.
+Não reutilizar serviços Render de outros produtos (`sobaixa-api`, `fardo-fashion-ecommerce`) nem projetos Supabase/Vercel `boleia` / `Makini`.
+
+**Cloud Run / GCP:** abandonado para o MVP (billing). O script `scripts/deploy-cloud-run.sh` foi removido. Não fazer deploy para Google Cloud neste produto.
 
 ---
 
 ## Supabase Auth / JWT
-
-Inspecção do endpoint público:
 
 ```text
 GET https://gaofsokeaqymsmgyjwfm.supabase.co/auth/v1/.well-known/jwks.json
@@ -39,106 +44,105 @@ GET https://gaofsokeaqymsmgyjwfm.supabase.co/auth/v1/.well-known/jwks.json
 | JWT algorithm | ES256 |
 | JWT verification strategy | JWKS / public key (`PyJWKClient`) |
 | JWKS URL | `{SUPABASE_URL}/auth/v1/.well-known/jwks.json` |
-| Legacy JWT secret (HS256) | Opcional; só se o token declarar `alg=HS256` |
+| Legacy JWT secret (HS256) | Opcional |
 
-Não é necessário migrar o projeto para Signing Keys — **já está** em ES256.
-
-A role **nunca** vem do JWT/`user_metadata`. Fluxo:
+Role **nunca** vem do JWT/`user_metadata`:
 
 ```text
 JWT (JWKS) → sub → public.users.role
 ```
 
-Trigger `handle_new_auth_user` cria sempre `role = COMERCIAL`. Elevação OPERADOR/ADMIN só via SQL/admin autorizado.
+Trigger `handle_new_auth_user` cria sempre `role = COMERCIAL`.
 
-### Contas de teste (apenas documentação local — NÃO no frontend)
+### Contas de teste (documentação local — NÃO no frontend)
 
-| Email | Role (public.users) |
+| Email | Role |
 |---|---|
 | `comercial@cotarco.ao` | COMERCIAL |
 | `operador@cotarco.ao` | OPERADOR |
 | `admin@cotarco.ao` | ADMIN |
 
-Passwords: geridas no Supabase Auth Dashboard / secrets locais — nunca em `NEXT_PUBLIC_*` nem no bundle.
+Passwords: só Supabase Auth Dashboard / secrets locais — nunca em `NEXT_PUBLIC_*`.
 
 ---
 
 ## Supabase Storage
 
 - Bucket `job-files`: `public = false`
-- Policies: `anon` e `authenticated` **não** acedem a `job-files`
+- Policies: `anon` / `authenticated` não acedem a `job-files`
 - Uploads/downloads: backend com **service role** (server-side only)
-- Signed URLs disponíveis via adapter quando necessário
 
 ---
 
-## Secrets backend (nunca no frontend)
+## Backend — Render Free
 
-| Variável | Notas |
+Blueprint: [`render.yaml`](../../render.yaml) na raiz do repo.
+
+| Setting | Valor |
 |---|---|
-| `DATABASE_URL` | Pooler / Transaction mode recomendado para Cloud Run |
-| `SUPABASE_URL` | Também usado para JWKS |
-| `SUPABASE_ANON_KEY` | Backend opcional; frontend usa `NEXT_PUBLIC_*` |
-| `SUPABASE_SERVICE_ROLE_KEY` | **Só** backend / Secret Manager |
-| `GEMINI_API_KEY` | Só backend |
-| `ALLOWED_ORIGINS` | Allowlist explícita (URL Vercel) |
+| Type | Web Service |
+| Name | `cotarco-ccm-api` |
+| Repo | `https://github.com/joaquimmulaza/auto-excel` |
+| Branch | `cursor/prod-architecture-supabase-7a1e` (até merge) |
+| Runtime | Python |
+| Root Directory | `.` (raiz) |
+| Build | `pip install --upgrade pip && pip install -r backend/requirements.txt` |
+| Start | `PYTHONPATH=. uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT` |
+| Plan | Free |
+| Region | Frankfurt |
+| Health Check | Definir `/health` no Dashboard (MCP create não expõe este campo) |
+| Auto-Deploy | Off (`autoDeploy=no`) |
 
-`SUPABASE_JWT_SECRET` **não** é necessário para o fluxo ES256 actual.
+Nota: a criação do serviço via MCP pode iniciar um build inicial automático. **Não** voltar a chamar `trigger_deploy` até secrets estarem preenchidos. Esse build pode falhar sem `DATABASE_URL` / Supabase — esperado.
 
----
+### Environment variables (Render)
 
-## Backend — Cloud Run
+| Variable | Required | Secret? | Purpose |
+|---|---|---|---|
+| `ENVIRONMENT` | yes | no | `production` |
+| `AUTH_MODE` | yes | no | `supabase` |
+| `STORAGE_BACKEND` | yes | no | `supabase` |
+| `STORAGE_BUCKET` | yes | no | `job-files` |
+| `SUPABASE_URL` | yes | no | Project URL + JWKS |
+| `SUPABASE_ANON_KEY` | yes | no | Anon key (backend) |
+| `SUPABASE_SERVICE_ROLE_KEY` | yes | **yes** | Storage privilegiado |
+| `DATABASE_URL` | yes | **yes** | Pooler Supabase PostgreSQL |
+| `ALLOWED_ORIGINS` | yes | no | URL(s) Vercel do frontend |
+| `GEMINI_API_KEY` | se IA activa | **yes** | Gemini |
+| `GEMINI_MODEL` | no | no | default no código |
+| `PORT` | auto | no | Injectado pelo Render |
 
-Container: `Dockerfile` na raiz (único). Script: `scripts/deploy-cloud-run.sh`.
+`SUPABASE_JWT_SECRET` **não** é necessário para ES256/JWKS.
 
-Secrets Secret Manager (sem valores em `--set-env-vars`):
+### Free tier notes
 
-- `cotarco-database-url`
-- `cotarco-supabase-url`
-- `cotarco-supabase-anon`
-- `cotarco-supabase-service-role`
-- `cotarco-gemini-api-key`
-- `cotarco-allowed-origins`
+- Cold start após inactividade (~spin down).
+- Memória limitada — Pandas/OpenPyXL OK para ficheiros pequenos do MVP.
+- Sem Redis/filas/Cloud SQL no Render.
 
-Env não secretos: `ENVIRONMENT=production`, `AUTH_MODE=supabase`, `STORAGE_BACKEND=supabase`, `STORAGE_BUCKET=job-files`.
+### Primeiro deploy (manual)
 
-Recursos: 1Gi / 1 CPU / timeout 300s / min 0 / max 3.
-
-```bash
-export GCP_PROJECT_ID=seu-projeto
-export GCP_REGION=europe-west1
-./scripts/deploy-cloud-run.sh
-```
+1. Confirmar serviço `cotarco-ccm-api` no Dashboard.
+2. Preencher secrets no Dashboard (nunca no git/chat).
+3. Autorizar o primeiro deploy.
+4. Validar `GET https://<service>.onrender.com/health`.
+5. Configurar Vercel `NEXT_PUBLIC_API_URL=https://<service>.onrender.com/api/v1`.
 
 ---
 
 ## Frontend — Vercel
 
-### Estado inspeccionado (equipa `joaquim-mulazas-projects`)
-
-| Project | ID | Notas |
-|---|---|---|
-| `boleia` | `prj_mWWuYRj49kPqDq9IRD68Y6YtLEib` | Outro produto — **não** reutilizar |
-| `auto-excel` | — | **404 / não existe** nesta equipa |
-| `frontend` | — | **404 / não existe** nesta equipa |
-
-Criação via MCP falhou com `403 forbidden`. Criar manualmente no dashboard:
-
-1. Import `joaquimmulaza/auto-excel`
-2. Nome sugerido: `cotarco-ccm` ou `auto-excel`
-3. **Root Directory:** `frontend`
-4. Framework: Next.js
-5. Env (Preview + Production):
+1. Projecto dedicado, **Root Directory:** `frontend`
+2. Framework: Next.js
+3. Env:
 
 | Variável | Valor |
 |---|---|
-| `NEXT_PUBLIC_API_URL` | `https://<cloud-run-url>/api/v1` |
+| `NEXT_PUBLIC_API_URL` | `https://<render-service>.onrender.com/api/v1` |
 | `NEXT_PUBLIC_SUPABASE_URL` | `https://gaofsokeaqymsmgyjwfm.supabase.co` |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | anon/publishable key |
 
-Nunca `SUPABASE_SERVICE_ROLE_KEY` no Vercel.
-
-`vercel.json` na raiz **não** define serviço FastAPI.
+Nunca `SUPABASE_SERVICE_ROLE_KEY` no Vercel. `vercel.json` na raiz **não** hospeda FastAPI.
 
 ---
 
@@ -147,13 +151,9 @@ Nunca `SUPABASE_SERVICE_ROLE_KEY` no Vercel.
 ```bash
 export ENVIRONMENT=local AUTH_MODE=local STORAGE_BACKEND=local
 export DATABASE_URL=sqlite+pysqlite:////tmp/cotarco-ccm.db
-# backend
 uvicorn backend.app.main:app --reload --app-dir .
-# frontend
 cd frontend && npm run dev
 ```
-
-Demo passwords locais: apenas com `AUTH_MODE=local` no backend (seed), nunca embutidas no UI de produção.
 
 ---
 
@@ -161,7 +161,8 @@ Demo passwords locais: apenas com `AUTH_MODE=local` no backend (seed), nunca emb
 
 | Sintoma | Verificação |
 |---|---|
-| 401 / JWT | JWKS alcançável; `SUPABASE_URL` correcto; token access |
+| 401 / JWT | JWKS alcançável; `SUPABASE_URL` correcto |
 | CORS | `ALLOWED_ORIGINS` com domínio Vercel exacto |
 | Upload | `STORAGE_BACKEND=supabase` + service role |
+| Cold start lento | Free tier — aguardar wake-up |
 | Role errada | `public.users.role` — não claim do frontend |
