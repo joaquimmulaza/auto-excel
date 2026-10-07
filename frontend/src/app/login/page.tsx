@@ -8,11 +8,25 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle, LogIn } from "lucide-react";
 
-const DEMO_ACCOUNTS = [
+/** Local AUTH_MODE fixtures (FastAPI). Supabase seeds use *@cotarco.ao below when configured. */
+const LOCAL_DEMO_ACCOUNTS = [
   { email: "joaquim.silva@cotarco.ao", password: "comercial123", label: "Comercial" },
   { email: "antonio.ferreira@cotarco.ao", password: "operador123", label: "Operador" },
   { email: "admin@cotarco.ao", password: "admin123", label: "Admin" },
 ];
+
+const SUPABASE_DEMO_ACCOUNTS = [
+  { email: "comercial@cotarco.ao", password: "ComercialTest123!", label: "Comercial" },
+  { email: "operador@cotarco.ao", password: "OperadorTest123!", label: "Operador" },
+  { email: "admin@cotarco.ao", password: "AdminTest123!", label: "Admin" },
+];
+
+const DEMO_ACCOUNTS =
+  typeof process !== "undefined" &&
+  process.env.NEXT_PUBLIC_SUPABASE_URL &&
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    ? SUPABASE_DEMO_ACCOUNTS
+    : LOCAL_DEMO_ACCOUNTS;
 
 export default function LoginPage() {
   const { login } = useAuth();

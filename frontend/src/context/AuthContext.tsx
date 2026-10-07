@@ -8,13 +8,22 @@ import React, {
   useState,
 } from "react";
 import { CurrentUser, UserRole } from "@/types";
-import { fetchMe, login as apiLogin, setStoredToken, getStoredToken } from "@/lib/api";
+import {
+  fetchMe,
+  login as apiLogin,
+  setStoredToken,
+  getStoredToken,
+} from "@/lib/api";
+import {
+  getSupabaseBrowserClient,
+  isSupabaseAuthConfigured,
+} from "@/lib/supabase";
 
 interface AuthContextType {
   user: CurrentUser | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   isOperador: boolean;
   isComercial: boolean;
   isAdmin: boolean;
@@ -28,26 +37,94 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = getStoredToken();
-    if (!token) {
-      setLoading(false);
-      return;
-    }
-    fetchMe()
-      .then(setUser)
-      .catch(() => {
+    let cancelled = false;
+    let unsubscribe: (() => void) | undefined;
+
+    async function boot() {
+      try {
+        if (isSupabaseAuthConfigured()) {
+          const supabase = getSupabaseBrowserClient();
+          const { data } = await supabase.auth.getSession();
+          const token = data.session?.access_token;
+          if (token) {
+            setStoredToken(token);
+            const me = await fetchMe();
+            if (!cancelled) setUser(me);
+          } else {
+            setStoredToken(null);
+            if (!cancelled) setUser(null);
+          }
+
+          const { data: sub } = supabase.auth.onAuthStateChange(
+            async (_event, session) => {
+              const access = session?.access_token ?? null;
+              setStoredToken(access);
+              if (!access) {
+                if (!cancelled) setUser(null);
+                return;
+              }
+              try {
+                const me = await fetchMe();
+                if (!cancelled) setUser(me);
+              } catch {
+                if (!cancelled) setUser(null);
+              }
+            }
+          );
+          unsubscribe = () => sub.subscription.unsubscribe();
+          return;
+        }
+
+        const token = getStoredToken();
+        if (!token) {
+          if (!cancelled) setUser(null);
+          return;
+        }
+        const me = await fetchMe();
+        if (!cancelled) setUser(me);
+      } catch {
         setStoredToken(null);
-        setUser(null);
-      })
-      .finally(() => setLoading(false));
+        if (!cancelled) setUser(null);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    void boot();
+    return () => {
+      cancelled = true;
+      unsubscribe?.();
+    };
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
+    if (isSupabaseAuthConfigured()) {
+      const supabase = getSupabaseBrowserClient();
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error || !data.session?.access_token) {
+        throw new Error(error?.message || "Falha no login");
+      }
+      setStoredToken(data.session.access_token);
+      const me = await fetchMe();
+      setUser(me);
+      return;
+    }
+
     const result = await apiLogin(email, password);
     setUser(result.user);
   }, []);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    if (isSupabaseAuthConfigured()) {
+      try {
+        await getSupabaseBrowserClient().auth.signOut();
+      } catch {
+        /* ignore */
+      }
+    }
     setStoredToken(null);
     setUser(null);
   }, []);
