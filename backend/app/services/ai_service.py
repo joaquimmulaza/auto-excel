@@ -170,15 +170,21 @@ def _call_gemini_json(prompt: str) -> dict[str, Any] | None:
         from google.genai import types  # type: ignore[import-untyped]
 
         client = _get_client()
+        # thinking_budget=0: modelos 2.5+ gastam tokens de thinking e com
+        # max_output_tokens baixo truncavam o JSON → fallback "IA indisponível".
+        config_kwargs: dict[str, Any] = {
+            "system_instruction": _SYSTEM_INSTRUCTIONS,
+            "response_mime_type": "application/json",
+            "temperature": 0.2,
+            "max_output_tokens": 2048,
+        }
+        if hasattr(types, "ThinkingConfig"):
+            config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=0)
+
         response = client.models.generate_content(
             model=_MODEL,
             contents=prompt,
-            config=types.GenerateContentConfig(
-                system_instruction=_SYSTEM_INSTRUCTIONS,
-                response_mime_type="application/json",
-                temperature=0.2,  # baixa temperatura para outputs estruturados
-                max_output_tokens=1024,
-            ),
+            config=types.GenerateContentConfig(**config_kwargs),
         )
         raw = response.text
         if not raw:
