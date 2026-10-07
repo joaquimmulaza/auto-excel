@@ -22,12 +22,13 @@ from backend.app.domain.models import (
     ValidationIssue,
 )
 from backend.app.domain.normalization import (
-    calcular_variacao,
+    format_currency,
     limpar_preco,
     limpar_stock,
     normalize_col,
     ultra_clean,
 )
+from backend.app.domain.rules import calculate_price_variation
 
 # Standard alias candidates for source columns
 DEFAULT_SOURCE_REF_ALIASES = [
@@ -275,7 +276,10 @@ def process_price_table(
                 issue = ValidationIssue(
                     severity=IssueSeverity.BLOCKER,
                     code="BLOCKED_ZERO_PRICE",
-                    message=f"Referência '{norm_ref}': Preço zero (0.00 EUR) bloqueado pelas regras do perfil.",
+                    message=(
+                        f"Referência '{norm_ref}': Preço zero ({format_currency(0)}) "
+                        "bloqueado pelas regras do perfil."
+                    ),
                     field="price",
                     row_number=row_idx,
                     details={"reference": norm_ref, "new_price": new_price, "old_price": old_price},
@@ -297,8 +301,7 @@ def process_price_table(
                 continue
 
             # Security Check 3: Dynamic Configurable Price Guard (Bug 3 fix)
-            var_ratio = calcular_variacao(old_price, new_price)
-            var_pct = round(var_ratio * 100.0, 2) if var_ratio is not None else None
+            _, var_pct = calculate_price_variation(old_price, new_price)
             threshold_pct = price_rule.max_variation_threshold * 100.0
 
             if var_pct is not None and abs(var_pct) > threshold_pct:
@@ -307,7 +310,8 @@ def process_price_table(
                     code="BLOCKED_PRICE_VARIATION",
                     message=(
                         f"Referência '{norm_ref}': Variação de {var_pct:+.1f}% "
-                        f"({old_price:.2f} -> {new_price:.2f}) excede o limiar de {threshold_pct:.0f}%."
+                        f"({format_currency(old_price)} -> {format_currency(new_price)}) "
+                        f"excede o limiar de {threshold_pct:.0f}%."
                     ),
                     field="price",
                     row_number=row_idx,

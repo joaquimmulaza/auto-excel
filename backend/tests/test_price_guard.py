@@ -71,6 +71,8 @@ class TestConfigurablePriceGuard:
         assert len(guard_issues) == 1
         assert guard_issues[0].severity == IssueSeverity.BLOCKER
         assert "PROD-REJECT" in guard_issues[0].message or guard_issues[0].details.get("reference") == "PROD-REJECT"
+        assert "Kz" in guard_issues[0].message
+        assert "EUR" not in guard_issues[0].message
 
         # Summary counts
         assert result.summary.updated == 1

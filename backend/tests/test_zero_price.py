@@ -64,6 +64,8 @@ class TestZeroPriceExistingProducts:
         assert len(zero_issues) == 1
         assert zero_issues[0].severity == IssueSeverity.BLOCKER
         assert "PROD-001" in zero_issues[0].message or zero_issues[0].details.get("reference") == "PROD-001"
+        assert "Kz" in zero_issues[0].message
+        assert "EUR" not in zero_issues[0].message
 
         # Item result check
         item = result.items[0]
