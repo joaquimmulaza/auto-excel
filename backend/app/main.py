@@ -53,7 +53,11 @@ class RequestIdMiddleware(BaseHTTPMiddleware):
 @asynccontextmanager
 async def lifespan(application: FastAPI):
     from backend.app.api.deps import _get_session_factory
+    from backend.app.core.settings import validate_runtime_settings
     from backend.app.services.bootstrap import bootstrap_database
+
+    runtime_settings = get_settings()
+    validate_runtime_settings(runtime_settings)
 
     factory = _get_session_factory()
     db = factory()

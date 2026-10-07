@@ -54,6 +54,43 @@ class Settings:
         return self.database_url.startswith("sqlite")
 
 
+class SettingsError(RuntimeError):
+    """Raised when runtime environment configuration is unsafe or incomplete."""
+
+
+def validate_runtime_settings(settings: Settings) -> None:
+    """Fail fast on misconfiguration that would crash or silently use SQLite in prod.
+
+    Production must use PostgreSQL (Supabase). Auth mode supabase requires the
+    three Supabase keys. Secrets are never logged — only missing *names*.
+    """
+    if not settings.is_production:
+        return
+
+    if settings.is_sqlite:
+        raise SettingsError(
+            "DATABASE_URL must be PostgreSQL in production; SQLite is forbidden. "
+            "Set DATABASE_URL to the Supabase pooler URI on Render "
+            "(Environment → DATABASE_URL)."
+        )
+
+    if settings.auth_mode == "supabase":
+        missing = [
+            name
+            for name, value in (
+                ("SUPABASE_URL", settings.supabase_url),
+                ("SUPABASE_ANON_KEY", settings.supabase_anon_key),
+                ("SUPABASE_SERVICE_ROLE_KEY", settings.supabase_service_role_key),
+            )
+            if not value
+        ]
+        if missing:
+            raise SettingsError(
+                "Missing required production Supabase env vars: "
+                + ", ".join(missing)
+            )
+
+
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
     environment = (_env("ENVIRONMENT", "local") or "local").lower()

@@ -47,6 +47,8 @@ def test_ensure_demo_users_noop_when_auth_mode_supabase(monkeypatch, db_session)
 def test_bootstrap_skips_demo_users_in_production_supabase(monkeypatch, db_session):
     monkeypatch.setenv("ENVIRONMENT", "production")
     monkeypatch.setenv("AUTH_MODE", "supabase")
+    # Intentionally leave DATABASE_URL as default SQLite: bootstrap must not
+    # seed demos/profiles in production (fail-fast happens in lifespan).
     clear_settings_cache()
     try:
         bootstrap_database(db_session)

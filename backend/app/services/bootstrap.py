@@ -129,6 +129,8 @@ def bootstrap_database(db: Session) -> None:
     settings = get_settings()
     if settings.auth_mode == "local":
         ensure_demo_users(db)
-    if settings.environment in {"local", "test"} or settings.is_sqlite:
+    # Seeds are local/test only. Production schema + profiles come from Supabase
+    # migrations — never seed from SQLite fallback in production.
+    if settings.environment in {"local", "test"}:
         ensure_seed_profiles(db)
     db.commit()
