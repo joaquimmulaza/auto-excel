@@ -1,7 +1,12 @@
 """Tests for POST /jobs/{id}/validate, GET /jobs/{id}/summary, items, issues."""
-from .conftest import TEST_PROFILE_ID
+from __future__ import annotations
+
+import io
 import uuid
 
+import pandas as pd
+
+from .conftest import TEST_PROFILE_ID
 
 JOB_PAYLOAD = {
     "profile_id": str(TEST_PROFILE_ID),
@@ -11,22 +16,58 @@ JOB_PAYLOAD = {
 }
 
 
+def _xlsx_bytes(rows: list[dict]) -> bytes:
+    buf = io.BytesIO()
+    pd.DataFrame(rows).to_excel(buf, index=False)
+    return buf.getvalue()
+
+
+def _upload_input(client, job_id: str) -> None:
+    content = _xlsx_bytes(
+        [
+            {"REF": "SKU-A", "PRECO": 110, "STOCK": 5},
+            {"REF": "SKU-B", "PRECO": 200, "STOCK": 2},
+        ]
+    )
+    files = {
+        "file": (
+            "input.xlsx",
+            content,
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+    }
+    resp = client.post(f"/api/v1/jobs/{job_id}/files?kind=INPUT", files=files)
+    assert resp.status_code == 201, resp.text
+
+
 class TestValidateEndpoint:
-    def test_validate_uploaded_job(self, comercial_client):
+    def test_validate_without_file_returns_409(self, comercial_client):
         r = comercial_client.post("/api/v1/jobs", json=JOB_PAYLOAD)
         job_id = r.json()["id"]
         resp = comercial_client.post(f"/api/v1/jobs/{job_id}/validate")
-        assert resp.status_code == 202
+        assert resp.status_code == 409
         body = resp.json()
-        assert body["status"] == "VALIDATING"
-        assert body["job_id"] == job_id
+        code = body.get("error", {}).get("code") or body.get("detail", {}).get("error", {}).get("code")
+        assert code == "MISSING_INPUT_FILE"
 
-    def test_validate_already_validating_returns_409(self, comercial_client):
+    def test_validate_uploaded_job(self, comercial_client):
         r = comercial_client.post("/api/v1/jobs", json=JOB_PAYLOAD)
         job_id = r.json()["id"]
-        # First validate
-        comercial_client.post(f"/api/v1/jobs/{job_id}/validate")
-        # Second validate on same job now in VALIDATING
+        _upload_input(comercial_client, job_id)
+        resp = comercial_client.post(f"/api/v1/jobs/{job_id}/validate")
+        assert resp.status_code == 200, resp.text
+        body = resp.json()
+        assert body["job_id"] == job_id
+        assert body["status"] in ("READY_FOR_REVIEW", "NEEDS_CORRECTION")
+        assert "summary" in body
+
+    def test_validate_wrong_state_returns_409(self, comercial_client):
+        r = comercial_client.post("/api/v1/jobs", json=JOB_PAYLOAD)
+        job_id = r.json()["id"]
+        _upload_input(comercial_client, job_id)
+        first = comercial_client.post(f"/api/v1/jobs/{job_id}/validate")
+        assert first.status_code == 200
+        # After validate, status is READY/NEEDS — not UPLOADED
         resp = comercial_client.post(f"/api/v1/jobs/{job_id}/validate")
         assert resp.status_code == 409
 

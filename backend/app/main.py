@@ -43,8 +43,15 @@ async def lifespan(application: FastAPI):
     before the first request arrives.
     """
     from backend.app.api.deps import _get_session_factory  # local import avoids circular
-    _get_session_factory()
-    logger.info("Database initialised — tables ready.")
+    from backend.app.services.bootstrap import bootstrap_database
+
+    factory = _get_session_factory()
+    db = factory()
+    try:
+        bootstrap_database(db)
+        logger.info("Database initialised — tables and seeds ready.")
+    finally:
+        db.close()
     yield
 
 
@@ -59,10 +66,17 @@ app = FastAPI(
 )
 
 
-# CORS - tighten in production
+_cors_origins = [
+    o.strip()
+    for o in os.getenv(
+        "ALLOWED_ORIGINS",
+        "http://localhost:3000,http://127.0.0.1:3000",
+    ).split(",")
+    if o.strip()
+]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_cors_origins or ["http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
