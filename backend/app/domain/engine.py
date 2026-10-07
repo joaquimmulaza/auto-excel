@@ -52,11 +52,14 @@ DEFAULT_TARGET_REF_ALIASES = [
     "ref", "sku", "codigo", "código",
 ]
 DEFAULT_TARGET_PRICE_ALIASES = [
-    "original_price", "price", "preco", "preço", "pvp",
+    # Cotarco Excel catalogs use "Preço com IVA"; also accept Mano/API shapes.
+    "PRECO COM IVA", "PREÇO COM IVA", "original_price", "price",
+    "preco", "preço", "pvp", "valor", "preco_final", "PRECO", "PREÇO", "PRICE",
 ]
 DEFAULT_TARGET_STOCK_ALIASES = [
-    "quantity", "stock", "estoque", "quantidade", "qty",
+    "quantity", "stock", "estoque", "quantidade", "qty", "STOCK",
 ]
+
 
 
 def _find_field_value(record: dict[str, Any], candidate_aliases: list[str], default: Any = None) -> Any:

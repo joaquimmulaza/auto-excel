@@ -64,6 +64,30 @@ class TestDomainEngine:
         assert result.summary.updated == 1
         assert result.has_blockers is False
 
+    def test_excel_catalog_preco_com_iva_maps_old_price(self, profile):
+        """Samsung/Cotarco catalogs use 'Preço com IVA', not original_price."""
+        source_records = [
+            {
+                "REFERÊNCIA": "AR09TQGAWKFA/FA",
+                "PREÇO COM IVA": 420000.0,
+                "STOCK": 600,
+            }
+        ]
+        target_catalog = [
+            {
+                "REFERÊNCIA": "AR09TQGAWKFA/FA",
+                "Preço com IVA": 400000.0,
+                "STOCK": 600,
+            }
+        ]
+
+        result = process_price_table(source_records, target_catalog, profile)
+        item = result.items[0]
+        assert item.decision_code == DecisionCode.UPDATE
+        assert item.old_price == 400000.0
+        assert item.new_price == 420000.0
+        assert item.price_variation_pct is not None
+
     def test_catalog_nan_stock_does_not_crash_validate(self, profile):
         """Excel blank stock cells become float NaN; must not raise ValueError/422."""
         source_records = [
