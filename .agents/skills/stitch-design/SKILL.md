@@ -82,3 +82,15 @@ After any tool call, always surface the `outputComponents` (Text Description and
 - **Iterative Polish**: Prefere `edit_screens` for targeted adjustments over full re-generation.
 - **Semantic First**: Name colors by their role (e.g., "Primary Action") as well as their appearance.
 - **Atmosphere Matters**: Explicitly set the "vibe" (Minimalist, Vibrant, Brutalist) to guide the generator.
+
+## Cotarco Commercial Manager
+
+When working in this repo, follow `cotarco-commercial-manager/agents.md` §5.2:
+
+1. UI Skills MCP selection (§5.1)
+2. Ensure `.stitch/DESIGN.md` exists (`taste-design` with Cotarco brand, or `design-md` from an existing screen)
+3. `enhance-prompt` + DESIGN.md Section 6 block
+4. Generate/edit via Stitch MCP; stage under `.stitch/designs/`
+5. Multi-screen: use `stitch-loop` baton (`.stitch/next-prompt.md`) — max 3 refine cycles per screen
+6. Brand tokens win: `#FF3C1D`, `#6B6363`, `#FFFFFF`, `#000000`
+7. Never treat Stitch HTML as final Next.js code

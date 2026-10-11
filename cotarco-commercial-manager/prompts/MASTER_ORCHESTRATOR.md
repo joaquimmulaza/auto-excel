@@ -64,21 +64,21 @@ A60-A63 Gemini
 A70-A76 Integrations/E2E/Security/Demo
 ```
 
-### Portões de Qualidade UI Skills (MCP) & Enhance-Prompt
-
-Protocolo obrigatório (`agents.md` §5.1) — o agente **não** usa uma lista fixa; navega e escolhe:
+### Portões UI Skills MCP + Stitch Skills (§5.1–5.2)
 
 ```text
-list_skills(query…) → escolher 2–4 skills → get_skill → enhance-prompt / audit → Stitch ou frontend
+list_skills → 2–4 get_skill
+  → .stitch/DESIGN.md (taste-design | design-md)
+  → enhance-prompt (+ DESIGN.md §6)
+  → Stitch MCP (stitch-design) ≤3 ciclos
+  → .stitch/designs/ + SITE.md + stitch-loop baton
+  → QA → frontend
 ```
 
-1. **Antes de enviar ao Stitch**:
-   - `list_skills` com queries da tela (ex. `baseline`, `accessibility`, `typography`, `dashboard`, `table`).
-   - Escolher 2–4 skills; `get_skill` em cada uma.
-   - Processar com `enhance-prompt`: `DESIGN SYSTEM (REQUIRED)` (`#FF3C1D`, `#6B6363`, `#FFFFFF`, `#000000`), `Page Structure` numerada, constraints das skills escolhidas.
-2. **Antes de codificar o Frontend**:
-   - Repetir ou reutilizar a seleção; auditar contra as skills carregadas (`tabular-nums`, `text-balance`, touch targets ≥ 44px, skeletons, a11y).
-3. **Handoff**: incluir `UI_SKILLS_SELECTED` com pathSlugs e motivo.
+1. **Antes de Stitch**: UI Skills seleção; garantir `.stitch/DESIGN.md`; `enhance-prompt` com tokens Cotarco; usar prompts em `prompts/stitch/` ou baton `.stitch/next-prompt.md`.
+2. **Multi-ecrã**: `stitch-loop` atualiza baton e sitemap; não escrever em `frontend/` nesta fase.
+3. **Antes do Frontend**: revalidar UI Skills; implementar intenção aprovada em Next.js.
+4. **Handoff**: `UI_SKILLS_SELECTED` + `STITCH_SKILLS_USED`.
 
 
 ## Política de delegação

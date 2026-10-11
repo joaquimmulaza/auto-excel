@@ -39,22 +39,24 @@ Antes de implementar:
 5. TDD loop.
 6. Entregar handoff canónico + `UI_SKILLS_SELECTED` quando aplicável (`agents.md` §7).
 
-## Stitch loop
-
-Para cada prompt Stitch:
+## Stitch loop (skills oficiais + baton)
 
 ```text
-PROMPT
+PROMPT / .stitch/next-prompt.md
   ↓
-UI Skills: list_skills → select 2–4 → get_skill → enhance-prompt
+UI Skills MCP → .stitch/DESIGN.md → enhance-prompt
   ↓
-STITCH GENERATE (MCP)
+STITCH GENERATE (stitch-design MCP)
   ↓
-VISUAL QA (+ skills selecionadas)
+stage .stitch/designs/ → update SITE.md → stitch-loop baton
   ↓
-aprovado? → IMPLEMENT (Portão 2 UI Skills)
-não → FEEDBACK → STITCH (máx. 3 ciclos)
+VISUAL QA
+  ↓
+aprovado? → IMPLEMENT frontend (04)
+não → FEEDBACK → STITCH (máx. 3 ciclos/tela)
 ```
+
+Skills: `taste-design` | `design-md`, `enhance-prompt`, `stitch-design`, `stitch-loop` (ver `agents.md` §5.2).
 
 ## Orquestrador principal
 

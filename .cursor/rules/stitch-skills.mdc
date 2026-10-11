@@ -1,0 +1,30 @@
+---
+description: Stitch Design Skills pipeline for Cotarco UI (DESIGN.md → enhance → Stitch → loop)
+alwaysApply: true
+---
+
+# Stitch Skills (Cotarco)
+
+Official docs: get-started, roundtrip, build-in-a-loop, taste, design-md, reference on stitch.withgoogle.com/docs.
+
+Repo skills (`.agents/skills/`): `stitch-design`, `enhance-prompt`, `design-md`, `taste-design`, `stitch-loop`.
+
+## Mandatory pipeline before Stitch / structural UI
+
+Follow `cotarco-commercial-manager/agents.md` §5.2:
+
+1. UI Skills MCP selection (§5.1)
+2. Ensure `.stitch/DESIGN.md` exists — `taste-design` (Cotarco brand) or `design-md` from an existing screen
+3. `enhance-prompt` including DESIGN.md Section 6
+4. Stitch MCP via `stitch-design` (max 3 refine cycles per screen)
+5. Stage under `.stitch/designs/`; update `.stitch/SITE.md` + `.stitch/metadata.json`
+6. Multi-screen: `stitch-loop` baton (`.stitch/next-prompt.md`)
+7. After visual QA only: frontend implementation (`04-frontend`)
+
+## Hard rules
+
+- Do not call Stitch without a useful `.stitch/DESIGN.md`
+- Cotarco brand wins: `#FF3C1D`, `#6B6363`, `#FFFFFF`, `#000000`
+- Do not treat Stitch HTML as final Next.js code
+- Do not write stitch-loop output into `frontend/` or invent `site/public/`
+- Handoff must include `STITCH_SKILLS_USED` and `UI_SKILLS_SELECTED`

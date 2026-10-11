@@ -30,10 +30,14 @@ Paths in prompts that say `context.md` / `agents.md` / `docs/...` resolve under 
    - `list_skills` with task-relevant queries
    - choose **2–4** matching skills
    - `get_skill` for each selected skill
-   - apply via `enhance-prompt` (Stitch) or implementation/QA (frontend)
-   - record selections in the handoff (`UI_SKILLS_SELECTED`)
-6. **TDD loop** → minimal implementation → QA. UI structural work uses Stitch MCP (max 3 cycles) per `agents.md` §5–6.
-7. **Handoff** in the 9-field format from `agents.md` §7.
+   - record `UI_SKILLS_SELECTED`
+6. **UI tasks only — Stitch Skills pipeline** (`agents.md` §5.2, `.cursor/rules/stitch-skills.mdc`):
+   - `.stitch/DESIGN.md` via `taste-design` / `design-md`
+   - `enhance-prompt` → Stitch MCP (`stitch-design`) → `.stitch/designs/`
+   - multi-screen: `stitch-loop` baton; max 3 refine cycles/screen
+   - record `STITCH_SKILLS_USED`
+7. **TDD loop** → minimal implementation → QA.
+8. **Handoff** per `agents.md` §7 (includes UI/Stitch skill fields when applicable).
 
 ## Hard limits
 
@@ -53,3 +57,10 @@ Canonical indexed repo for this workspace: **`joaquimmulaza/auto-excel`**.
 - Endpoint: `https://www.ui-skills.com/mcp`
 - Tools: `list_skills`, `get_skill`
 - Protocol: discover → select 2–4 → load → apply (see `agents.md` §5.1 and `.cursor/rules/ui-skills.mdc`).
+
+## Stitch Skills
+
+- Scaffolding: `.stitch/DESIGN.md`, `SITE.md`, `next-prompt.md`
+- Repo skills: `stitch-design`, `enhance-prompt`, `design-md`, `taste-design`, `stitch-loop`
+- Pipeline: `agents.md` §5.2 + `.cursor/rules/stitch-skills.mdc`
+- Docs: https://stitch.withgoogle.com/docs/skills/get-started/

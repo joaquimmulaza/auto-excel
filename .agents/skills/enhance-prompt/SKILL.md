@@ -26,6 +26,15 @@ Activate when a user wants to:
 - Add design system consistency to a simple idea
 - Structure a vague concept into an actionable prompt
 
+## Cotarco mandatory inputs
+
+Before enhancing prompts for this repo:
+
+1. Read `.stitch/DESIGN.md` Section 6 (or create it via `taste-design` / `design-md`)
+2. Run UI Skills MCP selection (`list_skills` → 2–4 → `get_skill`)
+3. Inject Cotarco tokens `#FF3C1D`, `#6B6363`, `#FFFFFF`, `#000000` into `DESIGN SYSTEM (REQUIRED)`
+4. Prefer Desktop-first enterprise density for CCM screens
+
 ## Enhancement Pipeline
 
 Follow these steps to enhance any prompt:

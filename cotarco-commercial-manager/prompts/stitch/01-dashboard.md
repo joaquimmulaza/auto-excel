@@ -1,8 +1,11 @@
 # Stitch Prompt — Dashboard
 
-## Gate UI Skills MCP (obrigatório)
+## Gate Stitch Skills (§5.1–5.2)
 
-Antes do Stitch: `list_skills` (ex. `dashboard`, `baseline`, `accessibility`, `typography`) → escolher 2–4 → `get_skill` → `enhance-prompt` → gerar. Ver `agents.md` §5.1. Documentar `UI_SKILLS_SELECTED`.
+1. Ler `.stitch/DESIGN.md` Section 6.
+2. UI Skills: `list_skills` (`dashboard`, `baseline`, `accessibility`, `typography`) → 2–4 → `get_skill`.
+3. `enhance-prompt` → Stitch MCP → `.stitch/designs/dashboard.*` → atualizar `SITE.md` / baton (`stitch-loop` se em loop).
+4. Handoff: `UI_SKILLS_SELECTED` + `STITCH_SKILLS_USED`.
 
 Use o design system aprovado do CCM.
 

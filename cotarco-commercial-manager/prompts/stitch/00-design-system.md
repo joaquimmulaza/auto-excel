@@ -6,15 +6,15 @@ Criar o design system base do Cotarco Commercial Manager, uma aplicação intern
 
 A aplicação será usada principalmente em desktop por equipa Comercial/Operador. O foco é produtividade, clareza de dados e segurança operacional.
 
-## Validação Pré-Stitch Obrigatória (UI Skills MCP + Enhance-Prompt)
+## Validação Pré-Stitch Obrigatória (§5.1–5.2)
 
-Antes de submeter este prompt ao Stitch (`agents.md` §5.1):
+Antes de submeter este prompt ao Stitch:
 
-1. **Navegar** com `list_skills` (queries sugeridas: `baseline`, `accessibility`, `typography`, `design`).
-2. **Escolher 2–4 skills** adequadas ao design system (ex. tipicos: `ibelick/baseline-ui`, a11y, typography, web-design-guidelines) — não assumir lista fixa.
-3. **Carregar** cada uma com `get_skill` e aplicar as constraints.
-4. Processar com a skill `enhance-prompt` (`.agents/skills/enhance-prompt/SKILL.md`): `DESIGN SYSTEM (REQUIRED)` + `Page Structure` numerada, densidade enterprise.
-5. Documentar `UI_SKILLS_SELECTED` no handoff.
+1. Ler `.stitch/DESIGN.md` (criar/atualizar com `taste-design` brand Cotarco se em falta).
+2. UI Skills MCP: `list_skills` (`baseline`, `accessibility`, `typography`, `design`) → escolher 2–4 → `get_skill`.
+3. `enhance-prompt` + bloco Section 6 de `.stitch/DESIGN.md`.
+4. Gerar via `stitch-design` / Stitch MCP; stage em `.stitch/designs/design-system.*`; atualizar `SITE.md` / `metadata.json`.
+5. Handoff: `UI_SKILLS_SELECTED` + `STITCH_SKILLS_USED`.
 
 ## Branding obrigatório
 

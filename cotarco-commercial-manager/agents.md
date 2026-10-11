@@ -104,6 +104,33 @@ list_skills(query…) → escolher 2–4 skills → get_skill → aplicar → do
 5. Incluir no handoff: `UI_SKILLS_SELECTED: <pathSlugs + motivo breve>`.
 6. Se o MCP `ui-skills` estiver indisponível: **bloquear** trabalho de UI e reportar o erro.
 
+### 5.2 Stitch Skills pipeline (obrigatório)
+
+Skills de repo em `.agents/skills/`: `stitch-design`, `enhance-prompt`, `design-md`, `taste-design`, `stitch-loop`. Scaffolding em `.stitch/`.
+
+Ordem:
+
+```text
+UI Skills MCP (§5.1)
+  → DESIGN.md (taste-design com brand Cotarco OU design-md a partir de ecrã existente)
+  → enhance-prompt (+ bloco Section 6 de .stitch/DESIGN.md)
+  → Stitch MCP via stitch-design (generate/edit; máx. 3 ciclos/tela)
+  → stage em .stitch/designs/ + atualizar SITE.md / metadata.json
+  → multi-ecrã: stitch-loop (baton .stitch/next-prompt.md)
+  → QA visual (§6)
+  → frontend (04-frontend) — Stitch HTML não é código final
+```
+
+Regras:
+
+1. Não chamar Stitch sem `.stitch/DESIGN.md` útil (criar/atualizar primeiro).
+2. Brand Cotarco prevalece: `#FF3C1D`, `#6B6363`, `#FFFFFF`, `#000000`.
+3. Persistir `projectId` em `.stitch/metadata.json` e `SITE.md`.
+4. Handoff: `STITCH_SKILLS_USED` (ex. `taste-design,enhance-prompt,stitch-design`) + `UI_SKILLS_SELECTED`.
+5. Roundtrip: design → stage → QA → implementar em Next.js; não publicar automaticamente em `frontend/`.
+
+Referências: https://stitch.withgoogle.com/docs/skills/get-started/ · roundtrip · build-in-a-loop · taste · design-md/overview · reference
+
 ## 6. QA de Stitch
 
 Critérios mínimos:
@@ -135,6 +162,7 @@ RISKS: <lista>
 DOCS_UPDATED: <lista>
 NEXT: <próxima tarefa recomendada>
 UI_SKILLS_SELECTED: <pathSlugs + motivo | n/a se tarefa não-UI>
+STITCH_SKILLS_USED: <stitch-design,enhance-prompt,design-md|taste-design,stitch-loop | n/a>
 ```
 
 ## 8. Handoffs
@@ -202,8 +230,8 @@ Para evitar poluição de contexto e cruzamento indevido de regras entre camadas
 | `01-domain-tdd` | `coding-guidelines`, `best-practices` | Extração do motor de domínio, regras determinísticas de negócio e TDD puro |
 | `02-database` | `security-best-practices` (Backend) | Schema Supabase/PostgreSQL, migrations, RLS e modelos relacionais |
 | `03-api` | `security-best-practices` (Next.js/FastAPI), `tlc-spec-driven` | Endpoints FastAPI, schemas Pydantic, RBAC, idempotência e rotas |
-| `04-frontend` | `shadcn-ui`, `frontend-blueprint`, `taste-design` + **UI Skills MCP** (§5.1) | Interface Next.js; selecionar skills MCP por tarefa antes de codificar |
-| `stitch/*` | `enhance-prompt`, `stitch-design` + **UI Skills MCP** (§5.1) | Geração visual; `list_skills` → escolher → `get_skill` antes do Stitch |
+| `04-frontend` | `shadcn-ui`, `frontend-blueprint`, `taste-design` + **UI Skills MCP** (§5.1) | Interface Next.js após QA Stitch; não copiar HTML Stitch à cega |
+| `stitch/*` | `stitch-design`, `enhance-prompt`, `design-md`/`taste-design`, `stitch-loop` + **UI Skills MCP** (§5.1–5.2) | Pipeline DESIGN.md → enhance → Stitch → stage → baton |
 | `05-gemini` | `technical-design-doc-creator`, `security-best-practices` | Serviços de IA assistiva (Gemini), structured outputs e sanitização |
 | `06-integrations` | `playwright-skill`, `core-web-vitals` | Testes E2E com Playwright, adapters de integração externa e performance web |
 

@@ -18,6 +18,18 @@ The generated `DESIGN.md` serves as the **single source of truth** for prompting
 - Access to Google Stitch via [labs.google.com/stitch](https://labs.google.com/stitch)
 - Optionally: Stitch MCP Server for programmatic integration with Cursor, Antigravity, or Gemini CLI
 
+## Cotarco brand override
+
+When generating `.stitch/DESIGN.md` for **Cotarco Commercial Manager**, product brand tokens override generic taste bans:
+
+- Accent / brand: `#FF3C1D`
+- Secondary: `#6B6363`
+- Surface: `#FFFFFF`
+- Ink / primary text: `#000000` (allowed here despite generic “no pure black” guidance)
+- Vibe: enterprise, data-dense, desktop-first, operational clarity
+
+Write the file to `.stitch/DESIGN.md` and include Section 6 “Design System Notes for Stitch Generation” for copy-paste into prompts.
+
 ## The Goal
 Generate a `DESIGN.md` file that encodes:
 1. **Visual atmosphere** — the mood, density, and design philosophy

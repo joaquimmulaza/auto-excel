@@ -1,0 +1,14 @@
+{
+  "name": "",
+  "projectId": "",
+  "title": "Cotarco Commercial Manager",
+  "visibility": "PRIVATE",
+  "projectType": "PROJECT_DESIGN",
+  "origin": "STITCH",
+  "deviceType": "DESKTOP",
+  "screens": {},
+  "metadata": {
+    "userRole": "OWNER",
+    "note": "Populate via Stitch MCP get_project / create_project. Keep stitch-project-id in SITE.md in sync."
+  }
+}
