@@ -6,11 +6,15 @@ Criar o design system base do Cotarco Commercial Manager, uma aplicação intern
 
 A aplicação será usada principalmente em desktop por equipa Comercial/Operador. O foco é produtividade, clareza de dados e segurança operacional.
 
-## Validação Pré-Stitch Obrigatória (UI Skills & Enhance-Prompt)
+## Validação Pré-Stitch Obrigatória (UI Skills MCP + Enhance-Prompt)
 
-Antes de submeter este prompt ao Stitch:
-1. Consultar o MCP `ui-skills` (skills `frontend-design`, `interface-design`, `baseline-ui` e playbooks de densidade/acessibilidade) para garantir conformidade de contrastes WCAG AA e espaçamento semântico.
-2. Processar a estrutura com a skill [enhance-prompt](.agents/skills/enhance-prompt/SKILL.md) para gerar a especificação formatada em `DESIGN SYSTEM (REQUIRED)` e `Page Structure` numerada com componentes de alta densidade.
+Antes de submeter este prompt ao Stitch (`agents.md` §5.1):
+
+1. **Navegar** com `list_skills` (queries sugeridas: `baseline`, `accessibility`, `typography`, `design`).
+2. **Escolher 2–4 skills** adequadas ao design system (ex. tipicos: `ibelick/baseline-ui`, a11y, typography, web-design-guidelines) — não assumir lista fixa.
+3. **Carregar** cada uma com `get_skill` e aplicar as constraints.
+4. Processar com a skill `enhance-prompt` (`.agents/skills/enhance-prompt/SKILL.md`): `DESIGN SYSTEM (REQUIRED)` + `Page Structure` numerada, densidade enterprise.
+5. Documentar `UI_SKILLS_SELECTED` no handoff.
 
 ## Branding obrigatório
 

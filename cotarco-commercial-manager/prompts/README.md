@@ -34,9 +34,10 @@ Antes de implementar:
 
 1. Ler os docs listados no prompt (+ `agents.md`).
 2. Graphify MCP recon em `joaquimmulaza/auto-excel`.
-3. Carregar só as skills da matriz (`agents.md` §11).
-4. TDD loop.
-5. Entregar handoff de 9 campos (`agents.md` §7).
+3. Carregar só as skills de repo da matriz (`agents.md` §11).
+4. Se UI/Stitch/frontend: **UI Skills MCP** — `list_skills` → escolher 2–4 → `get_skill` → aplicar (`agents.md` §5.1).
+5. TDD loop.
+6. Entregar handoff canónico + `UI_SKILLS_SELECTED` quando aplicável (`agents.md` §7).
 
 ## Stitch loop
 
@@ -45,11 +46,13 @@ Para cada prompt Stitch:
 ```text
 PROMPT
   ↓
+UI Skills: list_skills → select 2–4 → get_skill → enhance-prompt
+  ↓
 STITCH GENERATE (MCP)
   ↓
-VISUAL QA
+VISUAL QA (+ skills selecionadas)
   ↓
-aprovado? → IMPLEMENT
+aprovado? → IMPLEMENT (Portão 2 UI Skills)
 não → FEEDBACK → STITCH (máx. 3 ciclos)
 ```
 

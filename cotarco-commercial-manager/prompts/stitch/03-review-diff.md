@@ -1,5 +1,9 @@
 # Stitch Prompt — Review / Diff
 
+## Gate UI Skills MCP (obrigatório)
+
+Antes do Stitch: `list_skills` (ex. `table`, `baseline`, `accessibility`, `typography`, `data`) → escolher 2–4 → `get_skill` → `enhance-prompt` → gerar. Ver `agents.md` §5.1. Documentar `UI_SKILLS_SELECTED`.
+
 Criar a tela mais importante do produto.
 
 Objetivo: permitir que o Operador e a Comercial compreendam o resultado do processamento antes de qualquer ação crítica.
