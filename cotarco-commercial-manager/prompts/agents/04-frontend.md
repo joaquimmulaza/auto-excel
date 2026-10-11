@@ -1,6 +1,12 @@
 # Agent Prompt A50-A55 — Frontend after Stitch Approval
 
-Leia `context.md`, `agents.md`, `docs/ui-wireframes-and-design-system.md` e os resultados aprovados do Stitch.
+## Gate obrigatório (antes de implementar)
+
+1. Ler `context.md`, `agents.md`, `docs/ui-wireframes-and-design-system.md` e resultados Stitch aprovados (sob `cotarco-commercial-manager/`).
+2. Graphify MCP recon em `joaquimmulaza/auto-excel` sobre `frontend/` e contratos API (`query_graph`, `graphify_file_neighbors`).
+3. Skills só da matriz §11: `shadcn-ui`, `frontend-blueprint`, `taste-design`.
+4. Portão UI Skills + Stitch aprovado; TDD/RTL antes de componentes críticos.
+5. Entregar handoff de 9 campos (`agents.md` §7).
 
 ## Missão
 
@@ -37,3 +43,17 @@ Depois do fluxo completo, criar Playwright E2E.
 ## Responsividade
 
 Desktop-first, mas sem quebrar em 1024px e telas prioritárias usáveis a 390px.
+
+## Entrega
+
+```text
+STATUS: DONE | BLOCKED | NEEDS_REVIEW
+TASK: A50-A55
+SUMMARY: <resumo>
+FILES: <lista>
+TESTS: <comandos + resultado>
+QA: <resultado>
+RISKS: <lista>
+DOCS_UPDATED: <lista>
+NEXT: <próxima tarefa recomendada>
+```
