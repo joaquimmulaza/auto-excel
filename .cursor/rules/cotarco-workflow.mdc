@@ -1,0 +1,43 @@
+---
+description: Enforce Cotarco Commercial Manager workflow + Graphify MCP for every task
+alwaysApply: true
+---
+
+# Cotarco workflow (always on)
+
+This repo is Cotarco Commercial Manager. Product process lives under `cotarco-commercial-manager/`. Root `AGENTS.md` is the Cloud Agent entry point.
+
+## Before any code change
+
+1. Read `cotarco-commercial-manager/context.md` and `cotarco-commercial-manager/agents.md`.
+2. Read the task-specific docs listed in `agents.md` §0 (paths under `cotarco-commercial-manager/`).
+3. Run Graphify MCP recon on `joaquimmulaza/auto-excel` before broad grep or multi-file Read:
+   - `query_graph` / `graphify_find` for behavior and symbols
+   - `graphify_impact` / `graphify_callers` / `graphify_tests_for` when changing code
+   - Fall back to grep/Read only for literals, comments, or files already located
+4. If Graphify MCP tools are missing, report the connection failure; do not invent architecture from memory.
+
+## How to execute a user prompt
+
+- User pastes a phase prompt (`prompts/agents/00`–`06` or `prompts/stitch/*`): execute that prompt strictly (mission, TDD, DoD, handoff).
+- Free-form request: act as `prompts/MASTER_ORCHESTRATOR.md` — pick the next eligible backlog task, do not skip critical phases.
+- Load only skills from `agents.md` §11 for the active phase.
+
+## Definition of done
+
+- Tests run with real terminal evidence (`pytest` / project runners).
+- Docs/ADR updated when architecture or contracts change.
+- Stitch UI: max 3 MCP cycles; never treat Stitch export as final code.
+- End every task with the 9-field handoff from `agents.md` §7:
+
+```text
+STATUS: DONE | BLOCKED | NEEDS_REVIEW
+TASK: <id>
+SUMMARY: <resumo>
+FILES: <lista>
+TESTS: <comandos + resultado>
+QA: <resultado>
+RISKS: <lista>
+DOCS_UPDATED: <lista>
+NEXT: <próxima tarefa recomendada>
+```
