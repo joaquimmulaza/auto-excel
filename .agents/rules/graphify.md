@@ -1,14 +1,25 @@
 ---
 trigger: always_on
-description: Consult the graphify knowledge graph at graphify-out/ for codebase and architecture questions.
+description: Consult Graphify MCP/CLI before broad codebase reads; keep the graph current after code changes.
 ---
 
 ## graphify
 
-This project has a graphify knowledge graph at graphify-out/.
+This project is indexed by Graphify (local `graphify-out/` and Cloud MCP workspace).
+
+Canonical repository for MCP tools: `joaquimmulaza/auto-excel` (`155ea5ab-4976-4975-83e1-efcba12a3061`).
 
 Rules:
-- For codebase or architecture questions, when `graphify-out/graph.json` exists, first run `graphify query "<question>"` (CLI) or `query_graph` (MCP). Use `graphify path "<A>" "<B>"` / `shortest_path` for relationships and `graphify explain "<concept>"` / `get_node` for focused concepts. These return a scoped subgraph, usually much smaller than `GRAPH_REPORT.md` or raw grep output.
-- If graphify-out/wiki/index.md exists, navigate it instead of reading raw files
-- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context
-- After modifying code files in this session, run `graphify update .` to keep the graph current (AST-only, no API cost)
+
+- For codebase or architecture questions, use Graphify **before** broad grep/Read.
+- Prefer MCP when available:
+  - `list_repositories` — confirm access/index readiness
+  - `query_graph` — natural-language behavior/architecture questions
+  - `graphify_find` / `graphify_node` — locate and inspect symbols
+  - `graphify_callers` / `graphify_callees` / `graphify_impact` / `graphify_tests_for` — blast radius and linked tests
+  - `graphify_file_neighbors` — file deps
+  - `shortest_path` / `graphify_trace` — paths between symbols
+- CLI fallback (local): `graphify query`, `graphify path`, `graphify explain`.
+- If `graphify-out/wiki/index.md` exists, navigate it instead of reading raw dumps.
+- Read `graphify-out/GRAPH_REPORT.md` only for broad architecture review or when query tools do not surface enough context.
+- After modifying code files in this session, run `graphify update .` when the CLI is available (AST-only, no API cost).

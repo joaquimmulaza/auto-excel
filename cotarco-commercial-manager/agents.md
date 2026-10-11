@@ -1,8 +1,10 @@
 # AGENTS.md — Operating Rules for AI Coding Agents
 
-## 0. Ordem obrigatória de leitura
+## 0. Ordem obrigatória de leitura e recon
 
-Antes de qualquer alteração, ler:
+Antes de qualquer alteração:
+
+### 0.1 Ler
 
 1. `context.md`
 2. `agents.md`
@@ -16,7 +18,16 @@ Antes de qualquer alteração, ler:
 10. `docs/mvp-backlog.md`
 11. o documento específico da tarefa
 
-Não iniciar implementação sem compreender o estado atual do repositório.
+### 0.2 Graphify MCP (obrigatório antes de código)
+
+Repositório canónico: `joaquimmulaza/auto-excel` (`155ea5ab-4976-4975-83e1-efcba12a3061`).
+
+1. Confirmar acesso com `list_repositories` se necessário.
+2. Mapear impacto com `query_graph` e/ou `graphify_find`.
+3. Para mudanças: `graphify_impact`, `graphify_callers` / `graphify_callees`, `graphify_tests_for`.
+4. Só então ler ficheiros pontuais; grep amplo é fallback.
+
+Não iniciar implementação sem compreender o estado atual do repositório **e** o blast radius no grafo.
 
 ## 1. Princípio central
 
@@ -133,15 +144,34 @@ Evitar commits gigantes.
 
 ## 10. Graphify MCP e CLI — Navegação e Manutenção da Codebase
 
-Antes de realizar modificações no código ou na arquitetura, os agentes devem utilizar o Graphify (via servidor MCP ou CLI) para navegar na arquitetura e mapear dependências da codebase. Após modificações estruturais ou documentais, devem manter o grafo atualizado.
+Antes de modificar código ou arquitetura, usar Graphify. Preferir **MCP Cloud** quando disponível; CLI é fallback local.
 
-### Comandos de Navegação e Análise
-- `graphify query "<pergunta ou termo>"` — pesquisa nós, conceitos e arquivos relevantes no grafo de conhecimento.
-- `graphify path "<origem>" "<destino>"` — mapeia caminhos de dependência e fluxos entre componentes ou arquivos.
-- `graphify explain "<componente>"` — detalha a responsabilidade, dependentes e dependências de um componente específico.
+**Repo:** `joaquimmulaza/auto-excel` — passar `repository_id` como UUID ou `owner/name` nas tools.
 
-### Manutenção do Grafo
-- `graphify update .` — sincroniza e atualiza o grafo de conhecimento local a partir das alterações na codebase.
+### MCP (Cloud Agent — preferido)
+
+| Tool | Uso |
+|---|---|
+| `list_repositories` | Confirmar repos acessíveis e estado do índice |
+| `query_graph` | Pergunta em linguagem natural sobre comportamento/arquitetura |
+| `graphify_find` | Localizar definição de símbolo/classe/função |
+| `graphify_node` | Corpo + vizinhos imediatos de um símbolo |
+| `graphify_callers` / `graphify_callees` | Quem chama / o que é chamado |
+| `graphify_impact` | Blast radius direto (callers + callees) |
+| `graphify_tests_for` | Testes ligados a símbolo/ficheiro |
+| `graphify_file_neighbors` | Dependências e dependentes de um ficheiro |
+| `shortest_path` / `graphify_trace` | Caminho entre dois símbolos |
+
+### CLI (fallback local)
+
+- `graphify query "<pergunta ou termo>"`
+- `graphify path "<origem>" "<destino>"`
+- `graphify explain "<componente>"`
+
+### Manutenção do grafo
+
+- Após mudanças estruturais de código: `graphify update .` (AST-only, sem custo de LLM) quando a CLI estiver disponível.
+- Não editar `graphify-out/graph.json` à mão; usar merge driver / hooks documentados no README.
 
 ## 11. Matriz de Atribuição de Skills (Isolamento por Escopo)
 
