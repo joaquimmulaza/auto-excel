@@ -10,7 +10,7 @@ Objetivo: conduzir múltiplos agentes até um MVP funcional sem perder contexto,
 
 ## Fonte de verdade
 
-Antes de qualquer decisão:
+Antes de qualquer decisão (paths sob `cotarco-commercial-manager/`):
 
 1. `context.md`
 2. `agents.md`
@@ -23,7 +23,16 @@ Antes de qualquer decisão:
 9. `docs/testing-tdd.md`
 10. `docs/mvp-backlog.md`
 
-Se existir contradição, **parar, registrar a contradição e resolver/documentar antes de implementar**.
+### Gate Graphify MCP (obrigatório)
+
+Antes de delegar ou implementar:
+
+1. Confirmar repo `joaquimmulaza/auto-excel` via `list_repositories` se necessário.
+2. Recon com `query_graph` / `graphify_find` sobre a tarefa.
+3. Mapear impacto com `graphify_impact` / `graphify_callers` / `graphify_tests_for` quando houver mudança de código.
+4. Usar **Stitch MCP** só para UI estrutural (max 3 ciclos); usar **Graphify MCP** para navegação de código.
+
+Se existir contradição documental, **parar, registrar a contradição e resolver/documentar antes de implementar**.
 
 ## Sequência do MVP
 
@@ -195,10 +204,27 @@ Quando uma fase terminar, o orquestrador deve:
 2. verificar docs;
 3. atualizar backlog/status;
 4. registrar decisões novas como ADR quando apropriado;
-5. escolher a próxima tarefa elegível.
+5. exigir handoff canónico de 9 campos (`agents.md` §7);
+6. correr `graphify update .` se a CLI estiver disponível e houve mudanças de código;
+7. escolher a próxima tarefa elegível **sem saltar fases críticas**.
+
+### Checklist de saída do orquestrador
+
+```text
+STATUS: DONE | BLOCKED | NEEDS_REVIEW
+TASK: <id da fase>
+SUMMARY: <o que foi coordenado>
+FILES: <lista>
+TESTS: <comandos + resultado>
+QA: <resultado>
+RISKS: <lista>
+DOCS_UPDATED: <lista>
+NEXT: <próxima tarefa elegível do backlog>
+```
 
 ## Primeira ação agora
 
-Executar `prompts/agents/00-bootstrap-audit.md`.
+1. Completar gate de docs + Graphify recon.
+2. Executar `prompts/agents/00-bootstrap-audit.md`.
 
 Só avançar para A10-A16 depois que o agente A00 retornar `STATUS: DONE` com testes verdes e ausência de bloqueadores arquiteturais.

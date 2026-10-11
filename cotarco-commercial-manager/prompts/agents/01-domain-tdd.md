@@ -1,6 +1,12 @@
 # Agent Prompt A10-A16 — Domain Engine TDD First
 
-Leia `context.md`, `agents.md`, `docs/data-architecture.md`, `docs/testing-tdd.md` e `docs/requirements.md`.
+## Gate obrigatório (antes de implementar)
+
+1. Ler `context.md`, `agents.md`, `docs/data-architecture.md`, `docs/testing-tdd.md` e `docs/requirements.md` (sob `cotarco-commercial-manager/`).
+2. Graphify MCP recon em `joaquimmulaza/auto-excel`: localizar motor/regras (`query_graph`, `graphify_find`); mapear callers/tests com `graphify_callers` / `graphify_tests_for`.
+3. Skills só da matriz §11: `coding-guidelines`, `best-practices`.
+4. TDD first — nenhum domínio novo sem teste a falhar primeiro.
+5. Entregar handoff de 9 campos (`agents.md` §7).
 
 ## Missão
 
@@ -58,3 +64,17 @@ Preservar a lógica válida atual do Samsung→Mano através de fixtures reais a
 - casos de regressão cobertos;
 - domínio importável sem web;
 - código antigo pode ser adaptado para chamar engine.
+
+## Entrega
+
+```text
+STATUS: DONE | BLOCKED | NEEDS_REVIEW
+TASK: A10-A16
+SUMMARY: <resumo>
+FILES: <lista>
+TESTS: <comandos + resultado>
+QA: <resultado>
+RISKS: <lista>
+DOCS_UPDATED: <lista>
+NEXT: <próxima tarefa recomendada>
+```

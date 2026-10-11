@@ -1,6 +1,12 @@
 # Agent Prompt A70-A76 — Adapters, E2E, Security, Demo
 
-Leia todos os docs, especialmente `context.md`, `agents.md`, `docs/application-flows.md`, `docs/testing-tdd.md`.
+## Gate obrigatório (antes de implementar)
+
+1. Ler todos os docs, especialmente `context.md`, `agents.md`, `docs/application-flows.md`, `docs/testing-tdd.md` (sob `cotarco-commercial-manager/`).
+2. Graphify MCP recon em `joaquimmulaza/auto-excel` para adapters, fluxos e testes (`query_graph`, `graphify_tests_for`, `graphify_impact`).
+3. Skills só da matriz §11: `playwright-skill`, `core-web-vitals`.
+4. E2E + security checks com evidência de terminal.
+5. Entregar handoff de 9 campos (`agents.md` §7).
 
 ## Missão
 
@@ -53,3 +59,17 @@ Criar uma sequência de 5–10 minutos:
 ## Definition of Done
 
 Tudo documentado, CI verde e MVP reproduzível por outro desenvolvedor.
+
+## Entrega
+
+```text
+STATUS: DONE | BLOCKED | NEEDS_REVIEW
+TASK: A70-A76
+SUMMARY: <resumo>
+FILES: <lista>
+TESTS: <comandos + resultado>
+QA: <resultado>
+RISKS: <lista>
+DOCS_UPDATED: <lista>
+NEXT: <próxima tarefa recomendada>
+```
