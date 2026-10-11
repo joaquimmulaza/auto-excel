@@ -3,35 +3,40 @@
 SECURITY GUARDRAILS (obrigatórios por spec):
 1. GEMINI_API_KEY reside APENAS neste módulo (backend); nunca exposta ao frontend.
 2. O Gemini NÃO decide preços, stocks ou aprovações — apenas explica, resume e sugere.
-3. Todas as respostas seguem schemas Pydantic v2 estrictos.
-4. Fallback determinístico é ativado se a chamada ao Gemini falhar.
+3. Todas as respostas seguem schemas Pydantic v2 estrictos (structured output).
+4. Fallback determinístico é ativado se a chamada ao Gemini falhar ou for inválida.
 5. Inputs do utilizador são sanitizados antes de serem incluídos nos prompts.
 
 SDK: google-genai 2.x (from google import genai)
-Model: gemini-2.0-flash (rápido, custo-eficiente para assistência contextual)
+Model default: gemini-3.5-flash-lite
+Override: GEMINI_MODEL=gemini-3.6-flash|gemini-3.8-flash
 """
 from __future__ import annotations
+
+import logging
 import os
+import re
 from pathlib import Path
+from typing import Any, TypeVar
+
 from dotenv import load_dotenv
+from pydantic import BaseModel, ValidationError
 
 _backend_env = Path(__file__).resolve().parent.parent.parent / ".env"
 load_dotenv(_backend_env)
 load_dotenv()
 
-
-import logging
-import os
-import re
-from typing import Any
+from backend.app.schemas.ai import (  # noqa: E402
+    AnomalyExplanation,
+    ColumnMapping,
+    ExecutiveSummary,
+)
 
 logger = logging.getLogger(__name__)
 
-# ---------------------------------------------------------------------------
-# Lazy client — inicializado apenas quando GEMINI_API_KEY está presente
-# ---------------------------------------------------------------------------
-
 _genai_client = None
+
+TModel = TypeVar("TModel", bound=BaseModel)
 
 
 def _get_client():
@@ -45,36 +50,33 @@ def _get_client():
                 "Defina a variável de ambiente no backend (nunca no frontend)."
             )
         from google import genai  # type: ignore[import-untyped]
+
         _genai_client = genai.Client(api_key=api_key)
     return _genai_client
 
 
-# ---------------------------------------------------------------------------
-# Model constant
-# ---------------------------------------------------------------------------
-
-_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
-
-# ---------------------------------------------------------------------------
-# Input sanitization
-# ---------------------------------------------------------------------------
+# Default: gemini-3.5-flash-lite. Override with GEMINI_MODEL=
+# gemini-3.6-flash | gemini-3.8-flash (thinking_level may need LOW on 3.8).
+_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite")
 
 _SANITIZE_PATTERN = re.compile(r"[<>\"'%;()&+]")
 
 
 def _sanitize(text: str, max_len: int = 500) -> str:
-    """Remove caracteres potencialmente problemáticos em prompts.
-
-    GUARDRAIL: Inputs de utilizador nunca são inseridos crus no prompt.
-    Limita comprimento para evitar prompt injection via inputs grandes.
-    """
+    """Remove caracteres potencialmente problemáticos em prompts/outputs."""
     cleaned = _SANITIZE_PATTERN.sub("", text)
     return cleaned[:max_len]
 
 
-# ---------------------------------------------------------------------------
-# Prompt builders
-# ---------------------------------------------------------------------------
+def _sanitize_tree(value: Any, max_len: int = 500) -> Any:
+    if isinstance(value, str):
+        return _sanitize(value, max_len)
+    if isinstance(value, list):
+        return [_sanitize_tree(v, max_len) for v in value]
+    if isinstance(value, dict):
+        return {k: _sanitize_tree(v, max_len) for k, v in value.items()}
+    return value
+
 
 _SYSTEM_INSTRUCTIONS = (
     "Você é um assistente interno da Cotarco, especializado em tabelas comerciais "
@@ -93,20 +95,14 @@ def _build_explain_prompt(
     context: dict[str, Any],
     language: str,
 ) -> str:
-    ctx_str = ", ".join(f"{k}: {v}" for k, v in list(context.items())[:8])
+    ctx_str = ", ".join(f"{k}: {v}" for k, v in list(context.items())[:12])
     return (
-        f"Analise o seguinte problema de validação numa tabela comercial e responda "
-        f"em JSON estricto com os campos: "
-        f"title (str, max 120 chars), "
-        f"plain_explanation (str, max 800 chars), "
-        f"likely_cause (str, max 400 chars), "
-        f"suggested_action (str, max 400 chars, SEM decidir preços ou stocks), "
-        f"is_blocker (bool).\n\n"
+        f"Analise o seguinte problema de validação numa tabela comercial.\n\n"
         f"Idioma da resposta: {language}\n"
         f"Código do erro: {_sanitize(issue_code, 100)}\n"
         f"Mensagem: {_sanitize(issue_message)}\n"
         f"Severidade: {_sanitize(severity, 20)}\n"
-        f"Contexto: {_sanitize(ctx_str, 300)}\n"
+        f"Contexto: {_sanitize(ctx_str, 400)}\n"
         f"is_blocker deve ser true se severity for BLOCKER, caso contrário false."
     )
 
@@ -118,16 +114,11 @@ def _build_summary_prompt(
     language: str,
 ) -> str:
     return (
-        f"Analise o seguinte processamento de tabela comercial e responda em JSON "
-        f"estricto com os campos: "
-        f"headline (str, max 200 chars), "
-        f"highlights (list de 3 a 5 strings, cada max 150 chars), "
-        f"attention_items (list de 0 a 5 strings, cada max 150 chars), "
-        f"overall_assessment (str, max 400 chars).\n\n"
+        f"Analise o seguinte processamento de tabela comercial.\n\n"
         f"Idioma da resposta: {language}\n"
         f"Perfil comercial: {_sanitize(profile_name, 100)}\n"
-        f"Resumo quantitativo: {job_summary}\n"
-        f"Resumo de problemas: {issues_summary}\n"
+        f"Resumo quantitativo: {_sanitize_tree(job_summary)}\n"
+        f"Resumo de problemas: {_sanitize_tree(issues_summary)}\n"
         f"IMPORTANTE: Não tome decisões de negócio. Apenas resuma e contextualize."
     )
 
@@ -141,12 +132,7 @@ def _build_column_mapping_prompt(
     expected_clean = [_sanitize(c, 80) for c in expected[:50]]
     return (
         f"Sugira o mapeamento de colunas entre o ficheiro recebido e as colunas "
-        f"esperadas pelo sistema. Responda em JSON estricto com os campos:\n"
-        f"suggestions (list de objetos com: detected_column, suggested_mapping ou null, "
-        f"confidence (HIGH|MEDIUM|LOW), rationale max 200 chars),\n"
-        f"unmapped_expected (list de strings das colunas esperadas sem correspondência),\n"
-        f"disclaimer (string fixa: 'Sugestões geradas por IA. Reveja e confirme antes "
-        f"de aplicar o mapeamento.').\n\n"
+        f"esperadas pelo sistema.\n\n"
         f"Idioma da resposta: {language}\n"
         f"Colunas detetadas no ficheiro: {detected_clean}\n"
         f"Colunas esperadas pelo perfil: {expected_clean}\n"
@@ -154,32 +140,56 @@ def _build_column_mapping_prompt(
     )
 
 
-# ---------------------------------------------------------------------------
-# Core call helper with structured output
-# ---------------------------------------------------------------------------
+def _thinking_config(types_mod: Any) -> Any | None:
+    """Prefer thinking_level=MINIMAL; fall back to LOW or thinking_budget=0."""
+    if not hasattr(types_mod, "ThinkingConfig"):
+        return None
+    level_enum = getattr(types_mod, "ThinkingLevel", None)
+    if level_enum is not None:
+        for name in ("MINIMAL", "LOW"):
+            level = getattr(level_enum, name, None)
+            if level is not None:
+                try:
+                    return types_mod.ThinkingConfig(thinking_level=level)
+                except Exception:  # noqa: BLE001
+                    continue
+    try:
+        return types_mod.ThinkingConfig(thinking_budget=0)
+    except Exception:  # noqa: BLE001
+        return None
 
 
-def _call_gemini_json(prompt: str) -> dict[str, Any] | None:
-    """Chama o Gemini com response_mime_type JSON.
+def _schema_for_model(model: type[BaseModel]) -> dict[str, Any]:
+    return model.model_json_schema()
+
+
+def _call_gemini_json(
+    prompt: str,
+    *,
+    response_model: type[BaseModel] | None = None,
+) -> dict[str, Any] | None:
+    """Chama o Gemini com JSON structured output.
 
     Retorna dict parseado ou None se a chamada falhar.
     GUARDRAIL: Nunca propaga excepções ao router — usa fallback.
     """
     try:
         import json
+
         from google.genai import types  # type: ignore[import-untyped]
 
         client = _get_client()
-        # thinking_budget=0: modelos 2.5+ gastam tokens de thinking e com
-        # max_output_tokens baixo truncavam o JSON → fallback "IA indisponível".
         config_kwargs: dict[str, Any] = {
             "system_instruction": _SYSTEM_INSTRUCTIONS,
             "response_mime_type": "application/json",
             "temperature": 0.2,
             "max_output_tokens": 2048,
         }
-        if hasattr(types, "ThinkingConfig"):
-            config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=0)
+        thinking = _thinking_config(types)
+        if thinking is not None:
+            config_kwargs["thinking_config"] = thinking
+        if response_model is not None:
+            config_kwargs["response_json_schema"] = _schema_for_model(response_model)
 
         response = client.models.generate_content(
             model=_MODEL,
@@ -190,21 +200,31 @@ def _call_gemini_json(prompt: str) -> dict[str, Any] | None:
         if not raw:
             logger.warning("Gemini retornou resposta vazia.")
             return None
-        return json.loads(raw)
+        parsed = json.loads(raw)
+        if not isinstance(parsed, dict):
+            logger.warning("Gemini retornou JSON não-object.")
+            return None
+        return parsed
     except Exception as exc:  # noqa: BLE001
         logger.warning("Chamada ao Gemini falhou: %s", exc)
         return None
 
 
-# ---------------------------------------------------------------------------
-# Fallback builders (determinísticos — sem IA)
-# ---------------------------------------------------------------------------
+def _validate_or_none(
+    model: type[TModel], data: dict[str, Any] | None
+) -> dict[str, Any] | None:
+    if not data:
+        return None
+    try:
+        return model.model_validate(data).model_dump()
+    except ValidationError as exc:
+        logger.warning("Resposta Gemini inválida vs %s: %s", model.__name__, exc)
+        return None
 
 
 def _fallback_explanation(
     issue_code: str, issue_message: str, severity: str
 ) -> dict[str, Any]:
-    """Fallback determinístico para explain-issue quando Gemini está indisponível."""
     is_blocker = severity == "BLOCKER"
     return {
         "title": f"Problema detectado: {issue_code}",
@@ -223,7 +243,6 @@ def _fallback_explanation(
 
 
 def _fallback_summary(job_summary: dict[str, Any]) -> dict[str, Any]:
-    """Fallback determinístico para summary quando Gemini está indisponível."""
     total = job_summary.get("total", 0)
     updated = job_summary.get("updated", 0)
     new = job_summary.get("new", 0)
@@ -235,7 +254,9 @@ def _fallback_summary(job_summary: dict[str, Any]) -> dict[str, Any]:
             f"{new} referências novas.",
             f"{blocked} referências bloqueadas.",
         ],
-        "attention_items": [f"{blocked} bloqueios requerem revisão."] if blocked else [],
+        "attention_items": (
+            [f"{blocked} bloqueios requerem revisão."] if blocked else []
+        ),
         "overall_assessment": (
             "Resumo gerado localmente (assistência de IA temporariamente indisponível)."
         ),
@@ -245,7 +266,6 @@ def _fallback_summary(job_summary: dict[str, Any]) -> dict[str, Any]:
 def _fallback_column_mapping(
     detected: list[str], expected: list[str]
 ) -> dict[str, Any]:
-    """Fallback determinístico para suggest-columns quando Gemini está indisponível."""
     suggestions = [
         {
             "detected_column": col,
@@ -265,12 +285,8 @@ def _fallback_column_mapping(
     }
 
 
-# ---------------------------------------------------------------------------
-# Public service functions
-# ---------------------------------------------------------------------------
-
-
 _explain_cache: dict[str, dict[str, Any]] = {}
+
 
 def explain_issue(
     issue_code: str,
@@ -283,8 +299,7 @@ def explain_issue(
     """Explica uma anomalia de validação usando Gemini.
 
     Returns:
-        (data_dict, fallback_used): data_dict conforme AnomalyExplanation;
-        fallback_used=True se usámos o fallback determinístico.
+        (data_dict, fallback_used)
     """
     cache_key = f"{job_id}:{issue_code}:{language}"
     if job_id and cache_key in _explain_cache:
@@ -293,14 +308,12 @@ def explain_issue(
     prompt = _build_explain_prompt(
         issue_code, issue_message, severity, context, language
     )
-    result = _call_gemini_json(prompt)
+    raw = _call_gemini_json(prompt, response_model=AnomalyExplanation)
+    result = _validate_or_none(AnomalyExplanation, raw)
 
-    if result and all(
-        k in result
-        for k in ("title", "plain_explanation", "likely_cause", "suggested_action", "is_blocker")
-    ):
-        # Enforce is_blocker to match severity (deterministic override)
+    if result:
         result["is_blocker"] = severity == "BLOCKER"
+        result = _sanitize_tree(result)
         if job_id:
             _explain_cache[cache_key] = result
         return result, False
@@ -314,23 +327,16 @@ def generate_summary(
     profile_name: str,
     language: str = "pt",
 ) -> tuple[dict[str, Any], bool]:
-    """Gera resumo executivo assistivo de um processamento.
-
-    Returns:
-        (data_dict, fallback_used)
-    """
+    """Gera resumo executivo assistivo de um processamento."""
     prompt = _build_summary_prompt(job_summary, issues_summary, profile_name, language)
-    result = _call_gemini_json(prompt)
+    raw = _call_gemini_json(prompt, response_model=ExecutiveSummary)
+    result = _validate_or_none(ExecutiveSummary, raw)
 
-    if result and all(
-        k in result
-        for k in ("headline", "highlights", "overall_assessment")
-    ):
-        # Garantir que highlights tem no mínimo 1 item
+    if result:
         if not result.get("highlights"):
             result["highlights"] = ["Processamento analisado."]
         result.setdefault("attention_items", [])
-        return result, False
+        return _sanitize_tree(result), False
 
     return _fallback_summary(job_summary), True
 
@@ -344,19 +350,19 @@ def suggest_column_mapping(
 
     GUARDRAIL: Retorna apenas sugestões — o engine determinístico
     valida e confirma antes de aplicar qualquer mapeamento.
-
-    Returns:
-        (data_dict, fallback_used)
     """
-    prompt = _build_column_mapping_prompt(detected_columns, expected_columns, language)
-    result = _call_gemini_json(prompt)
+    prompt = _build_column_mapping_prompt(
+        detected_columns, expected_columns, language
+    )
+    raw = _call_gemini_json(prompt, response_model=ColumnMapping)
+    result = _validate_or_none(ColumnMapping, raw)
 
-    if result and "suggestions" in result:
+    if result:
         result.setdefault("unmapped_expected", [])
         result.setdefault(
             "disclaimer",
             "Sugestões geradas por IA. Reveja e confirme antes de aplicar o mapeamento.",
         )
-        return result, False
+        return _sanitize_tree(result), False
 
     return _fallback_column_mapping(detected_columns, expected_columns), True
