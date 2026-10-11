@@ -25,9 +25,15 @@ Paths in prompts that say `context.md` / `agents.md` / `docs/...` resolve under 
    - `graphify_callers` / `graphify_callees` / `graphify_impact` / `graphify_tests_for` for blast radius
    - `graphify_file_neighbors` for file deps
 3. **Pick the phase prompt** — if the user pasted `00`–`06` or a Stitch prompt, execute that prompt to the letter; otherwise follow `MASTER_ORCHESTRATOR.md` + `docs/mvp-backlog.md` and do not skip critical phases.
-4. **Load only scoped skills** from `agents.md` §11 for that phase.
-5. **TDD loop** → minimal implementation → QA. UI structural work uses Stitch MCP (max 3 cycles) per `agents.md` §5–6.
-6. **Handoff** in the 9-field format from `agents.md` §7.
+4. **Load only scoped repo skills** from `agents.md` §11 for that phase.
+5. **UI tasks only — UI Skills MCP selection** (before Stitch or frontend code):
+   - `list_skills` with task-relevant queries
+   - choose **2–4** matching skills
+   - `get_skill` for each selected skill
+   - apply via `enhance-prompt` (Stitch) or implementation/QA (frontend)
+   - record selections in the handoff (`UI_SKILLS_SELECTED`)
+6. **TDD loop** → minimal implementation → QA. UI structural work uses Stitch MCP (max 3 cycles) per `agents.md` §5–6.
+7. **Handoff** in the 9-field format from `agents.md` §7.
 
 ## Hard limits
 
@@ -41,3 +47,9 @@ Paths in prompts that say `context.md` / `agents.md` / `docs/...` resolve under 
 ## Graphify repository
 
 Canonical indexed repo for this workspace: **`joaquimmulaza/auto-excel`**.
+
+## UI Skills MCP
+
+- Endpoint: `https://www.ui-skills.com/mcp`
+- Tools: `list_skills`, `get_skill`
+- Protocol: discover → select 2–4 → load → apply (see `agents.md` §5.1 and `.cursor/rules/ui-skills.mdc`).

@@ -76,15 +76,33 @@ Antes de alterar schema, API, domínio ou UI global:
 Quando a tarefa envolve uma nova tela ou alteração estrutural de UI:
 
 1. Ler `docs/ui-wireframes-and-design-system.md`.
-2. Criar prompt específico para Stitch em `prompts/stitch/` ou usar o prompt fornecido pela tarefa.
-3. Chamar Stitch através do MCP disponível no ambiente do agente.
-4. Gerar a tela.
-5. Fazer QA visual contra os critérios de aceitação.
-6. Se aprovado: usar a proposta como referência para codificação.
-7. Se reprovado: enviar feedback objetivo para Stitch e pedir nova iteração.
-8. Repetir até aprovação ou atingir 3 ciclos; depois parar e pedir revisão humana.
+2. Executar o **protocolo UI Skills MCP** (§5.1).
+3. Criar/refinar o prompt Stitch (skill `enhance-prompt` + constraints das skills carregadas).
+4. Chamar Stitch através do MCP disponível no ambiente do agente.
+5. Gerar a tela.
+6. Fazer QA visual contra os critérios de aceitação **e** as skills UI selecionadas.
+7. Se aprovado: usar a proposta como referência para codificação (ainda com Portão 2 / §5.1).
+8. Se reprovado: enviar feedback objetivo para Stitch e pedir nova iteração.
+9. Repetir até aprovação ou atingir 3 ciclos; depois parar e pedir revisão humana.
 
 **Nunca considerar o código exportado por Stitch como implementação final automaticamente.** Deve ser adaptado à arquitetura, acessibilidade e componentes do projeto.
+
+### 5.1 UI Skills MCP — seleção dinâmica de skills
+
+Endpoint: `https://www.ui-skills.com/mcp`. Tools: `list_skills`, `get_skill`.
+
+Antes de Stitch **ou** de código frontend, o agente **navega o registry e escolhe** skills — não assume uma lista fixa:
+
+```text
+list_skills(query…) → escolher 2–4 skills → get_skill → aplicar → documentar UI_SKILLS_SELECTED
+```
+
+1. Chamar `list_skills` com 1–3 queries alinhadas à tarefa (ex.: `baseline`, `accessibility`, `typography`, `table`, `form`, `dashboard`, `design review`).
+2. Selecionar **2–4** skills pelo `pathSlug`/`name` mais relevantes (ex. tipicos Cotarco: `ibelick/baseline-ui`, `jakubkrehel/better-accessibility`, `jakubkrehel/better-typography`, `vercel-labs/web-design-guidelines`).
+3. Carregar cada uma com `get_skill`.
+4. Aplicar no prompt Stitch (`enhance-prompt`) ou na implementação/QA frontend.
+5. Incluir no handoff: `UI_SKILLS_SELECTED: <pathSlugs + motivo breve>`.
+6. Se o MCP `ui-skills` estiver indisponível: **bloquear** trabalho de UI e reportar o erro.
 
 ## 6. QA de Stitch
 
@@ -116,6 +134,7 @@ QA: <resultado>
 RISKS: <lista>
 DOCS_UPDATED: <lista>
 NEXT: <próxima tarefa recomendada>
+UI_SKILLS_SELECTED: <pathSlugs + motivo | n/a se tarefa não-UI>
 ```
 
 ## 8. Handoffs
@@ -183,7 +202,8 @@ Para evitar poluição de contexto e cruzamento indevido de regras entre camadas
 | `01-domain-tdd` | `coding-guidelines`, `best-practices` | Extração do motor de domínio, regras determinísticas de negócio e TDD puro |
 | `02-database` | `security-best-practices` (Backend) | Schema Supabase/PostgreSQL, migrations, RLS e modelos relacionais |
 | `03-api` | `security-best-practices` (Next.js/FastAPI), `tlc-spec-driven` | Endpoints FastAPI, schemas Pydantic, RBAC, idempotência e rotas |
-| `04-frontend` | `shadcn-ui`, `frontend-blueprint`, `taste-design` | Interface Next.js, componentes shadcn/ui, acessibilidade e design system |
+| `04-frontend` | `shadcn-ui`, `frontend-blueprint`, `taste-design` + **UI Skills MCP** (§5.1) | Interface Next.js; selecionar skills MCP por tarefa antes de codificar |
+| `stitch/*` | `enhance-prompt`, `stitch-design` + **UI Skills MCP** (§5.1) | Geração visual; `list_skills` → escolher → `get_skill` antes do Stitch |
 | `05-gemini` | `technical-design-doc-creator`, `security-best-practices` | Serviços de IA assistiva (Gemini), structured outputs e sanitização |
 | `06-integrations` | `playwright-skill`, `core-web-vitals` | Testes E2E com Playwright, adapters de integração externa e performance web |
 

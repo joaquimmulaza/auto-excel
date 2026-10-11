@@ -65,10 +65,20 @@ A70-A76 Integrations/E2E/Security/Demo
 ```
 
 ### Portões de Qualidade UI Skills (MCP) & Enhance-Prompt
+
+Protocolo obrigatório (`agents.md` §5.1) — o agente **não** usa uma lista fixa; navega e escolhe:
+
+```text
+list_skills(query…) → escolher 2–4 skills → get_skill → enhance-prompt / audit → Stitch ou frontend
+```
+
 1. **Antes de enviar ao Stitch**:
-   - Consultar o servidor MCP `ui-skills` para obter diretrizes de design, densidade e acessibilidade WCAG AA.
-   - Processar o prompt pela skill `enhance-prompt` para injetar a estrutura oficial (`DESIGN SYSTEM (REQUIRED)` com tokens `#FF3C1D`, `#6B6363`, `#FFFFFF`, `#000000`, `Page Structure` numerada e vocabulário UI/UX avançado).
-2. **Antes de codificar o Frontend**: Auditar especificações com `ui-skills` garantindo `tabular-nums` para tabelas/preços, `text-balance`, touch targets de 44px e skeletons estruturais.
+   - `list_skills` com queries da tela (ex. `baseline`, `accessibility`, `typography`, `dashboard`, `table`).
+   - Escolher 2–4 skills; `get_skill` em cada uma.
+   - Processar com `enhance-prompt`: `DESIGN SYSTEM (REQUIRED)` (`#FF3C1D`, `#6B6363`, `#FFFFFF`, `#000000`), `Page Structure` numerada, constraints das skills escolhidas.
+2. **Antes de codificar o Frontend**:
+   - Repetir ou reutilizar a seleção; auditar contra as skills carregadas (`tabular-nums`, `text-balance`, touch targets ≥ 44px, skeletons, a11y).
+3. **Handoff**: incluir `UI_SKILLS_SELECTED` com pathSlugs e motivo.
 
 
 ## Política de delegação

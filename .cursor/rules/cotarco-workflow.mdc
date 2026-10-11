@@ -1,5 +1,5 @@
 ---
-description: Enforce Cotarco Commercial Manager workflow + Graphify MCP for every task
+description: Enforce Cotarco workflow + Graphify MCP + UI Skills MCP selection
 alwaysApply: true
 ---
 
@@ -17,17 +17,27 @@ This repo is Cotarco Commercial Manager. Product process lives under `cotarco-co
    - Fall back to grep/Read only for literals, comments, or files already located
 4. If Graphify MCP tools are missing, report the connection failure; do not invent architecture from memory.
 
+## UI / Stitch work — UI Skills MCP
+
+Before Stitch generation or frontend code:
+
+1. `list_skills` with queries matching the task.
+2. Choose **2–4** skills; call `get_skill` for each.
+3. Apply constraints (`enhance-prompt` for Stitch; audit for frontend).
+4. Put `UI_SKILLS_SELECTED` in the handoff. Details: `.cursor/rules/ui-skills.mdc` and `agents.md` §5.1.
+
 ## How to execute a user prompt
 
 - User pastes a phase prompt (`prompts/agents/00`–`06` or `prompts/stitch/*`): execute that prompt strictly (mission, TDD, DoD, handoff).
 - Free-form request: act as `prompts/MASTER_ORCHESTRATOR.md` — pick the next eligible backlog task, do not skip critical phases.
-- Load only skills from `agents.md` §11 for the active phase.
+- Load only repo skills from `agents.md` §11 for the active phase; for UI, also run the UI Skills MCP selection protocol.
 
 ## Definition of done
 
 - Tests run with real terminal evidence (`pytest` / project runners).
 - Docs/ADR updated when architecture or contracts change.
 - Stitch UI: max 3 MCP cycles; never treat Stitch export as final code.
+- UI tasks list selected UI Skills MCP skills in the handoff.
 - End every task with the 9-field handoff from `agents.md` §7:
 
 ```text

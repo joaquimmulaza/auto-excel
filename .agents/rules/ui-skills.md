@@ -1,45 +1,52 @@
 ---
 trigger: always_on
-description: Mandatory UI Skills verification gates before sending prompts to Stitch and before writing frontend code.
+description: Mandatory UI Skills MCP selection + gates before Stitch prompts and frontend code.
 ---
 
 # UI Skills Workflow Rules (Mandatory Quality Gates)
 
-Este projeto integra o servidor MCP **UI Skills** (`https://www.ui-skills.com/mcp`) como autoridade técnica para qualidade de interface, engenharia de design e acessibilidade.
+MCP **UI Skills** (`https://www.ui-skills.com/mcp`) is the authority for interface quality, design engineering, and accessibility.
 
-Nenhum prompt pode ser enviado ao Stitch e nenhum código de frontend pode ser implementado sem passar previamente pelas seguintes portas de qualidade obrigatórias:
-
----
-
-## Portão 1: Validação Pré-Stitch (Antes de enviar prompt ao Stitch)
-
-Antes de redigir ou disparar qualquer prompt para o Stitch (geração de design system, ecrãs, dashboards ou componentes):
-
-1. **Consultar o MCP `ui-skills`**:
-   - Usar `list_skills` ou `get_skill` para carregar as diretrizes aplicáveis à tela (ex.: `frontend-design`, `baseline-ui`, `interface-design`, `accessibility`).
-   - Consultar os playbooks relevantes para o tipo de interface:
-     - Hierarquia visual e contenção de ruído.
-     - Escala e contraste de cores (`#FF3C1D` brand, `#6B6363` secondary, `#FFFFFF` surface, `#000000` text).
-     - Tipografia, alinhamento e densidade informacional para aplicações enterprise / data-heavy.
-2. **Formatar e Otimizar com `enhance-prompt`**:
-   - Executar o pipeline da skill [enhance-prompt](.agents/skills/enhance-prompt/SKILL.md) para transformar as diretrizes em um prompt estruturado para o Stitch:
-     - Definir plataforma (Web Desktop-first) e vibe empresarial.
-     - Injetar o bloco `DESIGN SYSTEM (REQUIRED)` com os tokens obrigatórios (`#FF3C1D`, `#6B6363`, `#FFFFFF`, `#000000`).
-     - Estruturar a página numerada (`Page Structure`) com keywords específicos de UI/UX (evitar termos genéricos).
-3. **Validação Final do Prompt Stitch**:
-   - O prompt final enviado ao Stitch deve conter diretrizes explícitas unificadas do `ui-skills` e formatadas pelo `enhance-prompt` (proporção de contrastes WCAG AA, espaçamento sistemático, ausência de slop de IA ou elementos meramente decorativos).
+No Stitch prompt and no frontend code without the selection protocol below.
 
 ---
 
-## Portão 2: Validação Pré-Implementação (Antes de codificar o frontend)
+## Protocolo de seleção (obrigatório)
 
-Antes de criar ou modificar qualquer componente React / Next.js / Tailwind CSS:
+Para cada tarefa de UI (Stitch ou frontend):
 
-1. **Auditoria de Design Engineering via `ui-skills`**:
-   - Validar que a implementação atende aos padrões do `ui-skills`:
-     - **Acessibilidade**: Elementos interativos com touch target $\ge 44\times 44\text{px}$, foco visível com `:focus-visible`, labels semânticos em formulários, status com texto + cor (nunca cor isolada).
-     - **Tabelas e Dados**: Uso obrigatório de `tabular-nums` para alinhamento de preços e quantidades, truncamento suave com fade ou line-clamp.
-     - **Tipografia e Espaçamento**: `text-balance` em títulos, `text-pretty` em parágrafos, agrupamento por espaçamento antes de usar linhas divisórias.
-     - **Feedback Visual**: Skeletons estruturais em carregamento inicial (sem spinners em ecrãs completos), transições CSS curtas e interrompíveis.
-2. **Execução Cirúrgica**:
-   - O código deve reproduzir a intenção validada no Stitch e refinada pelo `ui-skills`, sem importar slop ou CSS ad-hoc.
+```text
+list_skills(query…)  →  escolher 2–4 skills  →  get_skill(name…)  →  aplicar + documentar
+```
+
+1. **Navegar o registry** com `list_skills` e queries alinhadas à tarefa (ex.: `baseline`, `accessibility`, `typography`, `table`, `form`, `dashboard`).
+2. **Escolher 2–4 skills** adequadas — não carregar o catálogo inteiro. Critérios:
+   - anti-slop / polish → `ibelick/baseline-ui`
+   - acessibilidade → `jakubkrehel/better-accessibility`, `addyosmani/accessibility`, `ibelick/fixing-accessibility`
+   - tipografia / dados → `jakubkrehel/better-typography` (e skills com `tabular-nums`)
+   - review / guidelines → `vercel-labs/web-design-guidelines`, `superfuture/design-review`
+3. **Carregar** cada skill escolhida com `get_skill`.
+4. **Documentar** no handoff: `UI_SKILLS_SELECTED: <pathSlugs + motivo>`.
+5. Se o MCP falhar: **parar** trabalho UI e reportar o erro (não inventar guidelines).
+
+---
+
+## Portão 1: Pré-Stitch
+
+1. Executar o protocolo de seleção.
+2. Processar com [enhance-prompt](.agents/skills/enhance-prompt/SKILL.md):
+   - Web Desktop-first; vibe enterprise Cotarco.
+   - `DESIGN SYSTEM (REQUIRED)` com `#FF3C1D`, `#6B6363`, `#FFFFFF`, `#000000`.
+   - `Page Structure` numerada + vocabulário UI/UX preciso.
+3. Injetar no prompt Stitch as constraints das skills carregadas (contraste WCAG AA, densidade, hierarquia, estados).
+
+---
+
+## Portão 2: Pré-implementação frontend
+
+1. Executar o protocolo de seleção (pode reutilizar skills do Portão 1 se ainda válidas).
+2. Auditar contra as skills carregadas:
+   - touch targets ≥ 44×44px, `:focus-visible`, labels, status texto+cor
+   - `tabular-nums` em preços/quantidades
+   - `text-balance` / `text-pretty`, skeletons estruturais
+3. Implementar a intenção Stitch aprovada sem slop; não misturar sistemas de primitives sem necessidade.

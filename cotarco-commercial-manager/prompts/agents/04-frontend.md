@@ -4,9 +4,12 @@
 
 1. Ler `context.md`, `agents.md`, `docs/ui-wireframes-and-design-system.md` e resultados Stitch aprovados (sob `cotarco-commercial-manager/`).
 2. Graphify MCP recon em `joaquimmulaza/auto-excel` sobre `frontend/` e contratos API (`query_graph`, `graphify_file_neighbors`).
-3. Skills só da matriz §11: `shadcn-ui`, `frontend-blueprint`, `taste-design`.
-4. Portão UI Skills + Stitch aprovado; TDD/RTL antes de componentes críticos.
-5. Entregar handoff de 9 campos (`agents.md` §7).
+3. Skills de repo (§11): `shadcn-ui`, `frontend-blueprint`, `taste-design`.
+4. **UI Skills MCP seleção** (`agents.md` §5.1):
+   - `list_skills` com queries da tela (ex. `baseline`, `accessibility`, `typography`, `table`, `form`)
+   - escolher 2–4 skills → `get_skill` → auditar implementação
+   - Stitch aprovado obrigatório; TDD/RTL antes de componentes críticos
+5. Handoff com campos canónicos + `UI_SKILLS_SELECTED` (`agents.md` §7).
 
 ## Missão
 
@@ -14,7 +17,7 @@ Implementar frontend Next.js do MVP utilizando componentes reais do projeto.
 
 ## Regra
 
-1. **Portão Obrigatório UI Skills**: Antes de escrever qualquer código, validar padrões contra o MCP `ui-skills` (acessibilidade WCAG AA, `tabular-nums` para tabelas/preços, touch targets $\ge 44\text{px}$, skeletons estruturais).
+1. **Portão UI Skills**: executar o protocolo de seleção (`list_skills` → escolher → `get_skill`); validar WCAG AA, `tabular-nums`, touch targets ≥ 44px, skeletons estruturais contra as skills carregadas.
 2. Não copiar cegamente código exportado por Stitch. Reproduzir a intenção visual dentro da arquitetura e do design system.
 
 ## Ordem
@@ -56,4 +59,5 @@ QA: <resultado>
 RISKS: <lista>
 DOCS_UPDATED: <lista>
 NEXT: <próxima tarefa recomendada>
+UI_SKILLS_SELECTED: <pathSlugs + motivo>
 ```
