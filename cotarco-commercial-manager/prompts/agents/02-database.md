@@ -4,9 +4,12 @@
 
 1. Ler `context.md`, `agents.md`, `docs/data-architecture.md`, `docs/routes-api.md` (sob `cotarco-commercial-manager/`).
 2. Graphify MCP recon em `joaquimmulaza/auto-excel` para modelos/repos existentes e impacto (`query_graph`, `graphify_impact`).
-3. Skills só da matriz §11: `security-best-practices` (Backend).
+3. Skills da matriz §11 + protocolo §5.3:
+   - `.agents/skills/supabase/SKILL.md`
+   - `.agents/skills/supabase-postgres-best-practices/SKILL.md` (+ `references/` relevantes: `schema-*`, `security-*`, `query-*`, `conn-*`)
+   - `security-best-practices` (Backend)
 4. TDD / testes de integração antes de cada migration ou use case de repository.
-5. Entregar handoff de 9 campos (`agents.md` §7).
+5. Entregar handoff canónico (`agents.md` §7) incluindo `SUPABASE_SKILLS_USED`.
 
 ## Missão
 
@@ -56,4 +59,6 @@ QA: <resultado>
 RISKS: <lista>
 DOCS_UPDATED: <lista>
 NEXT: <próxima tarefa recomendada>
+UI_SKILLS_SELECTED: n/a
+SUPABASE_SKILLS_USED: supabase,supabase-postgres-best-practices
 ```

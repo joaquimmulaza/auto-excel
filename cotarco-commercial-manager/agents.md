@@ -104,6 +104,34 @@ list_skills(query…) → escolher 2–4 skills → get_skill → aplicar → do
 5. Incluir no handoff: `UI_SKILLS_SELECTED: <pathSlugs + motivo breve>`.
 6. Se o MCP `ui-skills` estiver indisponível: **bloquear** trabalho de UI e reportar o erro.
 
+### 5.3 Supabase Skills (obrigatório para DB / Auth / Storage / API com Supabase)
+
+Skills oficiais em `.agents/skills/` (fonte: [supabase/agent-skills](https://github.com/supabase/agent-skills), docs: https://supabase.com/docs/guides/getting-started/ai-skills):
+
+| Skill | Quando carregar |
+|---|---|
+| `supabase` | Qualquer tarefa Supabase (Database, Auth, Storage, RLS, migrations, CLI/MCP, clients SSR, troubleshooting) |
+| `supabase-postgres-best-practices` | **Antes** de escrever/alterar SQL, schema, indexes, RLS, pooling, queries ou diagnóstico de performance |
+
+Protocolo:
+
+```text
+Ler SKILL.md de supabase + supabase-postgres-best-practices
+  → carregar references/ relevantes (query-*, security-*, schema-*, conn-*)
+  → aplicar checklist de segurança Supabase (RLS, GRANT, service_role, views)
+  → TDD / verificar com query de teste
+  → handoff SUPABASE_SKILLS_USED
+```
+
+Regras:
+
+1. Fases `02-database` e `03-api` (e qualquer migration/RLS/Auth/Storage) **devem** carregar ambas as skills antes de implementar.
+2. Preferir Supabase MCP + CLI quando disponíveis; skills guiam o *como*, não substituem verificação.
+3. Nunca expor `service_role` no frontend; RLS em todo schema exposto; não usar `user_metadata` para autorização.
+4. Handoff: `SUPABASE_SKILLS_USED: supabase,supabase-postgres-best-practices` (+ references lidas se aplicável).
+
+Instalação / refresh: `npx skills add supabase/agent-skills` (ou re-copiar de `supabase/agent-skills` se a CLI falhar). Ver `SOURCE.md` em cada skill.
+
 ## 6. QA de Stitch
 
 Critérios mínimos:
@@ -135,6 +163,7 @@ RISKS: <lista>
 DOCS_UPDATED: <lista>
 NEXT: <próxima tarefa recomendada>
 UI_SKILLS_SELECTED: <pathSlugs + motivo | n/a se tarefa não-UI>
+SUPABASE_SKILLS_USED: <supabase,supabase-postgres-best-practices | n/a>
 ```
 
 ## 8. Handoffs
@@ -200,8 +229,8 @@ Para evitar poluição de contexto e cruzamento indevido de regras entre camadas
 |---|---|---|
 | `00-bootstrap-audit` | `tlc-spec-driven`, `web-quality-audit` | Auditoria inicial de repositório, baseline e quality gates |
 | `01-domain-tdd` | `coding-guidelines`, `best-practices` | Extração do motor de domínio, regras determinísticas de negócio e TDD puro |
-| `02-database` | `security-best-practices` (Backend) | Schema Supabase/PostgreSQL, migrations, RLS e modelos relacionais |
-| `03-api` | `security-best-practices` (Next.js/FastAPI), `tlc-spec-driven` | Endpoints FastAPI, schemas Pydantic, RBAC, idempotência e rotas |
+| `02-database` | `supabase`, `supabase-postgres-best-practices`, `security-best-practices` (Backend) | Schema Supabase/PostgreSQL, migrations, RLS e modelos relacionais (§5.3) |
+| `03-api` | `supabase`, `supabase-postgres-best-practices`, `security-best-practices` (Next.js/FastAPI), `tlc-spec-driven` | Endpoints FastAPI, schemas Pydantic, RBAC, Auth/Storage Supabase, idempotência (§5.3) |
 | `04-frontend` | `shadcn-ui`, `frontend-blueprint`, `taste-design` + **UI Skills MCP** (§5.1) | Interface Next.js; selecionar skills MCP por tarefa antes de codificar |
 | `stitch/*` | `enhance-prompt`, `stitch-design` + **UI Skills MCP** (§5.1) | Geração visual; `list_skills` → escolher → `get_skill` antes do Stitch |
 | `05-gemini` | `technical-design-doc-creator`, `security-best-practices` | Serviços de IA assistiva (Gemini), structured outputs e sanitização |

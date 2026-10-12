@@ -1,0 +1,39 @@
+---
+description: Supabase agent skills — load before DB/Auth/Storage/API work
+alwaysApply: true
+---
+
+# Supabase Skills (Cotarco)
+
+Official docs: https://supabase.com/docs/guides/getting-started/ai-skills  
+Upstream: https://github.com/supabase/agent-skills
+
+Repo skills (`.agents/skills/`): `supabase`, `supabase-postgres-best-practices`.
+
+## Mandatory before DB / Auth / Storage / Supabase-backed API
+
+Follow `cotarco-commercial-manager/agents.md` §5.3:
+
+1. Read `.agents/skills/supabase/SKILL.md`
+2. Read `.agents/skills/supabase-postgres-best-practices/SKILL.md`
+3. Load relevant `references/` (priority: `query-*`, `security-*`, `schema-*`, `conn-*`)
+4. Apply Supabase security checklist (RLS on exposed schemas, no `service_role` in clients, no `user_metadata` for authz, views/`SECURITY DEFINER` caution)
+5. Verify with a real test query after changes
+6. Handoff: `SUPABASE_SKILLS_USED`
+
+Phases `02-database` and `03-api` always load both skills (matrix §11).
+
+## Hard rules
+
+- Do not invent Supabase APIs from training data — verify changelog/docs when unsure
+- Enable RLS on every table in exposed schemas; pair `GRANT` with policies
+- Never commit secrets or put `service_role` in `NEXT_PUBLIC_*`
+- Prefer Supabase MCP tools when available for project inspection/migrations
+
+## Refresh
+
+```bash
+npx skills add supabase/agent-skills
+```
+
+If the CLI fails, re-copy from a clone of `supabase/agent-skills` into `.agents/skills/` (see each skill's `SOURCE.md`).
