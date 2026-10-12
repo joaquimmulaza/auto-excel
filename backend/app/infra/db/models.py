@@ -263,6 +263,7 @@ class ProfileRuleOrm(Base):
         nullable=False, server_default=func.now()
     )
     created_by_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        "created_by",
         _UuidColumn(),
         ForeignKey("users.id", ondelete="SET NULL"),
         nullable=True,
@@ -291,7 +292,8 @@ class ProcessingJobOrm(Base):
     __tablename__ = "processing_jobs"
     __table_args__ = (
         Index("idx_jobs_profile_status", "profile_id", "status"),
-        Index("idx_jobs_created_by", "created_by_id", "created_at"),
+        # DB column is created_by (ORM attr created_by_id)
+        Index("idx_jobs_created_by", "created_by", "created_at"),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(
@@ -308,11 +310,13 @@ class ProcessingJobOrm(Base):
         nullable=False,
     )
     created_by_id: Mapped[uuid.UUID] = mapped_column(
+        "created_by",
         _UuidColumn(),
         ForeignKey("users.id", ondelete="RESTRICT"),
         nullable=False,
     )
     approved_by_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        "approved_by",
         _UuidColumn(),
         ForeignKey("users.id", ondelete="SET NULL"),
         nullable=True,
@@ -412,6 +416,7 @@ class JobFileOrm(Base):
     mime_type: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     version: Mapped[int] = mapped_column(Integer, nullable=False, server_default="1")
     uploaded_by_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        "uploaded_by",
         _UuidColumn(),
         ForeignKey("users.id", ondelete="SET NULL"),
         nullable=True,
@@ -625,6 +630,7 @@ class PriceHistoryOrm(Base):
         nullable=False, server_default=func.now()
     )
     recorded_by_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        "recorded_by",
         _UuidColumn(),
         ForeignKey("users.id", ondelete="SET NULL"),
         nullable=True,
