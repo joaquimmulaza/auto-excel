@@ -22,7 +22,7 @@
 | Lint Python | Ruff | qualidade |
 | Typing | mypy/pyright | contratos |
 | CI | GitHub Actions | quality gate |
-| Frontend hosting | Vercel | deploy |
+| Frontend hosting | Vercel | deploy — projecto **`auto-excel`**, prod https://auto-excel-phi.vercel.app/ (histórico: projecto chamado `frontend`) |
 | Backend hosting | Cloud Run | deploy |
 | AI | Gemini + Google GenAI SDK | assistência |
 | UI generation | Google Stitch via MCP | prototipação/design |
@@ -200,6 +200,8 @@ Uma tarefa só pode entrar em desenvolvimento quando possui:
 Feature concluída = código + testes + QA + docs + evidência + sem regressões.
 
 ## 21. Notas de plataforma atuais
+
+**Vercel (frontend Cotarco):** projecto `auto-excel` no team `joaquim-mulazas-projects`; dashboard https://vercel.com/joaquim-mulazas-projects/auto-excel ; produção https://auto-excel-phi.vercel.app/ . O MCP Vercel é OAuth project-scoped — autorizar `auto-excel` (não só `boleia`) para agentes listarem/envirem o projecto; detalhes em `.notebook/phase-5-deployment.md` §8.
 
 O plano Free do Supabase disponibiliza atualmente PostgreSQL, 500 MB de base por projeto, 1 GB de file storage, 50.000 MAU e 5 GB de egress; também informa que projetos Free podem ser pausados após uma semana de inatividade e que não há backups automáticos no Free. Essas quotas devem ser tratadas como snapshot de setembro de 2026, não como garantia permanente.
 
