@@ -1,5 +1,5 @@
 ---
-description: Enforce Cotarco workflow + Graphify MCP + UI Skills MCP selection
+description: Enforce Cotarco workflow + Graphify MCP + UI Skills + Supabase Skills
 alwaysApply: true
 ---
 
@@ -17,6 +17,12 @@ This repo is Cotarco Commercial Manager. Product process lives under `cotarco-co
    - Fall back to grep/Read only for literals, comments, or files already located
 4. If Graphify MCP tools are missing, report the connection failure; do not invent architecture from memory.
 
+## Database / Auth / Storage / Supabase API
+
+1. **Supabase Skills** — load `supabase` + `supabase-postgres-best-practices` (`.cursor/rules/supabase-skills.mdc`, `agents.md` §5.3).
+2. Apply security checklist (RLS, GRANT, no `service_role` in clients) before implementing.
+3. Handoff: `SUPABASE_SKILLS_USED`.
+
 ## UI / Stitch work
 
 1. **UI Skills MCP** — `list_skills` → 2–4 → `get_skill` (`.cursor/rules/ui-skills.mdc`, `agents.md` §5.1).
@@ -27,7 +33,7 @@ This repo is Cotarco Commercial Manager. Product process lives under `cotarco-co
 
 - User pastes a phase prompt (`prompts/agents/00`–`06` or `prompts/stitch/*`): execute that prompt strictly (mission, TDD, DoD, handoff).
 - Free-form request: act as `prompts/MASTER_ORCHESTRATOR.md` — pick the next eligible backlog task, do not skip critical phases.
-- Load only repo skills from `agents.md` §11 for the active phase; for UI, also run the UI Skills MCP selection protocol.
+- Load only repo skills from `agents.md` §11 for the active phase; for UI, also run the UI Skills MCP selection protocol; for DB/API, also load Supabase skills.
 
 ## Definition of done
 
@@ -35,6 +41,7 @@ This repo is Cotarco Commercial Manager. Product process lives under `cotarco-co
 - Docs/ADR updated when architecture or contracts change.
 - Stitch UI: max 3 MCP cycles; never treat Stitch export as final code.
 - UI tasks list `UI_SKILLS_SELECTED` and `STITCH_SKILLS_USED` in the handoff.
+- DB/API/Supabase tasks list `SUPABASE_SKILLS_USED` in the handoff.
 - End every task with the handoff from `agents.md` §7:
 
 ```text

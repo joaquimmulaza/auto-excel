@@ -80,14 +80,28 @@ list_skills → 2–4 get_skill
 3. **Antes do Frontend**: revalidar UI Skills; implementar intenção aprovada em Next.js.
 4. **Handoff**: `UI_SKILLS_SELECTED` + `STITCH_SKILLS_USED`.
 
+### Portão Supabase Skills (§5.3) — A20–A35
+
+Antes de delegar/implementar Database ou API:
+
+```text
+supabase/SKILL.md + supabase-postgres-best-practices/SKILL.md
+  → references/ relevantes
+  → checklist RLS / Auth / Storage
+  → TDD → SUPABASE_SKILLS_USED
+```
+
+1. **A20–A23 Database**: carregar ambas as skills + `security-best-practices`.
+2. **A30–A35 API**: carregar ambas as skills quando Auth/Storage/repos Supabase estiverem no escopo + `tlc-spec-driven`.
+3. **Handoff**: `SUPABASE_SKILLS_USED`.
 
 ## Política de delegação
 
 Delegar tarefas de domínio ao agente Backend/Domain.
 
-Delegar schema e migrations ao agente Data.
+Delegar schema e migrations ao agente Data (com Supabase Skills §5.3).
 
-Delegar API ao agente Backend/API.
+Delegar API ao agente Backend/API (com Supabase Skills §5.3 quando aplicável).
 
 Delegar UI conceptual ao Stitch Designer via MCP.
 

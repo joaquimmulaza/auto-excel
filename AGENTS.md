@@ -26,18 +26,22 @@ Paths in prompts that say `context.md` / `agents.md` / `docs/...` resolve under 
    - `graphify_file_neighbors` for file deps
 3. **Pick the phase prompt** — if the user pasted `00`–`06` or a Stitch prompt, execute that prompt to the letter; otherwise follow `MASTER_ORCHESTRATOR.md` + `docs/mvp-backlog.md` and do not skip critical phases.
 4. **Load only scoped repo skills** from `agents.md` §11 for that phase.
-5. **UI tasks only — UI Skills MCP selection** (before Stitch or frontend code):
+5. **DB / Auth / Storage / Supabase API — Supabase Skills** (`agents.md` §5.3, `.cursor/rules/supabase-skills.mdc`):
+   - read `.agents/skills/supabase/SKILL.md`
+   - read `.agents/skills/supabase-postgres-best-practices/SKILL.md` (+ relevant `references/`)
+   - record `SUPABASE_SKILLS_USED`
+6. **UI tasks only — UI Skills MCP selection** (before Stitch or frontend code):
    - `list_skills` with task-relevant queries
    - choose **2–4** matching skills
    - `get_skill` for each selected skill
    - record `UI_SKILLS_SELECTED`
-6. **UI tasks only — Stitch Skills pipeline** (`agents.md` §5.2, `.cursor/rules/stitch-skills.mdc`):
+7. **UI tasks only — Stitch Skills pipeline** (`agents.md` §5.2, `.cursor/rules/stitch-skills.mdc`):
    - `.stitch/DESIGN.md` via `taste-design` / `design-md`
    - `enhance-prompt` → Stitch MCP (`stitch-design`) → `.stitch/designs/`
    - multi-screen: `stitch-loop` baton; max 3 refine cycles/screen
    - record `STITCH_SKILLS_USED`
-7. **TDD loop** → minimal implementation → QA.
-8. **Handoff** per `agents.md` §7 (includes UI/Stitch skill fields when applicable).
+8. **TDD loop** → minimal implementation → QA.
+9. **Handoff** per `agents.md` §7 (includes UI/Stitch/Supabase skill fields when applicable).
 
 ## Hard limits
 
@@ -64,3 +68,11 @@ Canonical indexed repo for this workspace: **`joaquimmulaza/auto-excel`**.
 - Repo skills: `stitch-design`, `enhance-prompt`, `design-md`, `taste-design`, `stitch-loop`
 - Pipeline: `agents.md` §5.2 + `.cursor/rules/stitch-skills.mdc`
 - Docs: https://stitch.withgoogle.com/docs/skills/get-started/
+
+## Supabase Skills
+
+- Repo skills: `supabase`, `supabase-postgres-best-practices` under `.agents/skills/`
+- Required for phases `02-database` / `03-api` and any migration, RLS, Auth, or Storage work
+- Protocol: `agents.md` §5.3 + `.cursor/rules/supabase-skills.mdc`
+- Docs: https://supabase.com/docs/guides/getting-started/ai-skills
+- Install/refresh: `npx skills add supabase/agent-skills` (see each skill `SOURCE.md` if CLI fails)
