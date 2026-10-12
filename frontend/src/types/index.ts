@@ -153,6 +153,26 @@ export interface AIAnomalyExplanation {
   is_blocker: boolean;
 }
 
+export interface AIExecutiveSummary {
+  headline: string;
+  highlights: string[];
+  attention_items: string[];
+  overall_assessment: string;
+}
+
+export interface AIColumnSuggestion {
+  detected_column: string;
+  suggested_mapping: string | null;
+  confidence: "HIGH" | "MEDIUM" | "LOW" | string;
+  rationale: string;
+}
+
+export interface AIColumnMapping {
+  suggestions: AIColumnSuggestion[];
+  unmapped_expected: string[];
+  disclaimer: string;
+}
+
 export interface AIResponse<T> {
   is_ai_generated: boolean;
   fallback_used: boolean;

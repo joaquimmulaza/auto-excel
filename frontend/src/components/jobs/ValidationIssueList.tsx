@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { ValidationIssueResponse, AIAnomalyExplanation } from "@/types";
 import { explainIssueWithAi } from "@/lib/api";
+import { AiAssistBadge } from "@/components/jobs/AiAssistBadge";
 import { AlertCircle, AlertTriangle, Info, Sparkles, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -149,14 +150,12 @@ export function ValidationIssueList({ issues }: ValidationIssueListProps) {
             </div>
 
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-ink block">
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-bold text-ink block text-balance">
                   Parecer de IA (Gemini Commercial Assistant):
                 </span>
-                {!isAiExplaining && aiExplanation && !aiIsRealResponse && (
-                  <span className="text-[10px] text-slateSecondary bg-canvas border border-border rounded px-1.5 py-0.5">
-                    Análise local · IA indisponível
-                  </span>
+                {!isAiExplaining && aiExplanation && (
+                  <AiAssistBadge fallbackUsed={!aiIsRealResponse} />
                 )}
               </div>
               {isAiExplaining ? (

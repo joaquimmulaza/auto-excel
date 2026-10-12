@@ -13,6 +13,8 @@ import {
   ApprovalResponse,
   AIExplainIssueRequest,
   AIAnomalyExplanation,
+  AIExecutiveSummary,
+  AIColumnMapping,
   AIResponse,
   CurrentUser,
 } from "@/types";
@@ -310,6 +312,72 @@ export async function explainIssueWithAi(
         suggested_action:
           "Reveja a referência no Excel de origem, corrija o valor e volte a validar o lote.",
         is_blocker: isBlocker,
+      },
+    };
+  }
+}
+
+export async function summarizeJobWithAi(
+  jobId: string,
+  language = "pt"
+): Promise<AIResponse<AIExecutiveSummary>> {
+  try {
+    return await apiFetch<AIResponse<AIExecutiveSummary>>(
+      `/jobs/${jobId}/ai/summary`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ language }),
+      }
+    );
+  } catch {
+    return {
+      is_ai_generated: false,
+      fallback_used: true,
+      data: {
+        headline: "Resumo local (assistência de IA indisponível).",
+        highlights: ["Consulte os totais quantitativos do processamento."],
+        attention_items: [],
+        overall_assessment:
+          "A API de IA não respondeu. Os números do motor determinístico continuam válidos.",
+      },
+    };
+  }
+}
+
+export async function suggestColumnsWithAi(
+  jobId: string,
+  detectedColumns: string[],
+  expectedColumns: string[],
+  language = "pt"
+): Promise<AIResponse<AIColumnMapping>> {
+  try {
+    return await apiFetch<AIResponse<AIColumnMapping>>(
+      `/jobs/${jobId}/ai/suggest-columns`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          detected_columns: detectedColumns,
+          expected_columns: expectedColumns,
+          language,
+        }),
+      }
+    );
+  } catch {
+    return {
+      is_ai_generated: false,
+      fallback_used: true,
+      data: {
+        suggestions: detectedColumns.map((col) => ({
+          detected_column: col,
+          suggested_mapping: null,
+          confidence: "LOW",
+          rationale: "Mapeamento automático indisponível. Reveja manualmente.",
+        })),
+        unmapped_expected: expectedColumns,
+        disclaimer:
+          "Sugestões geradas localmente (IA indisponível). Reveja e confirme antes de aplicar o mapeamento.",
       },
     };
   }

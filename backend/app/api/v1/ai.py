@@ -34,7 +34,6 @@ from backend.app.schemas.ai import (
     AIResponse,
     AnomalyExplanation,
     ColumnMapping,
-    ColumnSuggestion,
     ExecutiveSummary,
     ExplainIssueRequest,
     SuggestColumnsRequest,
@@ -156,6 +155,53 @@ def _append_audit(
 
 
 # ---------------------------------------------------------------------------
+# Helpers (Prompt B)
+# ---------------------------------------------------------------------------
+
+
+def _enrich_explain_context(job, payload: ExplainIssueRequest) -> dict[str, Any]:
+    """Enriquece contexto no servidor — não confiar só no frontend."""
+    enriched: dict[str, Any] = dict(payload.context or {})
+    enriched.setdefault("job_id", str(job.id))
+    enriched.setdefault("job_status", getattr(job, "status", None))
+    profile = getattr(job, "profile", None)
+    if profile is not None:
+        enriched.setdefault("profile_name", getattr(profile, "name", None))
+        enriched.setdefault("profile_code", getattr(profile, "code", None))
+    summary = getattr(job, "summary", None) or {}
+    if isinstance(summary, dict):
+        for key in ("total", "blocked", "updated", "new"):
+            if key in summary:
+                enriched.setdefault(f"job_{key}", summary.get(key))
+    return enriched
+
+
+def _safe_ai_response(
+    *,
+    model_cls: type,
+    data_dict: dict[str, Any],
+    fallback_used: bool,
+    fallback_factory,
+) -> AIResponse:
+    """Nunca devolver 500 por JSON/IA inválido — usar fallback determinístico."""
+    try:
+        validated = model_cls.model_validate(data_dict)
+        return AIResponse(
+            is_ai_generated=True,
+            fallback_used=fallback_used,
+            data=validated,
+        )
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("Falha a validar resposta AI (%s): %s", model_cls.__name__, exc)
+        validated = model_cls.model_validate(fallback_factory())
+        return AIResponse(
+            is_ai_generated=True,
+            fallback_used=True,
+            data=validated,
+        )
+
+
+# ---------------------------------------------------------------------------
 # POST /jobs/{job_id}/ai/explain-issue
 # ---------------------------------------------------------------------------
 
@@ -179,11 +225,12 @@ def explain_issue(
     _check_rate_limit(current_user.id)
     job, repo = _get_authorized_job(job_id, current_user, db)
 
+    enriched_context = _enrich_explain_context(job, payload)
     data_dict, fallback_used = ai_service.explain_issue(
         issue_code=payload.issue_code,
         issue_message=payload.issue_message,
         severity=payload.severity.value,
-        context=payload.context,
+        context=enriched_context,
         language=payload.language,
         job_id=str(job_id),
     )
@@ -200,11 +247,15 @@ def explain_issue(
         },
     )
 
-    explanation = AnomalyExplanation.model_validate(data_dict)
-    return AIResponse(
-        is_ai_generated=True,
+    return _safe_ai_response(
+        model_cls=AnomalyExplanation,
+        data_dict=data_dict,
         fallback_used=fallback_used,
-        data=explanation,
+        fallback_factory=lambda: ai_service._fallback_explanation(
+            payload.issue_code,
+            payload.issue_message,
+            payload.severity.value,
+        ),
     )
 
 
@@ -261,11 +312,11 @@ def generate_summary(
         },
     )
 
-    summary = ExecutiveSummary.model_validate(data_dict)
-    return AIResponse(
-        is_ai_generated=True,
+    return _safe_ai_response(
+        model_cls=ExecutiveSummary,
+        data_dict=data_dict,
         fallback_used=fallback_used,
-        data=summary,
+        fallback_factory=lambda: ai_service._fallback_summary(job_summary),
     )
 
 
@@ -326,28 +377,12 @@ def suggest_columns(
         },
     )
 
-    # Build ColumnMapping from data_dict
-    suggestions_data = data_dict.get("suggestions", [])
-    suggestions = [
-        ColumnSuggestion(
-            detected_column=s.get("detected_column", ""),
-            suggested_mapping=s.get("suggested_mapping"),
-            confidence=s.get("confidence", "LOW"),
-            rationale=s.get("rationale", ""),
-        )
-        for s in suggestions_data
-    ]
-    mapping = ColumnMapping(
-        suggestions=suggestions,
-        unmapped_expected=data_dict.get("unmapped_expected", []),
-        disclaimer=data_dict.get(
-            "disclaimer",
-            "Sugestoes geradas por IA. Reveja e confirme antes de aplicar o mapeamento.",
-        ),
-    )
-
-    return AIResponse(
-        is_ai_generated=True,
+    return _safe_ai_response(
+        model_cls=ColumnMapping,
+        data_dict=data_dict,
         fallback_used=fallback_used,
-        data=mapping,
+        fallback_factory=lambda: ai_service._fallback_column_mapping(
+            payload.detected_columns,
+            payload.expected_columns,
+        ),
     )

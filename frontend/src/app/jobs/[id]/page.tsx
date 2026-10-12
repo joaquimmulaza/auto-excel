@@ -21,6 +21,8 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { DiffViewer } from "@/components/jobs/DiffViewer";
 import { ValidationIssueList } from "@/components/jobs/ValidationIssueList";
+import { AiJobSummaryCard } from "@/components/jobs/AiJobSummaryCard";
+import { ColumnMappingAssist } from "@/components/jobs/ColumnMappingAssist";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -324,9 +326,13 @@ export default function JobDetailPage() {
         </Card>
       )}
 
+      <AiJobSummaryCard jobId={jobId} />
+
+      <ColumnMappingAssist jobId={jobId} />
+
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-bold text-ink flex items-center gap-1.5">
+          <h2 className="text-sm font-bold text-ink flex items-center gap-1.5 text-balance">
             <AlertOctagon className="h-4 w-4 text-error" />
             Alertas e Bloqueios ({issues.length})
           </h2>
