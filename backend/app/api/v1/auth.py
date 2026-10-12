@@ -71,9 +71,18 @@ def me(current_user: UserDep, db: DbDep):
 
 
 def ensure_demo_users(db) -> None:
-    """Seed default users with passwords if missing (local/dev)."""
+    """Seed default users with passwords if missing (local/dev only).
+
+    Skipped when AUTH_MODE is not local — production/Supabase Auth users are
+    provisioned separately and must not be overwritten by demo seeds.
+    """
     import uuid
     from datetime import datetime, timezone
+
+    from backend.app.core.settings import get_settings
+
+    if not get_settings().is_local_auth:
+        return
 
     seeds = [
         (
@@ -101,11 +110,15 @@ def ensure_demo_users(db) -> None:
     now = datetime.now(timezone.utc)
     for uid, email, name, role, password in seeds:
         existing = db.get(UserOrm, uid)
+        if existing is None:
+            existing = (
+                db.query(UserOrm).filter(UserOrm.email == email).one_or_none()
+            )
         if existing:
             if not existing.password_hash:
                 existing.password_hash = hash_password(password)
             continue
-        db.merge(
+        db.add(
             UserOrm(
                 id=uid,
                 email=email,
