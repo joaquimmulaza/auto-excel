@@ -23,6 +23,28 @@ def _next_job_number(db) -> int:
 
 @router.post("", response_model=JobResponse, status_code=status.HTTP_201_CREATED)
 def create_job(payload: JobCreateRequest, current_user: UserDep, db: DbDep):
+    # #region agent log
+    try:
+        import json as _json, time as _time
+
+        open("/opt/cursor/logs/debug.log", "a").write(
+            _json.dumps(
+                {
+                    "hypothesisId": "E",
+                    "location": "jobs.py:create_job",
+                    "message": "create_job entry",
+                    "data": {
+                        "user_id": str(current_user.id),
+                        "profile_id": str(payload.profile_id),
+                    },
+                    "timestamp": int(_time.time() * 1000),
+                }
+            )
+            + "\n"
+        )
+    except Exception:
+        pass
+    # #endregion
     profile_repo = ProfileRepository(db)
     profile = profile_repo.get_by_id(payload.profile_id)
     if not profile or not profile.active:

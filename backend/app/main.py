@@ -48,8 +48,26 @@ async def lifespan(application: FastAPI):
     factory = _get_session_factory()
     db = factory()
     try:
-        bootstrap_database(db)
-        logger.info("Database initialised — tables and seeds ready.")
+        try:
+            bootstrap_database(db)
+            logger.info("Database initialised — tables and seeds ready.")
+        except Exception as exc:
+            # #region agent log
+            open("/opt/cursor/logs/debug.log", "a").write(
+                json.dumps(
+                    {
+                        "hypothesisId": "C",
+                        "location": "main.py:lifespan",
+                        "message": "startup bootstrap failed",
+                        "data": {"exc_type": type(exc).__name__, "exc": str(exc)},
+                        "timestamp": int(__import__("time").time() * 1000),
+                    }
+                )
+                + "\n"
+            )
+            # #endregion
+            logger.exception("Database bootstrap failed: %s", exc)
+            raise
     finally:
         db.close()
     yield
@@ -87,6 +105,51 @@ app.add_middleware(
 # Error handlers
 app.add_exception_handler(HTTPException, http_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
+
+
+@app.middleware("http")
+async def _agent_debug_500_middleware(request, call_next):
+    # #region agent log
+    try:
+        response = await call_next(request)
+    except Exception as exc:
+        open("/opt/cursor/logs/debug.log", "a").write(
+            json.dumps(
+                {
+                    "hypothesisId": "E",
+                    "location": "main.py:_agent_debug_500_middleware",
+                    "message": "unhandled exception",
+                    "data": {
+                        "path": request.url.path,
+                        "method": request.method,
+                        "exc_type": type(exc).__name__,
+                        "exc": str(exc),
+                    },
+                    "timestamp": int(__import__("time").time() * 1000),
+                }
+            )
+            + "\n"
+        )
+        raise
+    if response.status_code >= 500:
+        open("/opt/cursor/logs/debug.log", "a").write(
+            json.dumps(
+                {
+                    "hypothesisId": "E",
+                    "location": "main.py:_agent_debug_500_middleware",
+                    "message": "http 5xx response",
+                    "data": {
+                        "path": request.url.path,
+                        "method": request.method,
+                        "status": response.status_code,
+                    },
+                    "timestamp": int(__import__("time").time() * 1000),
+                }
+            )
+            + "\n"
+        )
+    return response
+    # #endregion
 
 # Routes
 app.include_router(v1_router)

@@ -124,6 +124,66 @@ def ensure_seed_profiles(db: Session) -> None:
 
 
 def bootstrap_database(db: Session) -> None:
-    ensure_demo_users(db)
-    ensure_seed_profiles(db)
-    db.commit()
+    # #region agent log
+    try:
+        import json as _json, os as _os, time as _time
+        from sqlalchemy import text as _text
+
+        cols = []
+        try:
+            cols = [r[1] for r in db.execute(_text("PRAGMA table_info(users)")).fetchall()]
+        except Exception as _ce:
+            cols = [f"pragma_err:{_ce}"]
+        open("/opt/cursor/logs/debug.log", "a").write(
+            _json.dumps(
+                {
+                    "hypothesisId": "A",
+                    "location": "bootstrap.py:bootstrap_database",
+                    "message": "bootstrap start",
+                    "data": {
+                        "database_url": _os.getenv("DATABASE_URL"),
+                        "users_columns": cols,
+                        "has_password_hash": "password_hash" in cols,
+                    },
+                    "timestamp": int(_time.time() * 1000),
+                }
+            )
+            + "\n"
+        )
+    except Exception:
+        pass
+    # #endregion
+    try:
+        ensure_demo_users(db)
+        ensure_seed_profiles(db)
+        db.commit()
+        # #region agent log
+        open("/opt/cursor/logs/debug.log", "a").write(
+            __import__("json").dumps(
+                {
+                    "hypothesisId": "C",
+                    "location": "bootstrap.py:bootstrap_database",
+                    "message": "bootstrap success",
+                    "data": {},
+                    "timestamp": int(__import__("time").time() * 1000),
+                }
+            )
+            + "\n"
+        )
+        # #endregion
+    except Exception as exc:
+        # #region agent log
+        open("/opt/cursor/logs/debug.log", "a").write(
+            __import__("json").dumps(
+                {
+                    "hypothesisId": "A",
+                    "location": "bootstrap.py:bootstrap_database",
+                    "message": "bootstrap failed",
+                    "data": {"exc_type": type(exc).__name__, "exc": str(exc)},
+                    "timestamp": int(__import__("time").time() * 1000),
+                }
+            )
+            + "\n"
+        )
+        # #endregion
+        raise

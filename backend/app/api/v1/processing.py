@@ -56,6 +56,30 @@ def trigger_validate(
     dry_run: bool | None = Query(default=None),
 ):
     """Run domain engine against uploaded files and persist preview results."""
+    # #region agent log
+    try:
+        import json as _json, time as _time
+
+        open("/opt/cursor/logs/debug.log", "a").write(
+            _json.dumps(
+                {
+                    "hypothesisId": "D",
+                    "location": "processing.py:trigger_validate",
+                    "message": "validate entry",
+                    "data": {
+                        "job_id": str(job_id),
+                        "user_id": str(current_user.id),
+                        "role": current_user.role,
+                        "dry_run": dry_run,
+                    },
+                    "timestamp": int(_time.time() * 1000),
+                }
+            )
+            + "\n"
+        )
+    except Exception:
+        pass
+    # #endregion
     repo = JobRepository(db)
     job = _get_job_or_404(job_id, repo)
     _check_access(job, current_user)
@@ -82,6 +106,41 @@ def trigger_validate(
             status_code=status_code,
             detail={"error": {"code": code, "message": code, "request_id": ""}},
         ) from exc
+    except Exception as exc:
+        # #region agent log
+        open("/opt/cursor/logs/debug.log", "a").write(
+            __import__("json").dumps(
+                {
+                    "hypothesisId": "D",
+                    "location": "processing.py:trigger_validate",
+                    "message": "validate unexpected error",
+                    "data": {
+                        "job_id": str(job_id),
+                        "exc_type": type(exc).__name__,
+                        "exc": str(exc),
+                    },
+                    "timestamp": int(__import__("time").time() * 1000),
+                }
+            )
+            + "\n"
+        )
+        # #endregion
+        raise
+    # #region agent log
+    _status = result.get("status") if isinstance(result, dict) else None
+    open("/opt/cursor/logs/debug.log", "a").write(
+        __import__("json").dumps(
+            {
+                "hypothesisId": "D",
+                "location": "processing.py:trigger_validate",
+                "message": "validate success",
+                "data": {"job_id": str(job_id), "status": _status},
+                "timestamp": int(__import__("time").time() * 1000),
+            }
+        )
+        + "\n"
+    )
+    # #endregion
     return result
 
 
