@@ -180,6 +180,81 @@ class TestEngineConnectivity:
             f"Missing tables: {expected - existing}"
         )
 
+    def test_sqlite_sync_adds_password_hash_without_wiping_users(self, tmp_path):
+        """Stale SQLite users (pre-password_hash) are upgraded in place.
+
+        Regresses: OperationalError no such column users.password_hash on
+        bootstrap / Validar Ficheiro when create_all alone left old files untouched.
+        """
+        from sqlalchemy import text
+        from backend.app.services.bootstrap import bootstrap_database
+
+        db_path = tmp_path / "stale-cotarco.db"
+        eng = create_db_engine(url=f"sqlite+pysqlite:///{db_path}")
+        uid = "00000000-0000-0000-0000-000000000001"
+        with eng.begin() as conn:
+            conn.execute(
+                text(
+                    """
+                    CREATE TABLE users (
+                        id VARCHAR(36) NOT NULL PRIMARY KEY,
+                        email TEXT NOT NULL UNIQUE,
+                        display_name TEXT,
+                        role VARCHAR(20) NOT NULL DEFAULT 'COMERCIAL',
+                        is_active BOOLEAN NOT NULL DEFAULT 'true',
+                        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                        updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+                    )
+                    """
+                )
+            )
+            conn.execute(
+                text(
+                    """
+                    INSERT INTO users (id, email, display_name, role, is_active)
+                    VALUES (:id, :email, :name, 'COMERCIAL', 1)
+                    """
+                ),
+                {
+                    "id": uid,
+                    "email": "joaquim.silva@cotarco.ao",
+                    "name": "Joaquim Silva",
+                },
+            )
+
+        cols_before = {
+            r[1]
+            for r in eng.connect()
+            .execute(text("PRAGMA table_info(users)"))
+            .fetchall()
+        }
+        assert "password_hash" not in cols_before
+
+        create_all_tables(eng)
+
+        cols_after = {
+            r[1]
+            for r in eng.connect()
+            .execute(text("PRAGMA table_info(users)"))
+            .fetchall()
+        }
+        assert "password_hash" in cols_after
+
+        SessionFactory = sessionmaker(
+            bind=eng, autocommit=False, autoflush=False, expire_on_commit=False
+        )
+        with SessionFactory() as sess:
+            user = sess.get(UserOrm, uuid.UUID(uid))
+            assert user is not None
+            assert user.email == "joaquim.silva@cotarco.ao"
+            assert user.display_name == "Joaquim Silva"
+            bootstrap_database(sess)
+            user = sess.get(UserOrm, uuid.UUID(uid))
+            assert user is not None
+            assert user.password_hash  # seeded by ensure_demo_users
+
+        eng.dispose()
+
 
 # =============================================================================
 # Tests: UserOrm

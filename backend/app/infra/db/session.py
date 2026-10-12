@@ -175,14 +175,116 @@ def get_test_engine(url: str = "sqlite+pysqlite:///:memory:") -> Engine:
     return create_db_engine(url=url, echo=False)
 
 
+def _sqlite_column_default_sql(column, dialect) -> str:
+    """Compile a DEFAULT clause for SQLite ADD COLUMN, if available."""
+    server_default = column.server_default
+    if server_default is None:
+        return ""
+    arg = server_default.arg
+    # TextClause (e.g. explicit SQL fragments)
+    if hasattr(arg, "text"):
+        return f" DEFAULT {arg.text}"
+    try:
+        from sqlalchemy.sql import elements
+
+        if isinstance(arg, elements.ColumnElement):
+            # func.now() → CURRENT_TIMESTAMP on SQLite
+            compiled = str(
+                arg.compile(dialect=dialect, compile_kwargs={"literal_binds": True})
+            )
+            return f" DEFAULT {compiled}"
+    except Exception:
+        pass
+    if isinstance(arg, bool):
+        return f" DEFAULT {1 if arg else 0}"
+    if isinstance(arg, (int, float)):
+        return f" DEFAULT {arg}"
+    if isinstance(arg, str):
+        upper = arg.upper()
+        if upper in {"TRUE", "FALSE", "CURRENT_TIMESTAMP", "NULL"} or arg.isdigit():
+            return f" DEFAULT {arg}"
+        escaped = arg.replace("'", "''")
+        return f" DEFAULT '{escaped}'"
+    return ""
+
+
+def sync_sqlite_schema(engine: Engine) -> list[str]:
+    """Add missing ORM columns to an existing SQLite database (additive only).
+
+    ``Base.metadata.create_all`` does not ALTER existing tables, so local
+    file-backed DBs created before a column was added (e.g. ``users.password_hash``)
+    would otherwise raise OperationalError on every UserOrm SELECT.
+
+    Production Postgres continues to use ``backend/migrations/`` SQL scripts.
+    Returns a list of ``table.column`` names that were added.
+    """
+    if engine.dialect.name != "sqlite":
+        return []
+
+    from backend.app.infra.db.models import Base
+
+    dialect = engine.dialect
+    added: list[str] = []
+
+    with engine.begin() as conn:
+        for table in Base.metadata.sorted_tables:
+            rows = conn.execute(text(f"PRAGMA table_info('{table.name}')")).fetchall()
+            if not rows:
+                # Table not present yet — create_all handles creation.
+                continue
+            existing = {row[1] for row in rows}
+            for column in table.columns:
+                if column.name in existing:
+                    continue
+                type_sql = column.type.compile(dialect=dialect)
+                default_sql = _sqlite_column_default_sql(column, dialect)
+                # SQLite requires DEFAULT when adding NOT NULL to a non-empty table.
+                # Without a default, keep the column nullable rather than rebuild.
+                null_sql = (
+                    " NOT NULL" if (not column.nullable and default_sql) else ""
+                )
+                ddl = (
+                    f"ALTER TABLE {table.name} ADD COLUMN {column.name} "
+                    f"{type_sql}{null_sql}{default_sql}"
+                )
+                conn.execute(text(ddl))
+                added.append(f"{table.name}.{column.name}")
+
+    # #region agent log
+    try:
+        import json as _json, time as _time
+
+        open("/opt/cursor/logs/debug.log", "a").write(
+            _json.dumps(
+                {
+                    "hypothesisId": "A",
+                    "runId": "post-fix",
+                    "location": "session.py:sync_sqlite_schema",
+                    "message": "sqlite schema sync complete",
+                    "data": {"added": added, "added_count": len(added)},
+                    "timestamp": int(_time.time() * 1000),
+                }
+            )
+            + "\n"
+        )
+    except Exception:
+        pass
+    # #endregion
+    return added
+
+
 def create_all_tables(engine: Engine) -> None:
     """Create all ORM-mapped tables in the given engine.
 
-    Intended for testing only. Production schema is managed by
-    ``backend/migrations/`` SQL scripts executed in Supabase SQL Editor.
+    For SQLite file DBs, also additively syncs missing columns onto existing
+    tables (``sync_sqlite_schema``) so local upgrades do not wipe data.
+
+    Production Postgres schema is managed by ``backend/migrations/`` SQL
+    scripts executed in Supabase SQL Editor.
     """
     from backend.app.infra.db.models import Base
     Base.metadata.create_all(bind=engine)
+    sync_sqlite_schema(engine)
 
 
 def drop_all_tables(engine: Engine) -> None:
