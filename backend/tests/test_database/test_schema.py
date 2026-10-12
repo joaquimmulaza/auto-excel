@@ -180,6 +180,25 @@ class TestEngineConnectivity:
             f"Missing tables: {expected - existing}"
         )
 
+    def test_orm_fk_column_names_match_postgres_ddl(self):
+        """ORM attrs *_id must map to Postgres names without _id suffix.
+
+        Regresses Vercel production 500:
+        UndefinedColumn: column processing_jobs.created_by_id does not exist
+        (HINT: processing_jobs.created_by).
+        """
+        from sqlalchemy import inspect as sa_inspect
+
+        def col_name(model, attr: str) -> str:
+            return sa_inspect(model).columns[attr].name
+
+        assert col_name(ProcessingJobOrm, "created_by_id") == "created_by"
+        assert col_name(ProcessingJobOrm, "approved_by_id") == "approved_by"
+        assert col_name(JobFileOrm, "uploaded_by_id") == "uploaded_by"
+        assert col_name(PriceHistoryOrm, "recorded_by_id") == "recorded_by"
+        assert col_name(ProfileRuleOrm, "created_by_id") == "created_by"
+        assert col_name(AuditLogOrm, "extra_metadata") == "metadata"
+
     def test_sqlite_sync_adds_password_hash_without_wiping_users(self, tmp_path):
         """Stale SQLite users (pre-password_hash) are upgraded in place.
 

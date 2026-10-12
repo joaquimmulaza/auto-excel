@@ -85,6 +85,35 @@ class _UuidColumn(TypeDecorator):
             return value
 
 
+class _PgEnumColumn(TypeDecorator):
+    """Maps to an existing PostgreSQL ENUM; plain String on SQLite (tests).
+
+    ``create_type=False`` — enums are owned by ``001_initial_schema.sql``.
+    """
+
+    impl = SAString
+    cache_ok = True
+
+    def __init__(self, enum_name: str, *values: str, length: int = 30):
+        super().__init__(length)
+        self.enum_name = enum_name
+        self.values = values
+        self._length = length
+
+    def load_dialect_impl(self, dialect):
+        if dialect.name == "postgresql":
+            from sqlalchemy.dialects.postgresql import ENUM as PgENUM
+
+            return dialect.type_descriptor(
+                PgENUM(
+                    *self.values,
+                    name=self.enum_name,
+                    create_type=False,
+                )
+            )
+        return dialect.type_descriptor(SAString(self._length))
+
+
 # ---------------------------------------------------------------------------
 # Base
 # ---------------------------------------------------------------------------
@@ -113,9 +142,11 @@ class UserOrm(Base):
     email: Mapped[str] = mapped_column(Text, unique=True, nullable=False)
     display_name: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     password_hash: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    # COMERCIAL | OPERADOR | ADMIN
+    # COMERCIAL | OPERADOR | ADMIN — Postgres enum user_role (001_initial_schema)
     role: Mapped[str] = mapped_column(
-        String(20), nullable=False, server_default="COMERCIAL"
+        _PgEnumColumn("user_role", "COMERCIAL", "OPERADOR", "ADMIN", length=20),
+        nullable=False,
+        server_default="COMERCIAL",
     )
     is_active: Mapped[bool] = mapped_column(
         Boolean, nullable=False, server_default="true"
@@ -233,6 +264,7 @@ class ProfileRuleOrm(Base):
         nullable=False, server_default=func.now()
     )
     created_by_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        "created_by",
         _UuidColumn(),
         ForeignKey("users.id", ondelete="SET NULL"),
         nullable=True,
@@ -261,7 +293,8 @@ class ProcessingJobOrm(Base):
     __tablename__ = "processing_jobs"
     __table_args__ = (
         Index("idx_jobs_profile_status", "profile_id", "status"),
-        Index("idx_jobs_created_by", "created_by_id", "created_at"),
+        # Must use DB column name (mapped_column name="created_by").
+        Index("idx_jobs_created_by", "created_by", "created_at"),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(
@@ -277,19 +310,36 @@ class ProcessingJobOrm(Base):
         ForeignKey("commercial_profiles.id", ondelete="RESTRICT"),
         nullable=False,
     )
+    # Postgres DDL uses created_by / approved_by (001_initial_schema.sql)
     created_by_id: Mapped[uuid.UUID] = mapped_column(
+        "created_by",
         _UuidColumn(),
         ForeignKey("users.id", ondelete="RESTRICT"),
         nullable=False,
     )
     approved_by_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        "approved_by",
         _UuidColumn(),
         ForeignKey("users.id", ondelete="SET NULL"),
         nullable=True,
     )
-    # job_status enum values (enforced by DB CHECK or enum type in production)
+    # Postgres enum job_status (001_initial_schema.sql)
     status: Mapped[str] = mapped_column(
-        String(30), nullable=False, server_default="UPLOADED"
+        _PgEnumColumn(
+            "job_status",
+            "UPLOADED",
+            "VALIDATING",
+            "READY_FOR_REVIEW",
+            "NEEDS_CORRECTION",
+            "APPROVED",
+            "PROCESSING",
+            "COMPLETED",
+            "FAILED",
+            "CANCELLED",
+            length=30,
+        ),
+        nullable=False,
+        server_default="UPLOADED",
     )
     source_name: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     source_system: Mapped[Optional[str]] = mapped_column(
@@ -373,7 +423,7 @@ class JobFileOrm(Base):
         ForeignKey("processing_jobs.id", ondelete="CASCADE"),
         nullable=False,
     )
-    # INPUT | OUTPUT | LOG | REPORT
+    # INPUT | CATALOG | OUTPUT | LOG | REPORT
     kind: Mapped[str] = mapped_column(String(20), nullable=False)
     original_name: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     storage_path: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
@@ -382,6 +432,7 @@ class JobFileOrm(Base):
     mime_type: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     version: Mapped[int] = mapped_column(Integer, nullable=False, server_default="1")
     uploaded_by_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        "uploaded_by",
         _UuidColumn(),
         ForeignKey("users.id", ondelete="SET NULL"),
         nullable=True,
@@ -595,6 +646,7 @@ class PriceHistoryOrm(Base):
         nullable=False, server_default=func.now()
     )
     recorded_by_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        "recorded_by",
         _UuidColumn(),
         ForeignKey("users.id", ondelete="SET NULL"),
         nullable=True,
