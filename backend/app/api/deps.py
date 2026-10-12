@@ -51,45 +51,6 @@ def _get_session_factory():
         from backend.app.infra.db.session import create_all_tables
 
         create_all_tables(_engine)
-        # #region agent log
-        try:
-            import json as _json, time as _time
-            from sqlalchemy import text as _text
-            cols = []
-            if is_sqlite:
-                with _engine.connect() as _conn:
-                    cols = [r[1] for r in _conn.execute(_text("PRAGMA table_info(users)")).fetchall()]
-            open("/opt/cursor/logs/debug.log", "a").write(
-                _json.dumps(
-                    {
-                        "hypothesisId": "A",
-                        "location": "deps.py:_get_session_factory",
-                        "message": "session factory init schema",
-                        "data": {
-                            "database_url": url,
-                            "is_sqlite": is_sqlite,
-                            "users_columns": cols,
-                            "has_password_hash": "password_hash" in cols,
-                        },
-                        "timestamp": int(_time.time() * 1000),
-                    }
-                )
-                + "\n"
-            )
-        except Exception as _elog:
-            open("/opt/cursor/logs/debug.log", "a").write(
-                __import__("json").dumps(
-                    {
-                        "hypothesisId": "A",
-                        "location": "deps.py:_get_session_factory",
-                        "message": "schema inspect failed",
-                        "data": {"error": str(_elog)},
-                        "timestamp": int(__import__("time").time() * 1000),
-                    }
-                )
-                + "\n"
-            )
-        # #endregion
         _SessionLocal = sessionmaker(
             bind=_engine, autocommit=False, autoflush=False, expire_on_commit=False
         )
@@ -132,27 +93,6 @@ def get_current_user(
     db: DbDep,
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(_bearer),
 ):
-    # #region agent log
-    def _dbg(msg, data, hid="B"):
-        try:
-            import json as _json, time as _time
-
-            open("/opt/cursor/logs/debug.log", "a").write(
-                _json.dumps(
-                    {
-                        "hypothesisId": hid,
-                        "location": "deps.py:get_current_user",
-                        "message": msg,
-                        "data": data,
-                        "timestamp": int(_time.time() * 1000),
-                    }
-                )
-                + "\n"
-            )
-        except Exception:
-            pass
-
-    # #endregion
     # Prefer JWT Bearer when present
     if credentials and credentials.credentials:
         try:
@@ -161,20 +101,7 @@ def get_current_user(
 
             payload = decode_access_token(credentials.credentials)
             uid = uuid.UUID(payload["sub"])
-            # #region agent log
-            _dbg("jwt auth before db.get", {"uid": str(uid), "path": str(request.url.path)}, "B")
-            # #endregion
-            try:
-                user = db.get(UserOrm, uid)
-            except Exception as exc:
-                # #region agent log
-                _dbg(
-                    "jwt db.get failed",
-                    {"uid": str(uid), "exc_type": type(exc).__name__, "exc": str(exc)},
-                    "A",
-                )
-                # #endregion
-                raise
+            user = db.get(UserOrm, uid)
             if user and user.is_active:
                 return CurrentUser(id=user.id, email=user.email, role=user.role)
             # Token valid even if user row missing (tests)
@@ -183,16 +110,7 @@ def get_current_user(
                 email=payload.get("email", "user@cotarco.ao"),
                 role=payload.get("role", "COMERCIAL"),
             )
-        except HTTPException:
-            raise
-        except Exception as exc:
-            # #region agent log
-            _dbg(
-                "jwt auth exception",
-                {"exc_type": type(exc).__name__, "exc": str(exc)},
-                "B",
-            )
-            # #endregion
+        except Exception:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail={
@@ -211,24 +129,7 @@ def get_current_user(
             uid = uuid.UUID(x_user_id)
             from backend.app.infra.db.models import UserOrm
 
-            # #region agent log
-            _dbg(
-                "x-user-id auth before db.get",
-                {"uid": str(uid), "path": str(request.url.path)},
-                "B",
-            )
-            # #endregion
-            try:
-                user = db.get(UserOrm, uid)
-            except Exception as exc:
-                # #region agent log
-                _dbg(
-                    "x-user-id db.get failed",
-                    {"uid": str(uid), "exc_type": type(exc).__name__, "exc": str(exc)},
-                    "A",
-                )
-                # #endregion
-                raise
+            user = db.get(UserOrm, uid)
             if user and user.is_active:
                 return CurrentUser(id=user.id, email=user.email, role=user.role)
             return CurrentUser(id=uid, email="mock@cotarco.ao", role=_role_from_preset(uid))

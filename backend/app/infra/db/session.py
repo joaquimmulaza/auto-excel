@@ -250,26 +250,6 @@ def sync_sqlite_schema(engine: Engine) -> list[str]:
                 conn.execute(text(ddl))
                 added.append(f"{table.name}.{column.name}")
 
-    # #region agent log
-    try:
-        import json as _json, time as _time
-
-        open("/opt/cursor/logs/debug.log", "a").write(
-            _json.dumps(
-                {
-                    "hypothesisId": "A",
-                    "runId": "post-fix",
-                    "location": "session.py:sync_sqlite_schema",
-                    "message": "sqlite schema sync complete",
-                    "data": {"added": added, "added_count": len(added)},
-                    "timestamp": int(_time.time() * 1000),
-                }
-            )
-            + "\n"
-        )
-    except Exception:
-        pass
-    # #endregion
     return added
 
 

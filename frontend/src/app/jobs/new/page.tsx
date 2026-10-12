@@ -57,61 +57,24 @@ export default function NewJobPage() {
     setIsSubmitting(true);
     setErrorMessage(null);
 
-    // #region agent log
-    const dbg = (message: string, data: Record<string, unknown> = {}) => {
-      void fetch("/api/agent-debug", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          hypothesisId: "F",
-          location: "jobs/new/page.tsx:handleSubmit",
-          message,
-          data,
-        }),
-      }).catch(() => {});
-    };
-    // #endregion
-
     try {
       const profileId = selectedProfileId || profiles[0]?.id;
       if (!profileId) {
         throw new Error("Nenhum perfil comercial disponível. Contacte o administrador.");
       }
-      // #region agent log
-      dbg("submit start", { profileId, dryRun, fileName: file.name });
-      // #endregion
       const created = await createJob({
         profile_id: profileId,
         source_system: sourceSystem,
         description: description || `Lote ${file.name}`,
         options: { dry_run: dryRun },
       });
-      // #region agent log
-      dbg("createJob ok", { jobId: created.id });
-      // #endregion
       await uploadJobFile(created.id, file, "INPUT");
-      // #region agent log
-      dbg("upload INPUT ok", { jobId: created.id });
-      // #endregion
       if (catalogFile) {
         await uploadJobFile(created.id, catalogFile, "CATALOG");
-        // #region agent log
-        dbg("upload CATALOG ok", { jobId: created.id });
-        // #endregion
       }
       await validateJob(created.id, dryRun);
-      // #region agent log
-      dbg("validateJob ok", { jobId: created.id });
-      // #endregion
       router.push(`/jobs/${created.id}`);
     } catch (err: unknown) {
-      // #region agent log
-      dbg("submit failed", {
-        error: err instanceof Error ? err.message : String(err),
-        status: (err as { status?: number })?.status,
-        code: (err as { code?: string })?.code,
-      });
-      // #endregion
       setErrorMessage(
         err instanceof Error ? err.message : "Erro ao criar processamento"
       );
