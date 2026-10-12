@@ -35,9 +35,10 @@ Antes de implementar:
 1. Ler os docs listados no prompt (+ `agents.md`).
 2. Graphify MCP recon em `joaquimmulaza/auto-excel`.
 3. Carregar só as skills de repo da matriz (`agents.md` §11).
-4. Se UI/Stitch/frontend: **UI Skills MCP** — `list_skills` → escolher 2–4 → `get_skill` → aplicar (`agents.md` §5.1).
-5. TDD loop.
-6. Entregar handoff canónico + `UI_SKILLS_SELECTED` quando aplicável (`agents.md` §7).
+4. Se DB/API/Auth/Storage: **Supabase Skills** — `supabase` + `supabase-postgres-best-practices` (`agents.md` §5.3).
+5. Se UI/Stitch/frontend: **UI Skills MCP** — `list_skills` → escolher 2–4 → `get_skill` → aplicar (`agents.md` §5.1).
+6. TDD loop.
+7. Entregar handoff canónico + `UI_SKILLS_SELECTED` / `SUPABASE_SKILLS_USED` quando aplicável (`agents.md` §7).
 
 ## Stitch loop
 
