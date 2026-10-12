@@ -183,9 +183,11 @@ Quando gerar dados estruturados, preferir schema JSON/Pydantic/Zod.
 - Supabase PostgreSQL;
 - Supabase Auth;
 - Supabase Storage;
-- Vercel para frontend;
+- Vercel para frontend — projecto **`auto-excel`** (team `joaquim-mulazas-projects`), produção https://auto-excel-phi.vercel.app/ (nome histórico do projecto Vercel: `frontend`);
 - Cloud Run para backend;
 - GitHub Actions para CI.
+
+Agentes que usem Vercel MCP: o OAuth é project-scoped. Se `list_projects` só mostrar `boleia`, o utilizador deve reautorizar a ligação Cursor↔Vercel e conceder acesso a **`auto-excel`** (ou a todos os projectos). Ver `.notebook/phase-5-deployment.md` §8.
 
 ### IA
 

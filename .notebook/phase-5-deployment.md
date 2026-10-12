@@ -1,65 +1,92 @@
 # Fase 5 — Deploy Cloud (Vercel Production)
 
 ## 1. Visão Geral
-Deploy de produção do frontend **Cotarco Commercial Manager** na Vercel, realizado em 28/09/2026 para demonstração executiva à Direção Comercial.
+Deploy de produção do frontend **Cotarco Commercial Manager** na Vercel (projeto GitHub `joaquimmulaza/auto-excel`), usado para demonstração e validação em cloud.
 
 ---
 
-## 2. Estado Final
+## 2. Estado Actual (projecto `auto-excel`)
+
 | Item | Valor |
 |------|-------|
-| **Status** | ✅ SUCCESS (`readyState: READY`) |
-| **URL de Produção** | `https://frontend-bzba39y6y-joaquim-mulazas-projects.vercel.app` |
-| **Alias Alternativo** | `https://frontend-five-beta-69lrg2w7f9.vercel.app` |
-| **Deployment ID** | `dpl_C9RHFbtTrT8pjAvFwHizPVM769GG` |
-| **Inspect URL** | `https://vercel.com/joaquim-mulazas-projects/frontend/C9RHFbtTrT8pjAvFwHizPVM769GG` |
-| **HTTP Status** | 200 OK (341 KB HTML) |
-| **Região de Build** | Washington D.C. (iad1) |
-| **Build Machine** | 2 cores, 8 GB RAM |
+| **Status** | Produção activa (site público responde; título Cotarco Commercial Manager) |
+| **Projecto Vercel** | `auto-excel` |
+| **Team** | `joaquim-mulazas-projects` |
+| **Dashboard** | https://vercel.com/joaquim-mulazas-projects/auto-excel |
+| **URL de Produção** | https://auto-excel-phi.vercel.app/ |
+| **Exemplo de hostname de deployment** | `auto-excel-97cyq4j3i-joaquim-mulazas-projects.vercel.app` |
+| **Deployment ID (exemplo observado)** | `dpl_4Y4nECEjFqhLobTQhgPw5whQH7rG` |
+| **Último commit observado no deploy** | `acb37e1` |
+| **Root Directory** | `frontend/` (relativo ao repo `joaquimmulaza/auto-excel`) |
+| **Framework** | Next.js |
+
+> **Nota histórica:** o projecto Vercel antigo chamava-se `frontend` (URLs/aliases `frontend-*.vercel.app` e IDs `dpl_C9RH…` documentados em notas anteriores). O nome correcto actual é **`auto-excel`**, não `frontend`.
 
 ---
 
 ## 3. Configuração do Projecto Vercel
-- **Projecto:** `joaquim-mulazas-projects/frontend`
-- **Framework:** Next.js (auto-detectado)
-- **Build Command:** `next build` (padrão Next.js)
-- **Output Directory:** `.next` (Next.js default)
-- **Root Directory:** `frontend/` (relativo ao repo `joaquimmulaza/auto-excel`)
-- **GitHub:** Conectado a `https://github.com/joaquimmulaza/auto-excel`
+- **Projecto:** `joaquim-mulazas-projects/auto-excel`
+- **Framework:** Next.js
+- **Root Directory:** `frontend/`
+- **GitHub:** `https://github.com/joaquimmulaza/auto-excel`
+- **Produção:** https://auto-excel-phi.vercel.app/
+
+Não inventar `prj_*` IDs em docs enquanto o MCP/API não os devolver com OAuth correcto (ver secção 8).
 
 ---
 
 ## 4. Pré-Deploy Checklist
-- ✅ `git status` limpo — working tree sem ficheiros não comitados
-- ✅ `.env`, `.env.local` no `.gitignore` (confirmado)
-- ✅ Branch `main` sincronizada com `origin/main`
-- ✅ `npm run build` local compilado com 0 erros antes do deploy
-- ✅ `tsc --noEmit` exit code 0
+- ✅ `.env`, `.env.local` no `.gitignore`
+- ✅ Branch de produção alinhada com GitHub (`main` / commit observado no deploy)
+- ✅ Build Next.js no root `frontend/`
+- ⚠️ Env vars de API/Supabase no dashboard: validar via UI Vercel ou MCP **depois** de autorizar o projecto `auto-excel` (MCP actual pode devolver 403)
 
 ---
 
-## 5. Rotas Disponíveis na Produção
+## 5. Rotas Esperadas na Produção
 ```
-Route (app)                Size     First Load JS
-┌ ○ /                      4.7 kB   119 kB    ← Dashboard
-├ ○ /_not-found            873 B    88.1 kB
-├ ƒ /jobs/[id]             9.48 kB  124 kB    ← Revisão/Diff/RBAC
-└ ○ /jobs/new              4.39 kB  119 kB    ← Upload/Criação
-+ First Load JS shared     87.2 kB
+Route (app)
+┌ ○ /                      ← Dashboard
+├ ○ /_not-found
+├ ƒ /jobs/[id]             ← Revisão/Diff/RBAC
+└ ○ /jobs/new              ← Upload/Criação
 ```
+
+Confirmar no browser em https://auto-excel-phi.vercel.app/ (título: Cotarco Commercial Manager).
 
 ---
 
 ## 6. Gotchas & Notas
-- **Vercel CLI desatualizado:** CLI 37.14.0 falhou com "endpoint requires version 47.2.2+". Actualização para 60.1.3 resolveu.
-- **MCP Vercel:** Token não configurado no servidor MCP (`Unauthorized`). Deploy feito via CLI directamente.
-- **Security Warning Next.js 14.2.15:** Vulnerabilidade de segurança confirmada pelo npm. **Ação pendente:** Actualizar para a versão mais recente do Next.js após a demonstração executiva.
-- **Root Directory:** O `frontend/` está na raiz do monorepo `auto-excel`, não dentro de `cotarco-commercial-manager/`. A Vercel detectou correctamente o root.
+- **Nome do projecto:** docs e notebooks antigos referiam `frontend`; o projecto vivo é `auto-excel`.
+- **MCP Vercel e scope OAuth:** o servidor MCP Vercel é *project-scoped*. Com a ligação actual, `list_projects` / `get_project` / `filter_project_envs` só veem `boleia`. `web_fetch_vercel_url` em `auto-excel-phi` devolve 403 pedindo reautorização do projecto/team. Re-correr `mcp_auth` **sem** conceder acesso a `auto-excel` **não** adiciona o projecto. O site público continua a carregar sem OAuth.
+- **Security Warning Next.js:** manter patch de segurança do Next.js no radar pós-demo.
+- **Root Directory:** o `frontend/` está na raiz do monorepo `auto-excel`, não dentro de `cotarco-commercial-manager/`.
 
 ---
 
 ## 7. Próximos Passos
-1. Actualizar `next` para versão patched (segurança).
-2. Configurar domínio personalizado `cotarco-commercial-manager.vercel.app` ou similar.
-3. Adicionar variáveis de ambiente da API (`NEXT_PUBLIC_API_URL`) no dashboard Vercel.
-4. Configurar Deployment Protection para acesso restrito.
+1. Reautorizar Cursor Vercel MCP para o projecto `auto-excel` (ou todos os projectos) — ver secção 8.
+2. Após OAuth correcto: listar env vars via MCP e completar `NEXT_PUBLIC_API_URL` / backend rewrite conforme necessário.
+3. Actualizar `next` para versão patched (segurança).
+4. Domínio personalizado opcional; Deployment Protection se a demo deixar de ser pública.
+
+---
+
+## 8. Acesso de agentes via Vercel MCP (obrigatório para este projecto)
+
+OAuth do **Cursor Vercel MCP** é limitado aos projectos que o utilizador autoriza na ligação. Por isso o agente pode “não ver” `auto-excel` mesmo com o site em produção.
+
+### Porque o agente não listava `auto-excel`
+1. MCP autenticado no team `joaquim-mulazas-projects`, mas scope de projectos só inclui o que foi concedido (ex.: apenas `boleia`).
+2. `list_projects` / `get_project` / `filter_project_envs` não devolvem `auto-excel`.
+3. `web_fetch_vercel_url` no hostname de produção/deployment devolve **403** com mensagem para actualizar a ligação Vercel e autorizar o projecto/team do deployment.
+4. Repetir `mcp_auth` sem escolher `auto-excel` (ou “all projects”) **não** resolve.
+
+### Passos para o utilizador autorizar `auto-excel`
+1. Em Cursor: abrir as definições / ligações MCP e localizar **Vercel**.
+2. Desligar ou **Re-authorize / Update connection** do servidor Vercel MCP.
+3. No ecrã OAuth da Vercel, conceder acesso ao projecto **`auto-excel`** (team `joaquim-mulazas-projects`), ou a **todos os projectos** desse team.
+4. Confirmar que a ligação não fica limitada só a `boleia`.
+5. Pedir ao agente para voltar a correr `list_projects` / `get_project` — deve aparecer `auto-excel`; `web_fetch_vercel_url` em https://auto-excel-phi.vercel.app/ deve deixar de falhar por scope.
+
+Até isso, agentes devem tratar o projecto como **existente e público** (dashboard + URL acima) e **não** concluir que o projecto está ausente só porque o MCP não o lista.
