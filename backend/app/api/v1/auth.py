@@ -84,23 +84,24 @@ def ensure_demo_users(db) -> None:
     if not get_settings().is_local_auth:
         return
 
+    # IDs/emails aligned with Supabase seed (auth.users + public.users).
     seeds = [
         (
-            uuid.UUID("00000000-0000-0000-0000-000000000001"),
-            "joaquim.silva@cotarco.ao",
-            "Joaquim Silva",
+            uuid.UUID("11111111-1111-4111-8111-111111111111"),
+            "comercial@cotarco.ao",
+            "Comercial Cotarco",
             "COMERCIAL",
             "comercial123",
         ),
         (
-            uuid.UUID("00000000-0000-0000-0000-000000000002"),
-            "antonio.ferreira@cotarco.ao",
-            "António Ferreira",
+            uuid.UUID("22222222-2222-4222-8222-222222222222"),
+            "operador@cotarco.ao",
+            "Operador Cotarco",
             "OPERADOR",
             "operador123",
         ),
         (
-            uuid.UUID("00000000-0000-0000-0000-000000000003"),
+            uuid.UUID("33333333-3333-4333-8333-333333333333"),
             "admin@cotarco.ao",
             "Administrador Geral",
             "ADMIN",
@@ -110,11 +111,15 @@ def ensure_demo_users(db) -> None:
     now = datetime.now(timezone.utc)
     for uid, email, name, role, password in seeds:
         existing = db.get(UserOrm, uid)
+        if existing is None:
+            existing = (
+                db.query(UserOrm).filter(UserOrm.email == email).one_or_none()
+            )
         if existing:
             if not existing.password_hash:
                 existing.password_hash = hash_password(password)
             continue
-        db.merge(
+        db.add(
             UserOrm(
                 id=uid,
                 email=email,

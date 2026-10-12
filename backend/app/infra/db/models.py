@@ -36,10 +36,13 @@ from sqlalchemy import (
     UniqueConstraint,
     func,
 )
+from sqlalchemy.dialects.postgresql import ENUM as PgENUM
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.dialects.postgresql import UUID as PgUUID
 from sqlalchemy.types import TypeDecorator, String as SAString
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+
+_USER_ROLES = ("COMERCIAL", "OPERADOR", "ADMIN")
 
 
 # ---------------------------------------------------------------------------
@@ -85,10 +88,38 @@ class _UuidColumn(TypeDecorator):
             return value
 
 
+class _UserRoleColumn(TypeDecorator):
+    """Maps to Postgres enum ``user_role``; String(20) on SQLite (tests)."""
+
+    impl = SAString
+    cache_ok = True
+
+    def load_dialect_impl(self, dialect):
+        if dialect.name == "postgresql":
+            return dialect.type_descriptor(
+                PgENUM(*_USER_ROLES, name="user_role", create_type=False)
+            )
+        return dialect.type_descriptor(SAString(20))
+
+    def process_bind_param(self, value, dialect):
+        if value is None:
+            return value
+        text = str(value)
+        if text not in _USER_ROLES:
+            raise ValueError(f"invalid user role: {value!r}")
+        return text
+
+    def process_result_value(self, value, dialect):
+        if value is None:
+            return value
+        return str(value)
+
+
 class _PgEnumColumn(TypeDecorator):
     """Maps to an existing PostgreSQL ENUM; plain String on SQLite (tests).
 
     ``create_type=False`` — enums are owned by ``001_initial_schema.sql``.
+    Used for ``job_status`` (and similar) where values are not user_role.
     """
 
     impl = SAString
@@ -102,8 +133,6 @@ class _PgEnumColumn(TypeDecorator):
 
     def load_dialect_impl(self, dialect):
         if dialect.name == "postgresql":
-            from sqlalchemy.dialects.postgresql import ENUM as PgENUM
-
             return dialect.type_descriptor(
                 PgENUM(
                     *self.values,
@@ -142,11 +171,9 @@ class UserOrm(Base):
     email: Mapped[str] = mapped_column(Text, unique=True, nullable=False)
     display_name: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     password_hash: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    # COMERCIAL | OPERADOR | ADMIN — Postgres enum user_role (001_initial_schema)
+    # COMERCIAL | OPERADOR | ADMIN (Postgres enum user_role)
     role: Mapped[str] = mapped_column(
-        _PgEnumColumn("user_role", "COMERCIAL", "OPERADOR", "ADMIN", length=20),
-        nullable=False,
-        server_default="COMERCIAL",
+        _UserRoleColumn(), nullable=False, server_default="COMERCIAL"
     )
     is_active: Mapped[bool] = mapped_column(
         Boolean, nullable=False, server_default="true"
@@ -293,7 +320,7 @@ class ProcessingJobOrm(Base):
     __tablename__ = "processing_jobs"
     __table_args__ = (
         Index("idx_jobs_profile_status", "profile_id", "status"),
-        # Must use DB column name (mapped_column name="created_by").
+        # DB column is created_by (ORM attr created_by_id)
         Index("idx_jobs_created_by", "created_by", "created_at"),
     )
 

@@ -208,9 +208,17 @@ class TestEngineConnectivity:
         from sqlalchemy import text
         from backend.app.services.bootstrap import bootstrap_database
 
+        import os
+
+        from backend.app.core.settings import get_settings
+
+        # Demo seed IDs/emails from ensure_demo_users (aligned with Supabase).
+        uid = "11111111-1111-4111-8111-111111111111"
+        email = "comercial@cotarco.ao"
+        display_name = "Comercial Cotarco"
+
         db_path = tmp_path / "stale-cotarco.db"
         eng = create_db_engine(url=f"sqlite+pysqlite:///{db_path}")
-        uid = "00000000-0000-0000-0000-000000000001"
         with eng.begin() as conn:
             conn.execute(
                 text(
@@ -236,8 +244,8 @@ class TestEngineConnectivity:
                 ),
                 {
                     "id": uid,
-                    "email": "joaquim.silva@cotarco.ao",
-                    "name": "Joaquim Silva",
+                    "email": email,
+                    "name": display_name,
                 },
             )
 
@@ -262,15 +270,25 @@ class TestEngineConnectivity:
         SessionFactory = sessionmaker(
             bind=eng, autocommit=False, autoflush=False, expire_on_commit=False
         )
-        with SessionFactory() as sess:
-            user = sess.get(UserOrm, uuid.UUID(uid))
-            assert user is not None
-            assert user.email == "joaquim.silva@cotarco.ao"
-            assert user.display_name == "Joaquim Silva"
-            bootstrap_database(sess)
-            user = sess.get(UserOrm, uuid.UUID(uid))
-            assert user is not None
-            assert user.password_hash  # seeded by ensure_demo_users
+        prev_auth = os.environ.get("AUTH_MODE")
+        os.environ["AUTH_MODE"] = "local"
+        get_settings.cache_clear()
+        try:
+            with SessionFactory() as sess:
+                user = sess.get(UserOrm, uuid.UUID(uid))
+                assert user is not None
+                assert user.email == email
+                assert user.display_name == display_name
+                bootstrap_database(sess)
+                user = sess.get(UserOrm, uuid.UUID(uid))
+                assert user is not None
+                assert user.password_hash  # seeded by ensure_demo_users
+        finally:
+            if prev_auth is None:
+                os.environ.pop("AUTH_MODE", None)
+            else:
+                os.environ["AUTH_MODE"] = prev_auth
+            get_settings.cache_clear()
 
         eng.dispose()
 
