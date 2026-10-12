@@ -9,8 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle, LogIn } from "lucide-react";
 
 const DEMO_ACCOUNTS = [
-  { email: "joaquim.silva@cotarco.ao", password: "comercial123", label: "Comercial" },
-  { email: "antonio.ferreira@cotarco.ao", password: "operador123", label: "Operador" },
+  { email: "comercial@cotarco.ao", password: "comercial123", label: "Comercial" },
+  { email: "operador@cotarco.ao", password: "operador123", label: "Operador" },
   { email: "admin@cotarco.ao", password: "admin123", label: "Admin" },
 ];
 
