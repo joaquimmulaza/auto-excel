@@ -115,6 +115,34 @@ class _UserRoleColumn(TypeDecorator):
         return str(value)
 
 
+class _PgEnumColumn(TypeDecorator):
+    """Maps to an existing PostgreSQL ENUM; plain String on SQLite (tests).
+
+    ``create_type=False`` — enums are owned by ``001_initial_schema.sql``.
+    Used for ``job_status`` (and similar) where values are not user_role.
+    """
+
+    impl = SAString
+    cache_ok = True
+
+    def __init__(self, enum_name: str, *values: str, length: int = 30):
+        super().__init__(length)
+        self.enum_name = enum_name
+        self.values = values
+        self._length = length
+
+    def load_dialect_impl(self, dialect):
+        if dialect.name == "postgresql":
+            return dialect.type_descriptor(
+                PgENUM(
+                    *self.values,
+                    name=self.enum_name,
+                    create_type=False,
+                )
+            )
+        return dialect.type_descriptor(SAString(self._length))
+
+
 # ---------------------------------------------------------------------------
 # Base
 # ---------------------------------------------------------------------------
@@ -309,6 +337,7 @@ class ProcessingJobOrm(Base):
         ForeignKey("commercial_profiles.id", ondelete="RESTRICT"),
         nullable=False,
     )
+    # Postgres DDL uses created_by / approved_by (001_initial_schema.sql)
     created_by_id: Mapped[uuid.UUID] = mapped_column(
         "created_by",
         _UuidColumn(),
@@ -321,9 +350,23 @@ class ProcessingJobOrm(Base):
         ForeignKey("users.id", ondelete="SET NULL"),
         nullable=True,
     )
-    # job_status enum values (enforced by DB CHECK or enum type in production)
+    # Postgres enum job_status (001_initial_schema.sql)
     status: Mapped[str] = mapped_column(
-        String(30), nullable=False, server_default="UPLOADED"
+        _PgEnumColumn(
+            "job_status",
+            "UPLOADED",
+            "VALIDATING",
+            "READY_FOR_REVIEW",
+            "NEEDS_CORRECTION",
+            "APPROVED",
+            "PROCESSING",
+            "COMPLETED",
+            "FAILED",
+            "CANCELLED",
+            length=30,
+        ),
+        nullable=False,
+        server_default="UPLOADED",
     )
     source_name: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     source_system: Mapped[Optional[str]] = mapped_column(
@@ -407,7 +450,7 @@ class JobFileOrm(Base):
         ForeignKey("processing_jobs.id", ondelete="CASCADE"),
         nullable=False,
     )
-    # INPUT | OUTPUT | LOG | REPORT
+    # INPUT | CATALOG | OUTPUT | LOG | REPORT
     kind: Mapped[str] = mapped_column(String(20), nullable=False)
     original_name: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     storage_path: Mapped[Optional[str]] = mapped_column(Text, nullable=True)

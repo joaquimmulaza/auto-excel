@@ -180,6 +180,118 @@ class TestEngineConnectivity:
             f"Missing tables: {expected - existing}"
         )
 
+    def test_orm_fk_column_names_match_postgres_ddl(self):
+        """ORM attrs *_id must map to Postgres names without _id suffix.
+
+        Regresses Vercel production 500:
+        UndefinedColumn: column processing_jobs.created_by_id does not exist
+        (HINT: processing_jobs.created_by).
+        """
+        from sqlalchemy import inspect as sa_inspect
+
+        def col_name(model, attr: str) -> str:
+            return sa_inspect(model).columns[attr].name
+
+        assert col_name(ProcessingJobOrm, "created_by_id") == "created_by"
+        assert col_name(ProcessingJobOrm, "approved_by_id") == "approved_by"
+        assert col_name(JobFileOrm, "uploaded_by_id") == "uploaded_by"
+        assert col_name(PriceHistoryOrm, "recorded_by_id") == "recorded_by"
+        assert col_name(ProfileRuleOrm, "created_by_id") == "created_by"
+        assert col_name(AuditLogOrm, "extra_metadata") == "metadata"
+
+    def test_sqlite_sync_adds_password_hash_without_wiping_users(self, tmp_path):
+        """Stale SQLite users (pre-password_hash) are upgraded in place.
+
+        Regresses: OperationalError no such column users.password_hash on
+        bootstrap / Validar Ficheiro when create_all alone left old files untouched.
+        """
+        from sqlalchemy import text
+        from backend.app.services.bootstrap import bootstrap_database
+
+        import os
+
+        from backend.app.core.settings import get_settings
+
+        # Demo seed IDs/emails from ensure_demo_users (aligned with Supabase).
+        uid = "11111111-1111-4111-8111-111111111111"
+        email = "comercial@cotarco.ao"
+        display_name = "Comercial Cotarco"
+
+        db_path = tmp_path / "stale-cotarco.db"
+        eng = create_db_engine(url=f"sqlite+pysqlite:///{db_path}")
+        with eng.begin() as conn:
+            conn.execute(
+                text(
+                    """
+                    CREATE TABLE users (
+                        id VARCHAR(36) NOT NULL PRIMARY KEY,
+                        email TEXT NOT NULL UNIQUE,
+                        display_name TEXT,
+                        role VARCHAR(20) NOT NULL DEFAULT 'COMERCIAL',
+                        is_active BOOLEAN NOT NULL DEFAULT 'true',
+                        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                        updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+                    )
+                    """
+                )
+            )
+            conn.execute(
+                text(
+                    """
+                    INSERT INTO users (id, email, display_name, role, is_active)
+                    VALUES (:id, :email, :name, 'COMERCIAL', 1)
+                    """
+                ),
+                {
+                    "id": uid,
+                    "email": email,
+                    "name": display_name,
+                },
+            )
+
+        cols_before = {
+            r[1]
+            for r in eng.connect()
+            .execute(text("PRAGMA table_info(users)"))
+            .fetchall()
+        }
+        assert "password_hash" not in cols_before
+
+        create_all_tables(eng)
+
+        cols_after = {
+            r[1]
+            for r in eng.connect()
+            .execute(text("PRAGMA table_info(users)"))
+            .fetchall()
+        }
+        assert "password_hash" in cols_after
+
+        SessionFactory = sessionmaker(
+            bind=eng, autocommit=False, autoflush=False, expire_on_commit=False
+        )
+        prev_auth = os.environ.get("AUTH_MODE")
+        os.environ["AUTH_MODE"] = "local"
+        get_settings.cache_clear()
+        try:
+            with SessionFactory() as sess:
+                user = sess.get(UserOrm, uuid.UUID(uid))
+                assert user is not None
+                assert user.email == email
+                assert user.display_name == display_name
+                bootstrap_database(sess)
+                user = sess.get(UserOrm, uuid.UUID(uid))
+                assert user is not None
+                assert user.password_hash  # seeded by ensure_demo_users
+        finally:
+            if prev_auth is None:
+                os.environ.pop("AUTH_MODE", None)
+            else:
+                os.environ["AUTH_MODE"] = prev_auth
+            get_settings.cache_clear()
+
+        eng.dispose()
+
 
 # =============================================================================
 # Tests: UserOrm
