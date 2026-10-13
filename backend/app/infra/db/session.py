@@ -82,8 +82,10 @@ def create_db_engine(
     extra_kwargs: dict = {}
 
     if is_sqlite:
-        # SQLite requires check_same_thread=False for multi-threaded usage
+        # SQLite requires check_same_thread=False for multi-threaded usage.
+        # timeout (seconds) reduces "database is locked" under concurrent requests.
         connect_args["check_same_thread"] = False
+        connect_args["timeout"] = 30
     else:
         extra_kwargs = {
             "pool_size": pool_size,
