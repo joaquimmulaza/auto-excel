@@ -43,41 +43,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           code === "INVALID_TOKEN" ||
           code === "NOT_AUTHENTICATED" ||
           code === "INVALID_CREDENTIALS";
-        // #region agent log
-        try {
-          const base =
-            typeof window !== "undefined" &&
-            window.location.hostname !== "localhost" &&
-            window.location.hostname !== "127.0.0.1"
-              ? `${window.location.origin}/api/v1`
-              : process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
-                "http://localhost:8000/api/v1";
-          fetch(`${base}/__debug/agent-log`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              hypothesisId: "C",
-              location: "AuthContext.tsx:fetchMe:catch",
-              message: isAuthFailure
-                ? "clearing token after auth failure"
-                : "keeping token after non-auth fetchMe failure",
-              data: {
-                errMessage: err instanceof Error ? err.message : String(err),
-                errCode: code,
-                errStatus: status,
-                isAuthFailure,
-                hadToken: !!getStoredToken(),
-                tokenLen: getStoredToken()?.length ?? 0,
-                runId: "post-fix",
-              },
-              timestamp: Date.now(),
-            }),
-            keepalive: true,
-          }).catch(() => {});
-        } catch {
-          /* ignore */
-        }
-        // #endregion
         // Only wipe session on real auth failures — not network/5xx/DB blips.
         if (isAuthFailure) {
           setStoredToken(null);

@@ -44,21 +44,6 @@ async def upload_file(
     kind: str = "INPUT",
     file: UploadFile = File(...),
 ):
-    # #region agent log
-    from backend.app.debug_agent_log import agent_log
-
-    agent_log(
-        hypothesis_id="A,D",
-        location="files.py:upload_file:entry",
-        message="upload after auth",
-        data={
-            "job_id": str(job_id),
-            "user_id": str(current_user.id),
-            "kind": kind,
-            "filename": file.filename,
-        },
-    )
-    # #endregion
     kind = kind.upper()
     if kind not in ALLOWED_KINDS:
         raise HTTPException(

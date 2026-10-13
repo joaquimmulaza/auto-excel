@@ -4,6 +4,7 @@ import os
 import uuid
 from typing import Annotated, Generator, Optional
 
+import jwt
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy import create_engine, event
@@ -96,26 +97,7 @@ def get_current_user(
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(_bearer),
 ):
     # Prefer JWT Bearer when present
-    # #region agent log
-    from backend.app.debug_agent_log import agent_log
-
-    _tok = (credentials.credentials if credentials and credentials.credentials else "") or ""
-    agent_log(
-        hypothesis_id="A,B,D,E",
-        location="deps.py:get_current_user:entry",
-        message="auth entry",
-        data={
-            "path": str(request.url.path),
-            "method": request.method,
-            "has_bearer": bool(_tok),
-            "token_len": len(_tok),
-            "token_prefix": _tok[:12] if _tok else None,
-            "has_x_user_id": bool(request.headers.get("x-user-id")),
-        },
-    )
-    # #endregion
     if credentials and credentials.credentials:
-        import jwt
         from backend.app.services.auth_tokens import decode_access_token
         from backend.app.infra.db.models import UserOrm
 
@@ -125,21 +107,6 @@ def get_current_user(
             payload = decode_access_token(credentials.credentials)
             uid = uuid.UUID(payload["sub"])
         except (jwt.PyJWTError, ValueError, KeyError, TypeError) as exc:
-            # #region agent log
-            agent_log(
-                hypothesis_id="A,B,E",
-                location="deps.py:get_current_user:INVALID_TOKEN",
-                message="raising INVALID_TOKEN",
-                data={
-                    "path": str(request.url.path),
-                    "exc_type": type(exc).__name__,
-                    "exc_msg": str(exc)[:300],
-                    "token_len": len(credentials.credentials),
-                    "token_prefix": credentials.credentials[:12],
-                    "runId": "post-fix",
-                },
-            )
-            # #endregion
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail={
@@ -151,71 +118,15 @@ def get_current_user(
                 },
             ) from exc
 
-        # #region agent log
-        agent_log(
-            hypothesis_id="A,B",
-            location="deps.py:get_current_user:decoded",
-            message="jwt decoded ok, looking up user",
-            data={
-                "path": str(request.url.path),
-                "sub": str(uid),
-                "role": payload.get("role"),
-                "exp": payload.get("exp"),
-                "iat": payload.get("iat"),
-                "runId": "post-fix",
-            },
-        )
-        # #endregion
-
         try:
             user = db.get(UserOrm, uid)
-        except Exception as exc:
-            # #region agent log
-            agent_log(
-                hypothesis_id="B",
-                location="deps.py:get_current_user:db_lookup_failed",
-                message="db lookup failed; falling back to JWT claims",
-                data={
-                    "path": str(request.url.path),
-                    "exc_type": type(exc).__name__,
-                    "exc_msg": str(exc)[:300],
-                    "sub": str(uid),
-                    "runId": "post-fix",
-                },
-            )
-            # #endregion
+        except Exception:
             user = None
 
         if user and user.is_active:
-            # #region agent log
-            agent_log(
-                hypothesis_id="A,B",
-                location="deps.py:get_current_user:success_db",
-                message="auth ok via db user",
-                data={
-                    "path": str(request.url.path),
-                    "user_id": str(user.id),
-                    "role": user.role,
-                    "runId": "post-fix",
-                },
-            )
-            # #endregion
             return CurrentUser(id=user.id, email=user.email, role=user.role)
 
         # Token valid even if user row missing, inactive, or DB transiently unavailable
-        # #region agent log
-        agent_log(
-            hypothesis_id="A,B",
-            location="deps.py:get_current_user:success_payload",
-            message="auth ok via token payload (user missing/inactive/db skip)",
-            data={
-                "path": str(request.url.path),
-                "user_found": user is not None,
-                "is_active": getattr(user, "is_active", None),
-                "runId": "post-fix",
-            },
-        )
-        # #endregion
         return CurrentUser(
             id=uid,
             email=payload.get("email", "user@cotarco.ao"),
@@ -236,14 +147,6 @@ def get_current_user(
         except ValueError:
             pass
 
-    # #region agent log
-    agent_log(
-        hypothesis_id="C,D",
-        location="deps.py:get_current_user:NOT_AUTHENTICATED",
-        message="no bearer and no x-user-id",
-        data={"path": str(request.url.path)},
-    )
-    # #endregion
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail={

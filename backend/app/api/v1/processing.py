@@ -56,21 +56,6 @@ def trigger_validate(
     dry_run: bool | None = Query(default=None),
 ):
     """Run domain engine against uploaded files and persist preview results."""
-    # #region agent log
-    from backend.app.debug_agent_log import agent_log
-
-    agent_log(
-        hypothesis_id="A,D",
-        location="processing.py:trigger_validate:entry",
-        message="validate after auth",
-        data={
-            "job_id": str(job_id),
-            "user_id": str(current_user.id),
-            "role": current_user.role,
-            "dry_run": dry_run,
-        },
-    )
-    # #endregion
     repo = JobRepository(db)
     job = _get_job_or_404(job_id, repo)
     _check_access(job, current_user)

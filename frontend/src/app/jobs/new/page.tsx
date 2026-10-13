@@ -57,46 +57,6 @@ export default function NewJobPage() {
     setIsSubmitting(true);
     setErrorMessage(null);
 
-    // #region agent log
-    const _dbg = (location: string, message: string, data: Record<string, unknown> = {}) => {
-      try {
-        const token =
-          typeof window !== "undefined" ? localStorage.getItem("ccm_access_token") : null;
-        const base =
-          typeof window !== "undefined" &&
-          window.location.hostname !== "localhost" &&
-          window.location.hostname !== "127.0.0.1"
-            ? `${window.location.origin}/api/v1`
-            : process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
-              "http://localhost:8000/api/v1";
-        fetch(`${base}/__debug/agent-log`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            hypothesisId: "C,D",
-            location,
-            message,
-            data: {
-              ...data,
-              hasToken: !!token,
-              tokenLen: token?.length ?? 0,
-              tokenPrefix: token?.slice(0, 12) ?? null,
-            },
-            timestamp: Date.now(),
-          }),
-          keepalive: true,
-        }).catch(() => {});
-      } catch {
-        /* ignore */
-      }
-    };
-    _dbg("jobs/new/page.tsx:handleSubmit:start", "submit started", {
-      dryRun,
-      hasFile: !!file,
-      hasCatalog: !!catalogFile,
-    });
-    // #endregion
-
     try {
       const profileId = selectedProfileId || profiles[0]?.id;
       if (!profileId) {
@@ -108,29 +68,13 @@ export default function NewJobPage() {
         description: description || `Lote ${file.name}`,
         options: { dry_run: dryRun },
       });
-      // #region agent log
-      _dbg("jobs/new/page.tsx:handleSubmit:created", "job created", { jobId: created.id });
-      // #endregion
       await uploadJobFile(created.id, file, "INPUT");
-      // #region agent log
-      _dbg("jobs/new/page.tsx:handleSubmit:uploaded", "input uploaded", { jobId: created.id });
-      // #endregion
       if (catalogFile) {
         await uploadJobFile(created.id, catalogFile, "CATALOG");
       }
       await validateJob(created.id, dryRun);
-      // #region agent log
-      _dbg("jobs/new/page.tsx:handleSubmit:validated", "validate ok", { jobId: created.id });
-      // #endregion
       router.push(`/jobs/${created.id}`);
     } catch (err: unknown) {
-      // #region agent log
-      _dbg("jobs/new/page.tsx:handleSubmit:catch", "submit failed", {
-        errMessage: err instanceof Error ? err.message : String(err),
-        errCode: (err as { code?: string; status?: number })?.code,
-        errStatus: (err as { status?: number })?.status,
-      });
-      // #endregion
       setErrorMessage(
         err instanceof Error ? err.message : "Erro ao criar processamento"
       );
