@@ -121,6 +121,7 @@ def get_current_user(
         try:
             user = db.get(UserOrm, uid)
         except Exception:
+            db.rollback()
             user = None
 
         if user and user.is_active:
