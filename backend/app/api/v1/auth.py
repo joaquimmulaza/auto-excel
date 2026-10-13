@@ -48,6 +48,22 @@ def login(payload: LoginRequest, db: DbDep):
             },
         )
     token = create_access_token(user_id=user.id, email=user.email, role=user.role)
+    # #region agent log
+    from backend.app.debug_agent_log import agent_log
+
+    agent_log(
+        hypothesis_id="A,C,E",
+        location="auth.py:login:success",
+        message="login issued token",
+        data={
+            "user_id": str(user.id),
+            "email": user.email,
+            "role": user.role,
+            "token_len": len(token),
+            "token_prefix": token[:12],
+        },
+    )
+    # #endregion
     return LoginResponse(
         access_token=token,
         user={

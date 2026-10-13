@@ -35,7 +35,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     fetchMe()
       .then(setUser)
-      .catch(() => {
+      .catch((err) => {
+        // #region agent log
+        try {
+          const base =
+            typeof window !== "undefined" &&
+            window.location.hostname !== "localhost" &&
+            window.location.hostname !== "127.0.0.1"
+              ? `${window.location.origin}/api/v1`
+              : process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
+                "http://localhost:8000/api/v1";
+          fetch(`${base}/__debug/agent-log`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              hypothesisId: "C",
+              location: "AuthContext.tsx:fetchMe:catch",
+              message: "clearing token after fetchMe failure",
+              data: {
+                errMessage: err instanceof Error ? err.message : String(err),
+                errCode: (err as { code?: string })?.code,
+                hadToken: !!getStoredToken(),
+                tokenLen: getStoredToken()?.length ?? 0,
+              },
+              timestamp: Date.now(),
+            }),
+            keepalive: true,
+          }).catch(() => {});
+        } catch {
+          /* ignore */
+        }
+        // #endregion
         setStoredToken(null);
         setUser(null);
       })

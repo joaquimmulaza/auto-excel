@@ -21,6 +21,40 @@ import {
 
 const TOKEN_KEY = "ccm_access_token";
 
+// #region agent log
+function agentDebugLog(
+  hypothesisId: string,
+  location: string,
+  message: string,
+  data: Record<string, unknown> = {}
+): void {
+  if (typeof window === "undefined") return;
+  const token = localStorage.getItem(TOKEN_KEY);
+  const body = JSON.stringify({
+    hypothesisId,
+    location,
+    message,
+    data: {
+      ...data,
+      hasToken: !!token,
+      tokenLen: token ? token.length : 0,
+      tokenPrefix: token ? token.slice(0, 12) : null,
+    },
+    timestamp: Date.now(),
+  });
+  try {
+    fetch(`${getApiBaseUrl()}/__debug/agent-log`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body,
+      keepalive: true,
+    }).catch(() => {});
+  } catch {
+    /* ignore */
+  }
+}
+// #endregion
+
 /**
  * Resolve API base URL.
  * - Explicit NEXT_PUBLIC_API_URL wins
@@ -94,12 +128,30 @@ function networkError(err: unknown): ApiError {
 
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   try {
+    // #region agent log
+    agentDebugLog("C,D", "api.ts:apiFetch:before", "outgoing request", {
+      path,
+      method: init?.method || "GET",
+    });
+    // #endregion
     const res = await fetch(`${getApiBaseUrl()}${path}`, {
       ...init,
       headers: getAuthHeaders(init?.headers),
       cache: "no-store",
     });
-    if (!res.ok) throw await parseError(res);
+    if (!res.ok) {
+      const err = await parseError(res);
+      // #region agent log
+      agentDebugLog("A,C,D", "api.ts:apiFetch:error", "request failed", {
+        path,
+        method: init?.method || "GET",
+        status: res.status,
+        code: err.code,
+        message: err.message,
+      });
+      // #endregion
+      throw err;
+    }
     if (res.status === 204) return undefined as T;
     return res.json();
   } catch (err) {
@@ -190,6 +242,14 @@ export async function uploadJobFile(
 ): Promise<{ id: string; kind: string; original_name: string; sha256: string }> {
   const form = new FormData();
   form.append("file", file);
+  // #region agent log
+  agentDebugLog("C,D", "api.ts:uploadJobFile:before", "upload starting", {
+    jobId,
+    kind,
+    filename: file.name,
+    size: file.size,
+  });
+  // #endregion
   const res = await fetch(
     `${getApiBaseUrl()}/jobs/${jobId}/files?kind=${encodeURIComponent(kind)}`,
     {
@@ -198,7 +258,19 @@ export async function uploadJobFile(
       body: form,
     }
   );
-  if (!res.ok) throw await parseError(res);
+  if (!res.ok) {
+    const err = await parseError(res);
+    // #region agent log
+    agentDebugLog("A,C,D", "api.ts:uploadJobFile:error", "upload failed", {
+      jobId,
+      kind,
+      status: res.status,
+      code: err.code,
+      message: err.message,
+    });
+    // #endregion
+    throw err;
+  }
   return res.json();
 }
 

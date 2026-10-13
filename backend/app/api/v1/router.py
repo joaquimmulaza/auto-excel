@@ -5,6 +5,7 @@ from backend.app.api.v1 import (
     ai,
     approvals,
     auth,
+    debug_agent,
     files,
     history,
     jobs,
@@ -21,3 +22,6 @@ v1_router.include_router(processing.router)
 v1_router.include_router(approvals.router)
 v1_router.include_router(ai.router)
 v1_router.include_router(history.router)
+# #region agent log
+v1_router.include_router(debug_agent.router)
+# #endregion
