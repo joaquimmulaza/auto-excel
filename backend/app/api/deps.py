@@ -4,6 +4,7 @@ import os
 import uuid
 from typing import Annotated, Generator, Optional
 
+import jwt
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy import create_engine, event
@@ -26,7 +27,9 @@ def _get_session_factory():
         is_sqlite = url.startswith("sqlite")
         if is_mem:
             _engine = create_engine(
-                url, connect_args={"check_same_thread": False}, poolclass=StaticPool
+                url,
+                connect_args={"check_same_thread": False, "timeout": 30},
+                poolclass=StaticPool,
             )
 
             @event.listens_for(_engine, "connect")
@@ -95,22 +98,15 @@ def get_current_user(
 ):
     # Prefer JWT Bearer when present
     if credentials and credentials.credentials:
-        try:
-            from backend.app.services.auth_tokens import decode_access_token
-            from backend.app.infra.db.models import UserOrm
+        from backend.app.services.auth_tokens import decode_access_token
+        from backend.app.infra.db.models import UserOrm
 
+        # Only JWT / claim parse failures map to INVALID_TOKEN.
+        # DB lookup errors must NOT be masked as auth failures (SQLite lock etc.).
+        try:
             payload = decode_access_token(credentials.credentials)
             uid = uuid.UUID(payload["sub"])
-            user = db.get(UserOrm, uid)
-            if user and user.is_active:
-                return CurrentUser(id=user.id, email=user.email, role=user.role)
-            # Token valid even if user row missing (tests)
-            return CurrentUser(
-                id=uid,
-                email=payload.get("email", "user@cotarco.ao"),
-                role=payload.get("role", "COMERCIAL"),
-            )
-        except Exception:
+        except (jwt.PyJWTError, ValueError, KeyError, TypeError) as exc:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail={
@@ -120,7 +116,22 @@ def get_current_user(
                         "request_id": "",
                     }
                 },
-            )
+            ) from exc
+
+        try:
+            user = db.get(UserOrm, uid)
+        except Exception:
+            user = None
+
+        if user and user.is_active:
+            return CurrentUser(id=user.id, email=user.email, role=user.role)
+
+        # Token valid even if user row missing, inactive, or DB transiently unavailable
+        return CurrentUser(
+            id=uid,
+            email=payload.get("email", "user@cotarco.ao"),
+            role=payload.get("role", "COMERCIAL"),
+        )
 
     # Dev / test header fallback
     x_user_id = request.headers.get("x-user-id")

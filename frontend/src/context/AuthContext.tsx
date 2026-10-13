@@ -35,9 +35,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     fetchMe()
       .then(setUser)
-      .catch(() => {
-        setStoredToken(null);
-        setUser(null);
+      .catch((err) => {
+        const status = (err as { status?: number })?.status;
+        const code = (err as { code?: string })?.code;
+        const isAuthFailure =
+          status === 401 ||
+          code === "INVALID_TOKEN" ||
+          code === "NOT_AUTHENTICATED" ||
+          code === "INVALID_CREDENTIALS";
+        // Only wipe session on real auth failures — not network/5xx/DB blips.
+        if (isAuthFailure) {
+          setStoredToken(null);
+          setUser(null);
+        }
       })
       .finally(() => setLoading(false));
   }, []);
